@@ -24,7 +24,7 @@ public class AssetSync : MonoBehaviour {
 	
 	public GameObject b612;
 	public static string me = "";
-	public static Hashtable Others;
+	public static Hashtable Others; // other players' ccnx name and content
 	
 	public static int counter_for_run = 0;
 	
@@ -178,16 +178,16 @@ public class AssetSync : MonoBehaviour {
             break;
     	}
             
-		Egal.ccn_set_run_timeout(h, 0);
 		
 		return res;
 	}
+	
 	
 	static void ReadFromRepo(string dst)
 	{
 		print("Reading from the repo.");
 		IntPtr ccn = GetHandle();
-		int res = 0;
+		
 		IntPtr nm = Egal.ccn_charbuf_create();
 		Egal.ccn_name_from_uri(nm,dst);
 		Egal.ccn_create_version(ccn, nm, VersioningFlags.CCN_V_LOW, 0, 0); // without version, Unity crashes!
@@ -445,16 +445,6 @@ public class AssetSync : MonoBehaviour {
 		
 		WriteToRepo(name, content);
 	
-		
-	}
-	
-	
-	Upcall.ccn_upcall_res PublishState(IntPtr selfp,
-                                        Upcall.ccn_upcall_kind kind,
-                                        IntPtr info)
-	{
-		print ("Publish State...");
-		return Upcall.ccn_upcall_res.CCN_UPCALL_RESULT_OK;
 		
 	}
 	
