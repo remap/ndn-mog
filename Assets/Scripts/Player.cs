@@ -7,6 +7,7 @@ public class Player : MonoBehaviour {
 	
 	public Vector2 scrollPosition = Vector2.zero;
 	public static float radius = 100;
+	public Vector3 player_pos = new Vector3(0, 0, 0);
 	
 	void Start()
 	{
@@ -21,8 +22,8 @@ public class Player : MonoBehaviour {
 		float pos_x = radius * Mathf.Sin(theta);
 		float pos_y = 0;
 		float pos_z = radius * Mathf.Cos(theta);
-		Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
-		transform.position = pos;
+		player_pos = new Vector3(pos_x, pos_y, pos_z);
+		transform.position = player_pos;
 	}
 	
 	void WritePlayerToRepo()
@@ -51,14 +52,16 @@ public class Player : MonoBehaviour {
 		int count = AssetSync.Others.Count+1;
 		
 		scrollPosition = GUI.BeginScrollView(new Rect(5, 5, Screen.width-5, Screen.height-5), scrollPosition, new Rect(0, 0, Screen.width, Screen.height*count/10));
-		GUILayout.Label ("My name is: "+AssetSync.me);
-		GUILayout.Label ("The current number of players (including myself) in the game is: " + count);
-		GUILayout.Label ("The other players' names are: ");
+		GUILayout.Label("Number of Players: " + count);
+		GUILayout.Label ("List of Players: ");
+		GUILayout.Label (AssetSync.me + ": " + player_pos.x + ", " + player_pos.y + ", " + player_pos.z + " (this is me)");
 		ICollection keys = AssetSync.Others.Keys;
-		IEnumerator inum = keys.GetEnumerator();
-		while(inum.MoveNext())
+		IEnumerator kinum = keys.GetEnumerator();
+		ICollection values = AssetSync.Others.Values;
+		IEnumerator vinum = values.GetEnumerator();
+		while(kinum.MoveNext() && vinum.MoveNext())
 		{
-			GUILayout.Label("" + inum.Current);
+			GUILayout.Label("" + kinum.Current + ": " + vinum.Current);
 		}
 		 GUI.EndScrollView();
 		

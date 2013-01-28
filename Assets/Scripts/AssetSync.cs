@@ -151,31 +151,36 @@ public class AssetSync : MonoBehaviour {
 		Info = (Egal.ccn_upcall_info)Marshal.PtrToStructure(info, typeof(Egal.ccn_upcall_info));
 		IntPtr h=Info.h;
 		
-		/*
+		// get name of content object from self->data->nm ... phew!
 		Egal.ccn_closure Selfp = new Egal.ccn_closure();
 		Selfp = (Egal.ccn_closure)Marshal.PtrToStructure(selfp, typeof(Egal.ccn_closure));
-		IntPtr name = Selfp.data;
-		String Name = Marshal.PtrToStringAnsi(name);
-		print (Name);
-		*/
+		NormalStruct Data = new NormalStruct();
+		Data = (NormalStruct) Marshal.PtrToStructure(Selfp.data, typeof(NormalStruct));	
+		IntPtr uri = Egal.ccn_charbuf_create();
+		Egal.ccn_charbuf Name = (Egal.ccn_charbuf)Marshal.PtrToStructure(Data.nm, typeof(Egal.ccn_charbuf));
+		Egal.ccn_uri_append(uri, Name.buf, Name.length, 1);
+		IntPtr temp = Egal.ccn_charbuf_as_string(uri);
+		String PlayerName = Marshal.PtrToStringAnsi(temp);
+		String ShortPlayerName = NameTrim(PlayerName);
+		//print (PlayerName);
+		
 		
 		switch (kind) {
         case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT:
             //print("ReadCallback: CCN_UPCALL_CONTENT");
-			IntPtr source_ptr = Info.content_ccnb;
 			
+			// get human-readable content
+			IntPtr source_ptr = Info.content_ccnb;
 			Egal.ccn_parsed_ContentObject Pco = new Egal.ccn_parsed_ContentObject();
 			Pco = (Egal.ccn_parsed_ContentObject)Marshal.PtrToStructure(Info.content_ccnb, typeof(Egal.ccn_parsed_ContentObject));
-			
 			UInt16 source_length = Pco.offset[(int)PCO.ccn_parsed_content_object_offsetid.CCN_PCO_E];
-			
 			IntPtr result_ptr = IntPtr.Zero;
 			int result_length = 0;
             Egal.ccn_content_get_value(source_ptr, source_length, Info.pco, ref result_ptr, ref result_length);
-            
 			String content = Marshal.PtrToStringAnsi(result_ptr);
-			//print(content);
+			print(ShortPlayerName + ": " +  content);
 			
+			Others[ShortPlayerName] = content;
 			
 			break;
 		case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:
@@ -201,7 +206,10 @@ public class AssetSync : MonoBehaviour {
 		Egal.ccn_create_version(ccn, nm, VersioningFlags.CCN_V_LOW, 0, 0); // without version, Unity crashes!
 		//CCN_V_LOW might be right, might not!
 		
-		String Data = dst;
+		// I need to include name in the closure
+		// because readcallback will need this name
+		// and I don't know how to parse content object yet
+		NormalStruct Data = new NormalStruct(nm, IntPtr.Zero, IntPtr.Zero, 0, "");
 		IntPtr pData = Marshal.AllocHGlobal(Marshal.SizeOf(Data));
 		Marshal.StructureToPtr(Data, pData, true);
 		
