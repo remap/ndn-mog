@@ -23,6 +23,7 @@ public class AssetSync : MonoBehaviour {
 	Thread oThread;
 	
 	public GameObject b612;
+	//public static float radius = 100;
 	public static string me = "";
 	public static Hashtable Others; // other players' ccnx name and content
 	
@@ -42,8 +43,6 @@ public class AssetSync : MonoBehaviour {
 		print("WriteSlice returned: " + res);
 		
 		WatchOverRepo(prefix, topo);
-		
-		AsteroidToRepo();
 		
     	// RegisterInterestFilter(h, me + "/state");
     
@@ -152,6 +151,14 @@ public class AssetSync : MonoBehaviour {
 		Info = (Egal.ccn_upcall_info)Marshal.PtrToStructure(info, typeof(Egal.ccn_upcall_info));
 		IntPtr h=Info.h;
 		
+		/*
+		Egal.ccn_closure Selfp = new Egal.ccn_closure();
+		Selfp = (Egal.ccn_closure)Marshal.PtrToStructure(selfp, typeof(Egal.ccn_closure));
+		IntPtr name = Selfp.data;
+		String Name = Marshal.PtrToStringAnsi(name);
+		print (Name);
+		*/
+		
 		switch (kind) {
         case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT:
             //print("ReadCallback: CCN_UPCALL_CONTENT");
@@ -167,7 +174,8 @@ public class AssetSync : MonoBehaviour {
             Egal.ccn_content_get_value(source_ptr, source_length, Info.pco, ref result_ptr, ref result_length);
             
 			String content = Marshal.PtrToStringAnsi(result_ptr);
-			print(content);
+			//print(content);
+			
 			
 			break;
 		case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:
@@ -193,7 +201,7 @@ public class AssetSync : MonoBehaviour {
 		Egal.ccn_create_version(ccn, nm, VersioningFlags.CCN_V_LOW, 0, 0); // without version, Unity crashes!
 		//CCN_V_LOW might be right, might not!
 		
-		NormalStruct Data = new NormalStruct(nm, IntPtr.Zero, IntPtr.Zero, 0, "");
+		String Data = dst;
 		IntPtr pData = Marshal.AllocHGlobal(Marshal.SizeOf(Data));
 		Marshal.StructureToPtr(Data, pData, true);
 		
@@ -393,7 +401,7 @@ public class AssetSync : MonoBehaviour {
 		
 	}
 	
-	void WriteToRepo(System.String name, System.String content)
+	public void WriteToRepo(System.String name, System.String content)
 	{
 		print ("Writing " + name + " to repo: " + content);
 		
@@ -448,6 +456,24 @@ public class AssetSync : MonoBehaviour {
 		
 	}
 	
+	/*
+	void PlayerToRepo()
+	{
+		GameObject player = GameObject.Find("Player");
+		float theta = UnityEngine.Random.Range(0, 360f);
+		float pos_x = radius * Mathf.Sin(theta);
+		float pos_y = 0;
+		float pos_z = radius * Mathf.Cos(theta);
+		Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
+		player.transform.position = pos;
+		
+		System.String name = prefix + "/players/" + UnityEngine.Random.Range(0, 9999);
+		System.String content = "" + pos.x + "," + pos.y + "," + pos.z;
+		me = name;
+		
+		WriteToRepo(name, content);
+	}
+	*/
 	
 	void OnApplicationQuit() 
 	{
