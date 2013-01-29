@@ -97,7 +97,7 @@ public class Player : MonoBehaviour {
 		Vector3 pos = new Vector3(Single.Parse(split[0]), Single.Parse(split[1]), Single.Parse(split[2]));
 		GameObject NewPlayer = Instantiate(p, pos, p.transform.rotation) as GameObject;
 		NewPlayer.name = partialname;
-		NewPlayer.SetActiveRecursively(true);
+		NewPlayer.renderer.enabled = true;
 	}
 		
 	void OnGUI(){
