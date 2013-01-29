@@ -23,22 +23,26 @@ public class AssetSync : MonoBehaviour {
 	Thread oThread;
 	
 	public GameObject b612;
-	//public static float radius = 100;
+	
 	public static string me = "";
-	public static Hashtable Others; // other players' ccnx name and content
+	
+	public static Hashtable Buffer = new Hashtable(); // other players' ccnx name and content
+	public static System.Object lc = new System.Object(); // a lock for the buffer, share this lock with Player.cs
 	
 	public static int counter_for_run = 0;
 	
-	static bool KnownPlayer(string name)
+	static bool KnownAsset(string name)
 	{
-		return Others.ContainsKey(name);
+		bool ret = false;
+		if(Player.PlayerList.ContainsKey(name))
+			ret = true;
+		if(name == Player.me)
+			ret = true;
+		return ret;
 	}
 	
 	void Start()
 	{
-		// prepare
-		Others = new Hashtable();
-		
 		int res = WriteSlice(prefix, topo);
 		print("WriteSlice returned: " + res);
 		
@@ -120,22 +124,10 @@ public class AssetSync : MonoBehaviour {
 		
 		String ShortPlayerName = NameTrim(PlayerName);
 			
-		while(me=="");
-		if(KnownPlayer(ShortPlayerName) == false && ShortPlayerName != me)
+		if(KnownAsset(ShortPlayerName) == false)
 		{
-			print ("New Player Joined: " + ShortPlayerName);
-			Others.Add (ShortPlayerName,"");
 			ReadFromRepo(ShortPlayerName);
 		}
-		else if(ShortPlayerName==me)
-		{
-			print ("It's myself: " + ShortPlayerName);
-		}
-		else
-		{
-			print ("Known Player: " + ShortPlayerName);
-		}
-		
 		
 		Egal.ccn_charbuf_destroy(ref uri);
 		
@@ -178,9 +170,13 @@ public class AssetSync : MonoBehaviour {
 			int result_length = 0;
             Egal.ccn_content_get_value(source_ptr, source_length, Info.pco, ref result_ptr, ref result_length);
 			String content = Marshal.PtrToStringAnsi(result_ptr);
-			print(ShortPlayerName + ": " +  content);
 			
-			Others[ShortPlayerName] = content;
+			string pack = ShortPlayerName + ": " + content;
+			print(pack);
+			lock(lc)
+			{
+				Buffer.Add(ShortPlayerName, content);
+			}
 			
 			break;
 		case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:

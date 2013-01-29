@@ -9,10 +9,15 @@ public class Player : MonoBehaviour {
 	public static float radius = 100;
 	public Vector3 player_pos = new Vector3(0, 0, 0);
 	
+	public static string me = "";
+	public static Hashtable PlayerList = new Hashtable(); 
+	public static Hashtable ObjList = new Hashtable();
+		
 	void Start()
 	{
 		SetPlayerPosition();
 		WritePlayerToRepo();
+		InvokeRepeating("PollPlayerList", 0f, 0.2f); // player discovery, 5 per sec
 	}
 	
 	void SetPlayerPosition()
@@ -31,9 +36,46 @@ public class Player : MonoBehaviour {
 		System.String name = AssetSync.prefix + "/players/" + UnityEngine.Random.Range(0, 9999);
 		Vector3 pos = transform.position;
 		System.String content = "" + pos.x + "," + pos.y + "," + pos.z;
-		AssetSync.me = name;
+		me = name;
 		AssetSync assetsync = new AssetSync();
-		assetsync.WriteToRepo(name, content);
+		assetsync.WriteToRepo(name, content); // publish my existence
+		PlayerList.Add(name,content); // add myself to the player list
+	}
+	
+	void PollPlayerList()
+	{
+		Hashtable bufferclone = new Hashtable();
+		print (AssetSync.Buffer);
+		if(AssetSync.Buffer.Count != 0) // there is sth to read at AssetSync
+		{
+			lock(AssetSync.lc)
+			{
+				bufferclone = (Hashtable)AssetSync.Buffer.Clone(); // clone the buffer
+				AssetSync.Buffer.Clear(); // empty it
+			}
+			SortAssets(bufferclone);
+		}
+	}
+	
+	// sort buffer content into PlayerList, NpcList, ObjList 
+	void SortAssets(Hashtable buffer)
+	{
+		ICollection keys = buffer.Keys;
+		IEnumerator kinum = keys.GetEnumerator();
+		ICollection values = buffer.Values;
+		IEnumerator vinum = values.GetEnumerator();
+		while(kinum.MoveNext() && vinum.MoveNext())
+		{
+			// for now, assets are all players
+			try
+			{
+				PlayerList.Add(kinum.Current, vinum.Current);
+			}
+			catch
+			{
+				print (kinum.Current + "cannot be added to playerlist!");
+			}
+		}
 	}
 	
 	public GameObject sphere;
@@ -49,19 +91,21 @@ public class Player : MonoBehaviour {
 	}
 		
 	void OnGUI(){
-		int count = AssetSync.Others.Count+1;
 		
-		scrollPosition = GUI.BeginScrollView(new Rect(5, 5, Screen.width-5, Screen.height-5), scrollPosition, new Rect(0, 0, Screen.width, Screen.height*count/10));
-		GUILayout.Label("Number of Players: " + count);
+		scrollPosition = GUI.BeginScrollView(new Rect(5, 5, Screen.width-5, Screen.height-5), 
+											scrollPosition, 
+											new Rect(0, 0, Screen.width, Screen.height*PlayerList.Count/10));
+		GUILayout.Label("Number of Players: " + PlayerList.Count);
 		GUILayout.Label ("List of Players: ");
-		GUILayout.Label (AssetSync.me + ": " + player_pos.x + ", " + player_pos.y + ", " + player_pos.z + " (this is me)");
-		ICollection keys = AssetSync.Others.Keys;
+		GUILayout.Label (me + ": " + player_pos.x + ", " + player_pos.y + ", " + player_pos.z + " (this is me)");
+		ICollection keys = PlayerList.Keys;
 		IEnumerator kinum = keys.GetEnumerator();
-		ICollection values = AssetSync.Others.Values;
+		ICollection values = PlayerList.Values;
 		IEnumerator vinum = values.GetEnumerator();
 		while(kinum.MoveNext() && vinum.MoveNext())
 		{
-			GUILayout.Label("" + kinum.Current + ": " + vinum.Current);
+			if(kinum.Current!=me)
+				GUILayout.Label("" + kinum.Current + ": " + vinum.Current);
 		}
 		 GUI.EndScrollView();
 		
