@@ -106,7 +106,7 @@ public class AssetSync : MonoBehaviour {
 			ShortPlayerName = playername;
 		else
 			ShortPlayerName = playername.Remove (index-1);
-		
+
 		return ShortPlayerName;
 	}
 	

@@ -29,6 +29,7 @@ public class Player : MonoBehaviour {
 		float pos_z = radius * Mathf.Cos(theta);
 		player_pos = new Vector3(pos_x, pos_y, pos_z);
 		transform.position = player_pos;
+		transform.LookAt(new Vector3(0,0,0));
 	}
 	
 	void WritePlayerToRepo()
@@ -53,12 +54,12 @@ public class Player : MonoBehaviour {
 				bufferclone = (Hashtable)AssetSync.Buffer.Clone(); // clone the buffer
 				AssetSync.Buffer.Clear(); // empty it
 			}
-			SortAssets(bufferclone);
+			ProcessIncomingAssets(bufferclone);
 		}
 	}
 	
 	// sort buffer content into PlayerList, NpcList, ObjList 
-	void SortAssets(Hashtable buffer)
+	void ProcessIncomingAssets(Hashtable buffer)
 	{
 		ICollection keys = buffer.Keys;
 		IEnumerator kinum = keys.GetEnumerator();
@@ -66,28 +67,37 @@ public class Player : MonoBehaviour {
 		IEnumerator vinum = values.GetEnumerator();
 		while(kinum.MoveNext() && vinum.MoveNext())
 		{
-			// for now, assets are all players
-			try
+			string AssetName = kinum.Current.ToString();
+			string PartialName = AssetName.Remove(0, AssetSync.prefix.Length);
+			if(PartialName.StartsWith("/players"))
 			{
-				PlayerList.Add(kinum.Current, vinum.Current);
+				if(PlayerList.ContainsKey(kinum.Current))
+					{print ("Duplicated player detected.");}
+				else
+				{
+					PlayerList.Add (kinum.Current, vinum.Current); // full name in the list
+					RenderNewPlayer(PartialName, vinum.Current.ToString());
+				}
 			}
-			catch
+			else if(PartialName.StartsWith("/objects"))
 			{
-				print (kinum.Current + "cannot be added to playerlist!");
+				// 
 			}
+			
 		}
 	}
 	
 	public GameObject sphere;
-	public void AddNewPlayer(String content)
+	public void RenderNewPlayer(string partialname, string content)
 	{
 		print("Add New Player." + content);
 		// instantiate a white sphere in the location indicated by "content"
-		GameObject p = sphere;
+		GameObject p = GameObject.Find("/playermodel");
 		string [] split = content.Split(new Char [] {','});
 		Vector3 pos = new Vector3(Single.Parse(split[0]), Single.Parse(split[1]), Single.Parse(split[2]));
-		//GameObject NewPlayer = Instantiate(p, pos, p.transform.rotation) as GameObject;
-		//NewPlayer.name = "";
+		GameObject NewPlayer = Instantiate(p, pos, p.transform.rotation) as GameObject;
+		NewPlayer.name = partialname;
+		NewPlayer.SetActiveRecursively(true);
 	}
 		
 	void OnGUI(){
