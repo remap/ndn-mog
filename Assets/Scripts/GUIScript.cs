@@ -12,7 +12,7 @@ public class GUIScript : MonoBehaviour {
 		{
 			GameObject Obj = GameObject.Find("/objmodel");
 			
-			float radius = UnityEngine.Random.Range(0, Player.radius/2);
+			float radius = UnityEngine.Random.Range(0, Player.radius/4);
 			float theta = UnityEngine.Random.Range(0, 360f);
 			float beta = UnityEngine.Random.Range(0, 360f);
 			float pos_x = radius * Mathf.Sin (theta);
