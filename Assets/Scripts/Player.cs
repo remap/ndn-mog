@@ -5,9 +5,9 @@ using System;
 
 public class Player : MonoBehaviour {
 	
-	public Vector2 scrollPosition = Vector2.zero;
+	
 	public static float radius = 100;
-	public Vector3 player_pos = new Vector3(0, 0, 0);
+	public static Vector3 player_pos = new Vector3(0, 0, 0);
 	
 	public static string me = "";
 	public static Hashtable PlayerList = new Hashtable(); 
@@ -41,6 +41,11 @@ public class Player : MonoBehaviour {
 		AssetSync assetsync = new AssetSync();
 		assetsync.WriteToRepo(name, content); // publish my existence
 		PlayerList.Add(name,content); // add myself to the player list
+	}
+	
+	public void WriteObjToRepo()
+	{
+		
 	}
 	
 	void PollPlayerList()
@@ -100,26 +105,7 @@ public class Player : MonoBehaviour {
 		NewPlayer.renderer.enabled = true;
 	}
 		
-	void OnGUI(){
-		
-		scrollPosition = GUI.BeginScrollView(new Rect(5, 5, Screen.width-5, Screen.height-5), 
-											scrollPosition, 
-											new Rect(0, 0, Screen.width, Screen.height*PlayerList.Count/10));
-		GUILayout.Label("Number of Players: " + PlayerList.Count);
-		GUILayout.Label ("List of Players: ");
-		GUILayout.Label (me + ": " + player_pos.x + ", " + player_pos.y + ", " + player_pos.z + " (this is me)");
-		ICollection keys = PlayerList.Keys;
-		IEnumerator kinum = keys.GetEnumerator();
-		ICollection values = PlayerList.Values;
-		IEnumerator vinum = values.GetEnumerator();
-		while(kinum.MoveNext() && vinum.MoveNext())
-		{
-			if(kinum.Current!=me)
-				GUILayout.Label("" + kinum.Current + ": " + vinum.Current);
-		}
-		 GUI.EndScrollView();
-		
-	}
+	
 	
 
 }
