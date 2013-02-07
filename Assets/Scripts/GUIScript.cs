@@ -60,10 +60,10 @@ public class GUIScript : MonoBehaviour {
 	}
 	
 	// default parameters for the Control Panel (Create Some Objects)
-	string ObjNum = "2";
+	string ObjNum = "1";
 	public int ObjColor = 0;
-    public Texture2D[] ObjTextures; 
-	public Material[] ObjMaterials; // not displayed but related
+    public static Texture2D[] ObjTextures; 
+	public static Material[] ObjMaterials; // not displayed but related
 	void CtrlPanel(int windowID)
 	{
 		GUILayout.BeginHorizontal();

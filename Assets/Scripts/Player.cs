@@ -126,7 +126,7 @@ public class Player : MonoBehaviour {
 		Quaternion quater = Quaternion.identity;
 		quater.eulerAngles = rot;
 		GameObject NewObj = Instantiate(p, pos, quater) as GameObject;
-		//NewObj.renderer.material = GUIScript.
+		NewObj.renderer.material = GUIScript.ObjMaterials[color];
 		NewObj.renderer.enabled = true;
 		NewObj.name = partialname;
 		
