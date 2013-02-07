@@ -17,7 +17,7 @@ public class Player : MonoBehaviour {
 	{
 		SetPlayerPosition();
 		WritePlayerToRepo();
-		InvokeRepeating("PollPlayerList", 0f, 0.2f); // player discovery, 5 per sec
+		InvokeRepeating("PollAssetList", 0f, 0.2f); // player discovery, 5 per sec
 	}
 	
 	void SetPlayerPosition()
@@ -41,17 +41,23 @@ public class Player : MonoBehaviour {
 		AssetSync assetsync = new AssetSync();
 		assetsync.WriteToRepo(name, content); // publish my existence
 		PlayerList.Add(name,content); // add myself to the player list
-	}
-	
-	public void WriteObjToRepo()
-	{
 		
 	}
 	
-	void PollPlayerList()
+	public string WriteObjToRepo(Vector3 pos, Vector3 rot)
+	{
+		string NdnName = AssetSync.prefix + "/objects/" + UnityEngine.Random.Range(0, 9999);
+		string content = "" + pos.x + "," + pos.y + "," + pos.z + "," + rot.x + "," + rot.y + "," + rot.z;
+		AssetSync assetsync = new AssetSync();
+		assetsync.WriteToRepo(NdnName, content); 
+		ObjList.Add(NdnName,content); 
+		string PartialName = NdnName.Remove(0, AssetSync.prefix.Length);
+		return PartialName;
+	}
+	
+	void PollAssetList()
 	{
 		Hashtable bufferclone = new Hashtable();
-		print (AssetSync.Buffer);
 		if(AssetSync.Buffer.Count != 0) // there is sth to read at AssetSync
 		{
 			lock(AssetSync.lc)
@@ -86,13 +92,18 @@ public class Player : MonoBehaviour {
 			}
 			else if(PartialName.StartsWith("/objects"))
 			{
-				// 
+				if(ObjList.ContainsKey(kinum.Current))
+					{print ("Duplicated object detected.");}
+				else
+				{
+					ObjList.Add (kinum.Current, vinum.Current); // full name in the list
+					RenderNewObj(PartialName, vinum.Current.ToString());
+				}
 			}
 			
 		}
 	}
 	
-	public GameObject sphere;
 	public void RenderNewPlayer(string partialname, string content)
 	{
 		print("Add New Player." + content);
@@ -105,6 +116,19 @@ public class Player : MonoBehaviour {
 		NewPlayer.renderer.enabled = true;
 	}
 		
+	public void RenderNewObj(string partialname, string content)
+	{
+		GameObject p = GameObject.Find("/objmodel");
+		string [] split = content.Split(new Char [] {','});
+		Vector3 pos = new Vector3(Single.Parse(split[0]), Single.Parse(split[1]), Single.Parse(split[2]));
+		Vector3 rot = new Vector3(Single.Parse(split[3]), Single.Parse(split[4]), Single.Parse(split[5]));
+		Quaternion quater = Quaternion.identity;
+		quater.eulerAngles = rot;
+		GameObject NewObj = Instantiate(p, pos, quater) as GameObject;
+		NewObj.renderer.enabled = true;
+		NewObj.name = partialname;
+		
+	}
 	
 	
 

@@ -8,7 +8,7 @@ public class GUIScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		Player playerscript = new Player();
-		for(int i=0; i<100; i++)
+		for(int i=0; i<1; i++)
 		{
 			GameObject Obj = GameObject.Find("/objmodel");
 			
@@ -23,12 +23,13 @@ public class GUIScript : MonoBehaviour {
 			float rot_y = UnityEngine.Random.Range(0,360f);
 			float rot_z = UnityEngine.Random.Range(0,360f);
 			Vector3 rot = new Vector3(rot_x, rot_y, rot_z);
-			GameObject newobj = Instantiate(Obj, pos, Obj.transform.rotation) as GameObject;
-			newobj.transform.Rotate(rot);
+			Quaternion quater = Quaternion.identity;
+			quater.eulerAngles = rot;
+			GameObject newobj = Instantiate(Obj, pos, quater) as GameObject;
 			newobj.renderer.enabled = true;
 			
-			//playerscript.WriteObjToRepo();
-			
+			string NdnName = playerscript.WriteObjToRepo(pos,rot);
+			newobj.name = NdnName;
 		}
 		
 	}
