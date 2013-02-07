@@ -44,10 +44,10 @@ public class Player : MonoBehaviour {
 		
 	}
 	
-	public string WriteObjToRepo(Vector3 pos, Vector3 rot)
+	public string WriteObjToRepo(Vector3 pos, Vector3 rot, int color)
 	{
 		string NdnName = AssetSync.prefix + "/objects/" + UnityEngine.Random.Range(0, 9999);
-		string content = "" + pos.x + "," + pos.y + "," + pos.z + "," + rot.x + "," + rot.y + "," + rot.z;
+		string content = "" + pos.x + "," + pos.y + "," + pos.z + "," + rot.x + "," + rot.y + "," + rot.z + "," + color;
 		AssetSync assetsync = new AssetSync();
 		assetsync.WriteToRepo(NdnName, content); 
 		ObjList.Add(NdnName,content); 
@@ -122,9 +122,11 @@ public class Player : MonoBehaviour {
 		string [] split = content.Split(new Char [] {','});
 		Vector3 pos = new Vector3(Single.Parse(split[0]), Single.Parse(split[1]), Single.Parse(split[2]));
 		Vector3 rot = new Vector3(Single.Parse(split[3]), Single.Parse(split[4]), Single.Parse(split[5]));
+		int color = Int32.Parse(split[6]);
 		Quaternion quater = Quaternion.identity;
 		quater.eulerAngles = rot;
 		GameObject NewObj = Instantiate(p, pos, quater) as GameObject;
+		//NewObj.renderer.material = GUIScript.
 		NewObj.renderer.enabled = true;
 		NewObj.name = partialname;
 		

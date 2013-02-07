@@ -1,11 +1,13 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class GUIScript : MonoBehaviour {
 	
 	public Vector2 scrollPosition = Vector2.zero;
 	
 	// Use this for initialization
+	/*
 	void Start () {
 		Player playerscript = new Player();
 		for(int i=0; i<1; i++)
@@ -33,6 +35,7 @@ public class GUIScript : MonoBehaviour {
 		}
 		
 	}
+	*/
 	
 	void OnGUI(){
 		
@@ -67,17 +70,64 @@ public class GUIScript : MonoBehaviour {
 		GUILayout.Label("# of objects: " + Player.ObjList.Count);
 	}
 	
-	string stringToEdit = "5";
-	public int selGridInt = 0;
-    public Texture2D[] selTextures;
+	// default parameters for the Control Panel (Create Some Objects)
+	string ObjNum = "2";
+	public int ObjColor = 0;
+    public Texture2D[] ObjTextures;
+	public Material[] ObjMaterials; // not displayed but related
 	void CtrlPanel(int windowID)
 	{
 		GUILayout.BeginHorizontal();
 		GUILayout.Label("How Many?");  
-		stringToEdit = GUILayout.TextArea (stringToEdit, 20);
+		ObjNum = GUILayout.TextArea (ObjNum, 20);
 		GUILayout.EndHorizontal();
 		
 		GUILayout.Label("Which Color?");
-		selGridInt = GUILayout.SelectionGrid(selGridInt, selTextures, 3);
+		ObjColor = GUILayout.SelectionGrid(ObjColor, ObjTextures, 3);
+		
+		if(GUILayout.Button("Done!"))
+		{
+			CreateObjs(ObjNum,ObjColor);
+		}
+	}
+	
+	void CreateObjs(string num, int color)
+	{
+		Player playerscript = new Player();
+		int count;
+		try
+		{
+			count = Int32.Parse(num);
+		}
+		catch
+		{
+			print ("CreateObjs() Error.");
+			return;
+		}
+		
+		for(int i=0; i<count; i++)
+		{
+			GameObject Obj = GameObject.Find("/objmodel");
+			
+			float radius = UnityEngine.Random.Range(0, Player.radius/4);
+			float theta = UnityEngine.Random.Range(0, 360f);
+			float beta = UnityEngine.Random.Range(0, 360f);
+			float pos_x = radius * Mathf.Sin (theta);
+			float pos_y = radius * Mathf.Sin (beta);
+			float pos_z = radius * Mathf.Cos (theta);
+			Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
+			float rot_x = UnityEngine.Random.Range(0,360f);
+			float rot_y = UnityEngine.Random.Range(0,360f);
+			float rot_z = UnityEngine.Random.Range(0,360f);
+			Vector3 rot = new Vector3(rot_x, rot_y, rot_z);
+			Quaternion quater = Quaternion.identity;
+			quater.eulerAngles = rot;
+			GameObject newobj = Instantiate(Obj, pos, quater) as GameObject;
+			newobj.renderer.material = ObjMaterials[color];
+			newobj.renderer.enabled = true;
+			
+			string NdnName = playerscript.WriteObjToRepo(pos,rot,color);
+			newobj.name = NdnName;
+		}
 	}
 }
