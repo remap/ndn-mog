@@ -4,7 +4,6 @@ using System;
 
 public class GUIScript : MonoBehaviour {
 	
-	public Vector2 scrollPosition = Vector2.zero;
 	
 	void Start () {
 		//ObjTextures =  Resources.LoadAll("GUI", typeof(Texture2D)) as Texture2D[];
@@ -32,31 +31,61 @@ public class GUIScript : MonoBehaviour {
 		
 		GUILayout.Window(1, new Rect(20, 120, 200, 50), CtrlPanel, "Create Some Objects");
 		
-		/*
-		scrollPosition = GUI.BeginScrollView(new Rect(5, 5, Screen.width-5, Screen.height-5), 
-											scrollPosition, 
-											new Rect(0, 0, Screen.width, Screen.height*Player.PlayerList.Count/10));
-		GUILayout.Label("Number of Players: " + Player.PlayerList.Count);
-		GUILayout.Label ("List of Players: ");
-		GUILayout.Label (Player.me + ": " + Player.player_pos.x + ", " + Player.player_pos.y + ", " + Player.player_pos.z + " (this is me)");
-		ICollection keys = Player.PlayerList.Keys;
-		IEnumerator kinum = keys.GetEnumerator();
-		ICollection values = Player.PlayerList.Values;
-		IEnumerator vinum = values.GetEnumerator();
-		while(kinum.MoveNext() && vinum.MoveNext())
+		GUILayout.Window(2, new Rect(Screen.width-220, 20, 200, DetailHeight), Detail, "Players & Objects");
+		
+		
+	}
+	
+	public bool ShowDetails = false;
+	public Vector2 scrollPosition = Vector2.zero;
+	public int DetailHeight = 50;
+	void Detail(int windowID)
+	{
+		if(ShowDetails == false)
 		{
-			if(kinum.Current!=Player.me)
-				GUILayout.Label("" + kinum.Current + ": " + vinum.Current);
+			if(GUILayout.Button("Show Name List")) 
+			{
+				ShowDetails=true;
+				DetailHeight = Screen.height-40;
+			}
 		}
-		 GUI.EndScrollView();
-		 */
+		else // show details
+		{
+			
+			if(GUILayout.Button("Hide Name List")) 
+			{
+				ShowDetails=false;
+				DetailHeight = 50;
+			}
+			
+			scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+		
+			ICollection keys = Player.PlayerList.Keys;
+			IEnumerator kinum = keys.GetEnumerator();
+			while(kinum.MoveNext())
+			{
+				GUILayout.Label("" + kinum.Current);
+			}
+			
+			keys = Player.ObjList.Keys;
+			kinum = keys.GetEnumerator();
+			while(kinum.MoveNext())
+			{
+				GUILayout.Label("" + kinum.Current);
+			}
+			
+		 	GUILayout.EndScrollView();
+		 
+		}
 		
 	}
 	
 	void InfoPanel(int windowID)
 	{
 		GUILayout.Label("# of players: " + Player.PlayerList.Count);
+		
 		GUILayout.Label("# of objects: " + Player.ObjList.Count);
+
 	}
 	
 	// default parameters for the Control Panel (Create Some Objects)
