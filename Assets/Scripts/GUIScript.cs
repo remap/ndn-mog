@@ -35,6 +35,12 @@ public class GUIScript : MonoBehaviour {
 	}
 	
 	void OnGUI(){
+		
+		GUILayout.Window(0, new Rect(20, 20, 200, 50), InfoPanel, "Information");
+		
+		GUILayout.Window(1, new Rect(20, 120, 200, 50), CtrlPanel, "Create Some Objects");
+		
+		/*
 		scrollPosition = GUI.BeginScrollView(new Rect(5, 5, Screen.width-5, Screen.height-5), 
 											scrollPosition, 
 											new Rect(0, 0, Screen.width, Screen.height*Player.PlayerList.Count/10));
@@ -51,6 +57,27 @@ public class GUIScript : MonoBehaviour {
 				GUILayout.Label("" + kinum.Current + ": " + vinum.Current);
 		}
 		 GUI.EndScrollView();
+		 */
 		
+	}
+	
+	void InfoPanel(int windowID)
+	{
+		GUILayout.Label("# of players: " + Player.PlayerList.Count);
+		GUILayout.Label("# of objects: " + Player.ObjList.Count);
+	}
+	
+	string stringToEdit = "5";
+	public int selGridInt = 0;
+    public Texture2D[] selTextures;
+	void CtrlPanel(int windowID)
+	{
+		GUILayout.BeginHorizontal();
+		GUILayout.Label("How Many?");  
+		stringToEdit = GUILayout.TextArea (stringToEdit, 20);
+		GUILayout.EndHorizontal();
+		
+		GUILayout.Label("Which Color?");
+		selGridInt = GUILayout.SelectionGrid(selGridInt, selTextures, 3);
 	}
 }
