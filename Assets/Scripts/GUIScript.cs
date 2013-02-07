@@ -6,36 +6,25 @@ public class GUIScript : MonoBehaviour {
 	
 	public Vector2 scrollPosition = Vector2.zero;
 	
-	// Use this for initialization
-	/*
 	void Start () {
-		Player playerscript = new Player();
-		for(int i=0; i<1; i++)
-		{
-			GameObject Obj = GameObject.Find("/objmodel");
-			
-			float radius = UnityEngine.Random.Range(0, Player.radius/4);
-			float theta = UnityEngine.Random.Range(0, 360f);
-			float beta = UnityEngine.Random.Range(0, 360f);
-			float pos_x = radius * Mathf.Sin (theta);
-			float pos_y = radius * Mathf.Sin (beta);
-			float pos_z = radius * Mathf.Cos (theta);
-			Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
-			float rot_x = UnityEngine.Random.Range(0,360f);
-			float rot_y = UnityEngine.Random.Range(0,360f);
-			float rot_z = UnityEngine.Random.Range(0,360f);
-			Vector3 rot = new Vector3(rot_x, rot_y, rot_z);
-			Quaternion quater = Quaternion.identity;
-			quater.eulerAngles = rot;
-			GameObject newobj = Instantiate(Obj, pos, quater) as GameObject;
-			newobj.renderer.enabled = true;
-			
-			string NdnName = playerscript.WriteObjToRepo(pos,rot);
-			newobj.name = NdnName;
-		}
-		
+		//ObjTextures =  Resources.LoadAll("GUI", typeof(Texture2D)) as Texture2D[];
+		//ObjMaterials =  Resources.LoadAll("Materials", typeof(Material)) as Material[];
+		ObjTextures = new Texture2D[6];
+		ObjTextures[0] = Resources.Load("GUI/red") as Texture2D;
+		ObjTextures[1] = Resources.Load("GUI/purple") as Texture2D;
+		ObjTextures[2] = Resources.Load("GUI/green") as Texture2D;
+		ObjTextures[3] = Resources.Load("GUI/alum") as Texture2D;
+		ObjTextures[4] = Resources.Load("GUI/steel") as Texture2D;
+		ObjTextures[5] = Resources.Load("GUI/rust") as Texture2D;
+		ObjMaterials = new Material[6];
+		ObjMaterials[0] = Resources.Load("Materials/red") as Material;
+		ObjMaterials[1] = Resources.Load("Materials/purple") as Material;
+		ObjMaterials[2] = Resources.Load("Materials/green") as Material;
+		ObjMaterials[3] = Resources.Load("Materials/alum") as Material;
+		ObjMaterials[4] = Resources.Load("Materials/steel") as Material;
+		ObjMaterials[5] = Resources.Load("Materials/rust") as Material;
 	}
-	*/
+	
 	
 	void OnGUI(){
 		
@@ -73,7 +62,7 @@ public class GUIScript : MonoBehaviour {
 	// default parameters for the Control Panel (Create Some Objects)
 	string ObjNum = "2";
 	public int ObjColor = 0;
-    public Texture2D[] ObjTextures;
+    public Texture2D[] ObjTextures; 
 	public Material[] ObjMaterials; // not displayed but related
 	void CtrlPanel(int windowID)
 	{
