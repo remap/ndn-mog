@@ -1,10 +1,18 @@
 # How to run Confetti as a MOG
 
+<<<<<<< HEAD
 Feb 21, 2013
 
 by Zening Qu (quzening@remap.ucla.edu)
 
 Confetti is a mini multiplayer online game (MOG) using NDN. It is assumed that players will self-organize into a peer-to-peer network, that they will create some objects (confettis) in the game, and the game application is responsible for disseminating these objects to all players. In this way, players can navigate and observe objects created by themselves as well as those created by other players. In the screenshot below, two instances of Confetti are synchronized. Both players see confetties in the space, but from different perspectives.
+=======
+Feb 09, 2013
+
+by Zening Qu (quzening@gmail.com)
+
+Confetti is a mini multiplayer online game using NDN. It is assumed that players will self-organize into a peer-to-peer network, that they will create some objects (confettis) in the game, and the game application is responsible for disseminating these objects to all players. In this way, players can navigate and observe objects created by themselves as well as those created by other players. In the screenshot below, two instances of Confetti are synchronized. Both players see confetties in the space, but from different perspectives.
+>>>>>>> fa5542394c8bcc3e44f1333dd42e7cf8be1cb921
 
 ![screenshots](http://quzening.com/wp-content/uploads/confetti%E5%89%AF%E6%9C%AC.png)
 
@@ -21,6 +29,7 @@ Confetti runs on Mac OS X (10.7 Lion and 10.8 Mountain Lion tested, earlier OSs 
 3. CCNx
 4. Confetti
 
+<<<<<<< HEAD
 ## Step-by-step Guide
 
 Confetti needs CCNx to provide NDN support. In order to install CCNx, please refer to [this guide](http://irl.cs.ucla.edu/autoconf/client.html) or follow steps 1 through 3. If you already have CCNx, please jump to step 4 to run Confetti.
@@ -39,6 +48,23 @@ MacPorts "pkg" installers available [here](http://www.macports.org/install.php).
 ### Step 3 Install CCNx
 
 CCNx can be installed via MacPorts. If your Macports are installed in /opt/local, add the following line at the end of /opt/local/etc/macports/sources.conf before the default port repository.
+=======
+## Install
+
+Confetti needs CCNx to provide NDN support. In order to install CCNx, please refer to [this guide](http://irl.cs.ucla.edu/autoconf/client.html) or follow steps 1 through 3. If you already have CCNx, please jump to step 4 to run Confetti.
+
+### Step 1 Xcode
+
+Download a free copy of Xcode from the App Store and install it, if it is not already installed on your computer.
+
+Make sure the **Xcode Command Line Tools** are installed also. Recent installations of Xcode does not include the command line tools. They can be installed from: Xcode -> Preferences -> Downloads. 
+
+### Step 2 MacPorts
+
+MacPorts "pkg" installers available [here](http://www.macports.org/install.php). 
+
+CCNx can be installed by MacPorts. If your Macports are installed in /opt/local, add the following line at the end of /opt/local/etc/macports/sources.conf before the default port repository.
+>>>>>>> fa5542394c8bcc3e44f1333dd42e7cf8be1cb921
 
 	rsync://ndn.iu4.ru/macports/
 
@@ -46,6 +72,7 @@ After this step, use the following command to fetch updated port definitions.
 
 	sudo port selfupdate
 
+<<<<<<< HEAD
 Then use these commands to install and load CCNx.
 	
 	sudo port install ccnx
@@ -102,4 +129,18 @@ This requirement is further examplified in the extreme case below. The two machi
 
 ### Step 7 Play!
 :D
+=======
+Then use this command to install CCNx.
+	
+	sudo port install ccnx
+
+#### Trouble Shooting
+
+### Step 3 CCNx
+
+
+## Connect With Other Players
+
+## Play
+>>>>>>> fa5542394c8bcc3e44f1333dd42e7cf8be1cb921
 
