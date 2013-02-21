@@ -65,12 +65,41 @@ A repository functions as a local data cache for Confetti. Switch to the directo
 
 ### Step 6 Connect With Other Players
 
+#### A. on the same machine
+
+Multiple players could be multiple instances of Confetti on the same machine (see picture below). In this case the following command can be used to start multiple instances.
+
+	open -n $directory$/Confetti.app
+
+In this case the multiple instances are shaing the same repository (the local repository on the shared machine). 
+	
 ![image](https://www.evernote.com/shard/s287/sh/2ba3c787-3588-4a11-ac4c-3990d6c80fa4/2240fedc6706dd483d6adb5c30667f52/res/37346e19-73b7-4f6b-ab79-2031cb65be40/IMG_0498.jpg?resizeSmall&width=832)
+
+#### B. on directly routable machines
+
+More often than not players are on different machines. We can use the following command to set up FIB tables for players so that packets are directly routed among players.
+
+	ccndc add 'uri' udp 'host'
 
 ![image](https://www.evernote.com/shard/s287/sh/2ba3c787-3588-4a11-ac4c-3990d6c80fa4/2240fedc6706dd483d6adb5c30667f52/res/2c925224-974f-4380-9cdc-b20db6066e79/IMG_0499.jpg?resizeSmall&width=832)
 
+#### C. on indirectly routable machines
+
+In other cases there is no direct routing path between a pair of players, such as in the following picture. Packets between this pair of players are routed through a common hub.
+
+Note that in this senario, there is an extra requirement for the hub: CCNx SYNC has to be running on the hub. To be specific, the hub should also maintain a repository and there should be a slice in this repository defined using the following parameters:
+
+	prefix = "ccnx:/ndn/ucla.edu/apps/Confetti";
+	topo = "ccnx:/ndn/broadcast/Confetti";
+	
+Which is how the slices on all players' machines were defined. 
+
 ![image](https://www.evernote.com/shard/s287/sh/2ba3c787-3588-4a11-ac4c-3990d6c80fa4/2240fedc6706dd483d6adb5c30667f52/res/0f05f053-450b-44cc-9986-0c3490e0a8ab/IMG_0500.jpg?resizeSmall&width=832)
 
+This requirement is further examplified in the extreme case below. The two machines running Confetti can be syncrhonized if and only if every machine on their routing path (including they themselves) are running CCNx SYNC. In the picture below, they are not synced because the chain breaks at HUB(3).
 
-## Play
+![image](https://www.evernote.com/shard/s287/sh/1e596495-5c87-4499-a291-4b30bd3a1faa/01468c945912c318d5d80247f2620b47/res/3c5c77b5-c0a5-47bf-8e07-4fb4b00d5646/IMG_0503.jpg?resizeSmall&width=832)
+
+### Step 7 Play!
+:D
 

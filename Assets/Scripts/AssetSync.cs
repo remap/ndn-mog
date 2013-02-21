@@ -16,8 +16,8 @@ public class AssetSync : MonoBehaviour {
 	
 	public static bool Initialized = false;
 	
-	public static System.String prefix = "ccnx:/ndn/ucla.edu/apps/LPP";
-	private static System.String topo = "ccnx:/ndn/broadcast/LPP";
+	public static System.String prefix = "ccnx:/ndn/ucla.edu/apps/Confetti";
+	private static System.String topo = "ccnx:/ndn/broadcast/Confetti";
 	public static int TIMEOUT = 10;
 	
 	Thread oThread;
