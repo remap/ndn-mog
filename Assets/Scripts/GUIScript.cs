@@ -111,7 +111,7 @@ public class GUIScript : MonoBehaviour {
 	
 	void CreateObjs(string num, int color)
 	{
-		Player playerscript = new Player();
+		
 		int count;
 		try
 		{
@@ -125,8 +125,15 @@ public class GUIScript : MonoBehaviour {
 		
 		for(int i=0; i<count; i++)
 		{
-			GameObject Obj = GameObject.Find("/objmodel");
-			
+			CreateSingleObj(color);
+		}
+	}
+	
+	void CreateSingleObj(int color)
+	{
+		GameObject Obj = GameObject.Find("/objmodel");
+		Player playerscript = new Player();
+		
 			float radius = UnityEngine.Random.Range(0, Player.radius/4);
 			float theta = UnityEngine.Random.Range(0, 360f);
 			float beta = UnityEngine.Random.Range(0, 360f);
@@ -146,6 +153,6 @@ public class GUIScript : MonoBehaviour {
 			
 			string NdnName = playerscript.WriteObjToRepo(pos,rot,color);
 			newobj.name = NdnName;
-		}
+			
 	}
 }
