@@ -102,4 +102,8 @@ This requirement is further examplified in the extreme case below. The two machi
 ![image](https://www.evernote.com/shard/s287/sh/1e596495-5c87-4499-a291-4b30bd3a1faa/01468c945912c318d5d80247f2620b47/res/3c5c77b5-c0a5-47bf-8e07-4fb4b00d5646/IMG_0503.jpg?resizeSmall&width=832)
 
 ### Step 7 Play!
+
 :D
+Here is a picture showing the spatial relationship among players and confettis.
+
+![image](https://www.evernote.com/shard/s287/sh/9be542af-456a-4c0e-9e9f-724311f08407/fd689e32708cf5495a8f5e6cd651e083/res/8c93d9e7-4e62-4d2a-8eb8-abf7886cb89e/IMG_0504.jpg?resizeSmall&width=832)
