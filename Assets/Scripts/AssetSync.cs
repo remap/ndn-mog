@@ -22,8 +22,6 @@ public class AssetSync : MonoBehaviour {
 	
 	Thread oThread;
 	
-	public GameObject b612;
-	
 	public static string me = "";
 	
 	public static Hashtable Buffer = new Hashtable(); // other players' ccnx name and content
@@ -442,23 +440,7 @@ public class AssetSync : MonoBehaviour {
 		 
 	}
 	
-	void AsteroidToRepo()
-	{
-		b612 = GameObject.Find ("b612");
-		float pos_x = UnityEngine.Random.Range(0, 999f);
-		float pos_y = UnityEngine.Random.Range(0, 999f);
-		float pos_z = UnityEngine.Random.Range(0, 999f);
-		Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
-		b612.transform.position = pos;
-		
-		System.String name = prefix + "/b612/" + UnityEngine.Random.Range(-999999, 999999);
-		System.String content = "" + pos.x + "," + pos.y + "," + pos.z + ',' + b612.GetInstanceID();
-		me = name;
-		
-		WriteToRepo(name, content);
 	
-		
-	}
 	
 	/*
 	void PlayerToRepo()
