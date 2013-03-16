@@ -27,7 +27,24 @@ public class GetAsteroidNames : MonoBehaviour {
 	
 	Upcall.ccn_upcall_res ENCallback(IntPtr selfp, Upcall.ccn_upcall_kind kind, IntPtr info)
 	{
-		print("Name Enumeration Callback!");
+		Egal.ccn_upcall_info Info = new Egal.ccn_upcall_info();
+		Info = (Egal.ccn_upcall_info)Marshal.PtrToStructure(info, typeof(Egal.ccn_upcall_info));
+		
+		switch (kind) {
+		case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT_UNVERIFIED:
+        case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT:
+			
+			IntPtr ccnb = Info.content_ccnb;
+			IntPtr result_ptr = IntPtr.Zero;
+			int result_length = 0;
+            Egal.ccn_content_get_value(ccnb, 0, Info.pco, ref result_ptr, ref result_length);
+			print(result_ptr);
+			// I still need to parse the ccnb encoded content here...
+			break;
+		case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:
+			print("EN upcall final");
+			break;
+		}
 		return Upcall.ccn_upcall_res.CCN_UPCALL_RESULT_OK;
 	}
 }
