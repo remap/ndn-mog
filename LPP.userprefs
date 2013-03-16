@@ -1,9 +1,10 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/CCNScript.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/GetAsteroidNames.cs">
     <Files>
-      <File FileName="Assets/Scripts/GetAsteroidNames.cs" Line="9" Column="3" />
-      <File FileName="Assets/Scripts/CCNScript.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/GetAsteroidNames.cs" Line="23" Column="9" />
+      <File FileName="Assets/Scripts/AssetSync.cs" Line="349" Column="28" />
+      <File FileName="Assets/Plugins/Egal.cs" Line="267" Column="58" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

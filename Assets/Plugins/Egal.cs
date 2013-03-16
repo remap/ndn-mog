@@ -103,7 +103,7 @@ public class Egal: MonoBehaviour {
 	public struct ccn_parsed_ContentObject {
     	public int magic;
     	Content.ccn_content_type type;
-    	int name_ncomps;
+    	public int name_ncomps;
 		[MarshalAs (UnmanagedType.ByValArray, SizeConst=(int)PCO.ccn_parsed_content_object_offsetid.CCN_PCO_E+1)]
     	public UInt16[] offset;
 		[MarshalAs (UnmanagedType.ByValArray, SizeConst=32)]
@@ -259,6 +259,12 @@ public class Egal: MonoBehaviour {
 	
 	[DllImport ("Egal")]
 	public static extern int ccn_name_append_numeric(IntPtr c, Marker.ccn_marker marker, int value);
+	
+	[DllImport ("Egal")]
+	public static extern int ccn_name_append_components(IntPtr c, IntPtr ccnb, int start, int stop);
+	
+	[DllImport ("Egal")]
+	public static extern int ccn_name_chop(IntPtr c, IntPtr components, int n);
 
 
 	// slice, ccns
@@ -315,8 +321,10 @@ public class Egal: MonoBehaviour {
 	[DllImport ("Egal")]
 	public static extern int ccn_put(IntPtr h, IntPtr p, int length); // returns -1 for error
 
-
 	
+	// check
+	[DllImport ("Egal")]
+	public static extern int ccn_is_final_block(IntPtr info);
 	
 	// Delegates, for Callback //
 	//==================================//
