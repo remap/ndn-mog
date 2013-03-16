@@ -34,7 +34,7 @@ public class Player : MonoBehaviour {
 	
 	void WritePlayerToRepo()
 	{
-		System.String name = AssetSync.prefix + "/players/" + UnityEngine.Random.Range(0, 9999);
+		System.String name = AssetSync.matryoshka_prefix + "/players/" + UnityEngine.Random.Range(0, 9999);
 		Vector3 pos = transform.position;
 		System.String content = "" + pos.x + "," + pos.y + "," + pos.z;
 		me = name;
@@ -46,12 +46,12 @@ public class Player : MonoBehaviour {
 	
 	public string WriteObjToRepo(Vector3 pos, Vector3 rot, int color)
 	{
-		string NdnName = AssetSync.prefix + "/objects/" + UnityEngine.Random.Range(0, 9999);
+		string NdnName = AssetSync.matryoshka_prefix + "/objects/" + UnityEngine.Random.Range(0, 9999);
 		string content = "" + pos.x + "," + pos.y + "," + pos.z + "," + rot.x + "," + rot.y + "," + rot.z + "," + color;
 		AssetSync assetsync = new AssetSync();
 		assetsync.WriteToRepo(NdnName, content); 
 		ObjList.Add(NdnName,content); 
-		string PartialName = NdnName.Remove(0, AssetSync.prefix.Length);
+		string PartialName = NdnName.Remove(0, AssetSync.matryoshka_prefix.Length);
 		return PartialName;
 	}
 	
@@ -79,7 +79,7 @@ public class Player : MonoBehaviour {
 		while(kinum.MoveNext() && vinum.MoveNext())
 		{
 			string AssetName = kinum.Current.ToString();
-			string PartialName = AssetName.Remove(0, AssetSync.prefix.Length);
+			string PartialName = AssetName.Remove(0, AssetSync.matryoshka_prefix.Length);
 			if(PartialName.StartsWith("/players"))
 			{
 				if(PlayerList.ContainsKey(kinum.Current))

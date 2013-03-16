@@ -16,8 +16,13 @@ public class AssetSync : MonoBehaviour {
 	
 	public static bool Initialized = false;
 	
-	public static System.String prefix = "ccnx:/ndn/ucla.edu/apps/Confetti";
-	private static System.String topo = "ccnx:/ndn/broadcast/Confetti";
+	public static string matryoshka_prefix = "ccnx:/ndn/ucla.edu/apps/matryoshka";
+	public static string matryoshka_topo = "ccnx:/ndn/broadcast/matryoshka";
+	public static string airports_prefix = "ccnx:/ndn/ucla.edu/airports";
+	public static string airports_topo = "ccnx:/ndn/ucla.edu";
+	public static string realtimeflights_prefix = "ccnx:/ndn/ucla.edu/realtimeflights";
+	public static string realtimeflights_topo = "ccnx:/ndn/ucla.edu";
+	
 	public static int TIMEOUT = 10;
 	
 	Thread oThread;
@@ -41,25 +46,18 @@ public class AssetSync : MonoBehaviour {
 	
 	void Start()
 	{
-		int res = WriteSlice(prefix, topo);
+		int res = WriteSlice(matryoshka_prefix, matryoshka_topo);
+		res |= WriteSlice(airports_prefix, airports_topo);
+		res |= WriteSlice(realtimeflights_prefix, realtimeflights_topo);
 		print("WriteSlice returned: " + res);
 		
-		WatchOverRepo(prefix, topo);
+		WatchOverRepo(matryoshka_prefix, matryoshka_topo);
 		
     	// RegisterInterestFilter(h, me + "/state");
     
 	}
 	
-	static IntPtr GetHandle()
-	{
-		// this is a C# expansion of Egal.GetHandle()
-		IntPtr ccn = Egal.ccn_create();
-		if (Egal.ccn_connect(ccn, "") == -1) 
-        	print("could not connect to ccnd.");
-		//else
-			//print ("a handle is connected to ccnd.");
-		return ccn;
-	}
+	
 	
 	int WriteSlice(System.String p, System.String t)
 	{
@@ -87,7 +85,7 @@ public class AssetSync : MonoBehaviour {
 		
 		IntPtr slice = Egal.ccns_slice_create();
 		Egal.ccns_slice_set_topo_prefix(slice, topo, prefix);
-		IntPtr h = GetHandle();
+		IntPtr h = CCNScript.GetHandle();
 		res = Egal.ccns_write_slice(h, slice, prefix);
     	Egal.ccn_destroy(ref h);
     	Egal.ccns_slice_destroy(ref slice); // after this, slice == 0
@@ -193,7 +191,7 @@ public class AssetSync : MonoBehaviour {
 	static void ReadFromRepo(string dst)
 	{
 		print("Reading from the repo.");
-		IntPtr ccn = GetHandle();
+		IntPtr ccn = CCNScript.GetHandle();
 		
 		IntPtr nm = Egal.ccn_charbuf_create();
 		Egal.ccn_name_from_uri(nm,dst);
@@ -223,7 +221,7 @@ public class AssetSync : MonoBehaviour {
 	{
 		// this is a C# expansion of Egal.WatchOverRepo
 		int res;
-		h_ccns_watch = GetHandle();
+		h_ccns_watch = CCNScript.GetHandle();
 		IntPtr prefix = Egal.ccn_charbuf_create();
 		IntPtr topo = Egal.ccn_charbuf_create();
 		
@@ -408,7 +406,7 @@ public class AssetSync : MonoBehaviour {
 		print ("Writing " + name + " to repo: " + content);
 		
 		int res;
-		IntPtr h = GetHandle();
+		IntPtr h = CCNScript.GetHandle();
 		IntPtr cb = Egal.ccn_charbuf_create();
 		IntPtr nm = Egal.ccn_charbuf_create();
 		IntPtr cmd = Egal.ccn_charbuf_create();
