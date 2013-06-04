@@ -45,11 +45,13 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\AssetSync.cs" />
+     <Compile Include="Assets\Scripts\Asteroids.cs" />
      <Compile Include="Assets\Scripts\CCNScript.cs" />
      <Compile Include="Assets\Scripts\GUIScript.cs" />
      <Compile Include="Assets\Scripts\GetAsteroidNames.cs" />
      <Compile Include="Assets\Scripts\Motion.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
+     <Compile Include="Assets\Scripts\move.cs" />
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurfacePro Hidden Front Cut Out Specular.shader" />
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurface Free Cut Out Opaque Bump.shader" />
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurfacePro Hidden Front Transparent.shader" />
