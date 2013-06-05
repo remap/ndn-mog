@@ -47,6 +47,7 @@
      <Compile Include="Assets\Scripts\AssetSync.cs" />
      <Compile Include="Assets\Scripts\Asteroids.cs" />
      <Compile Include="Assets\Scripts\CCNScript.cs" />
+     <Compile Include="Assets\Scripts\Data.cs" />
      <Compile Include="Assets\Scripts\GUIScript.cs" />
      <Compile Include="Assets\Scripts\GetAsteroidNames.cs" />
      <Compile Include="Assets\Scripts\Motion.cs" />
