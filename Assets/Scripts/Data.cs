@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 
 public class Data : MonoBehaviour {
+	
 	public Dictionary<string, List<string>> data = new Dictionary<string, List<string>>();
 	
 	void Start () {
@@ -30,7 +31,6 @@ public class Data : MonoBehaviour {
 		}
 
 		file.Close();
-		
 		
 	}
 	
