@@ -1,20 +1,35 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class discover : MonoBehaviour {
 
 	
-	void Start () {
+	IEnumerator Start () {
 	
-		
 		Vector3 pos = Birth();
 		transform.position = pos;
 		
-		// compute labels for my current octant
 		string label = GetLabel(pos);
-        
+		
+        string nameprefix = "/" + label + "/asteroid";
+		
+		yield return Data.Start(); // wait for data to be loaded
+		List<string> content = Request(nameprefix);
+		
+		if(content == null)
+		{
+			print("Nothing in this octant!");
+		}
+		
+		foreach(string c in content)
+			RenderAsteroid(c);
+		
+		
+		
 	}
+	
 	
 	Vector3 Birth()
 	{
@@ -74,12 +89,48 @@ public class discover : MonoBehaviour {
 //		print(xbits);
 //		print(ybits);
 //		print(zbits);
-//		print(labels);
+		print(labels);
 		
 		return labels;
 	}
 	
-	void Update () {
+	List<string> Request(string name)
+	{
+		
+		Dictionary<string, List<string>> source = Data.data;
 	
+		if(source.ContainsKey(name))
+		{
+			print("There's something in this octant.");
+			return source[name];
+		}
+		else
+		{
+			print("Nothing here!");
+			return null;
+		}
+	}
+	
+	void RenderAsteroid(string info)
+	{
+		print(info);
+		
+		string [] split = info.Split((char[])null,StringSplitOptions.RemoveEmptyEntries);
+		foreach(string s in split)
+			print(s);
+		
+		string id = split[0];
+		float x = float.Parse(split[1]);
+		float y = float.Parse(split[2]);
+		float z = float.Parse(split[3]);
+		string type = split[4];
+		
+		Vector3 pos = new Vector3(x,y,z);
+		GameObject asteroid1 = GameObject.Find("asteroid1");
+		
+		
+		GameObject newAsteroid = UnityEngine.Object.Instantiate(asteroid1, pos, Quaternion.identity) as GameObject;
+		newAsteroid.name = "asteroid/"+id;
+		newAsteroid.transform.localScale = new Vector3(500f,500f,500f);
 	}
 }

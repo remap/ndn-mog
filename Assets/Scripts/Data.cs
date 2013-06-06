@@ -5,9 +5,10 @@ using System.IO;
 
 public class Data : MonoBehaviour {
 	
-	public Dictionary<string, List<string>> data = new Dictionary<string, List<string>>();
+	public static bool ready = false;
+	public static Dictionary<string, List<string>> data = new Dictionary<string, List<string>>();
 	
-	void Start () {
+	public static bool Start () {
 		
 		string line;
 		StreamReader file = new StreamReader("data.txt");
@@ -31,6 +32,7 @@ public class Data : MonoBehaviour {
 		}
 
 		file.Close();
+		return true;
 		
 	}
 	
