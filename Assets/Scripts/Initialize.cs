@@ -3,36 +3,53 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-public class discover : MonoBehaviour {
+public class Initialize : MonoBehaviour {
 
 	
 	IEnumerator Start () {
 	
-		
-		Vector3 pos = Birth();
+		yield return Data.Start(); 
+		int id = UnityEngine.Random.Range(1,967);
+		string name = "/asteroid/" + id;
+		List<string> content = Request(name);
+		string info = content[0];
+		string [] split = info.Split((char[])null,StringSplitOptions.RemoveEmptyEntries);
+		float x = float.Parse(split[1]);
+		float y = float.Parse(split[2]);
+		float z = float.Parse(split[3]);
+		Vector3 pos = new Vector3(x,y+25,z);
 		transform.position = pos;
+		ShowBoat(false);
 		
-		string label = GetLabel(pos);
+		RenderAsteroid(info);
 		
-        string nameprefix = "/" + label + "/asteroid";
-		
-		yield return Data.Start(); // wait for data to be loaded
-		List<string> content = Request(nameprefix);
-		
-		if(content == null)
-		{
-			print("Nothing in this octant!");
-		}
-		
-		foreach(string c in content)
-		{
-			
-			RenderAsteroid(c); // don't render here, just parse asteroid and store the info. Render should come later.
-			
-		}
+//		Vector3 pos = Birth();
+//		transform.position = pos;
+//		
+//		string label = GetLabel(pos);
+//		
+//        string nameprefix = "/" + label + "/asteroid";
+//		
+//		yield return Data.Start(); // wait for data to be loaded
+//		List<string> content = Request(nameprefix);
+//		
+//		if(content == null)
+//		{
+//			print("Nothing in this octant!");
+//		}
+//		
+//		foreach(string c in content)
+//		{
+//			RenderAsteroid(c); 
+//		}
 		
 	}
 	
+	void ShowBoat(bool b)
+	{
+		transform.Find("FPS").Find("Graphics").Find("boat").gameObject.SetActiveRecursively(b);
+		transform.Find("TPS").Find("Graphics").Find("boat").gameObject.SetActiveRecursively(b);
+	}
 	
 	Vector3 Birth()
 	{

@@ -3,24 +3,27 @@ using System.Collections;
 
 public class switchRole : MonoBehaviour {
 
-	public GameObject FPS;
-	public GameObject TPS;
-	public bool FirstPersonView;
+	
+	Transform FPS;
+	Transform TPS;
 	
 	void Start()
 	{
-		FPS.SetActiveRecursively(false);
-		TPS.SetActiveRecursively(true);
-		FirstPersonView = false;
+		FPS = transform.Find("FPS");
+		TPS = transform.Find("TPS");
+		
+		FPS.gameObject.SetActiveRecursively(false);
+		TPS.gameObject.SetActiveRecursively(true);
+		
 	}
 	
 	void Update () {
 	
 		if (Input.GetKeyUp (KeyCode.Escape))
 		{
-			FPS.SetActiveRecursively( !FPS.active );
-			TPS.SetActiveRecursively( !TPS.active );
-			FirstPersonView = !FirstPersonView;
+			FPS.gameObject.SetActiveRecursively( !FPS.active );
+			TPS.gameObject.SetActiveRecursively( !TPS.active );
+			
 		}
 	}
 }
