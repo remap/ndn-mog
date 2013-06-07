@@ -8,6 +8,7 @@ public class discover : MonoBehaviour {
 	
 	IEnumerator Start () {
 	
+		
 		Vector3 pos = Birth();
 		transform.position = pos;
 		
@@ -24,9 +25,11 @@ public class discover : MonoBehaviour {
 		}
 		
 		foreach(string c in content)
-			RenderAsteroid(c);
-		
-		
+		{
+			
+			RenderAsteroid(c); // don't render here, just parse asteroid and store the info. Render should come later.
+			
+		}
 		
 	}
 	

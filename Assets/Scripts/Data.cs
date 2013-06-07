@@ -32,6 +32,10 @@ public class Data : MonoBehaviour {
 		}
 
 		file.Close();
+		
+//		foreach(string k in data.Keys)
+//			print(k);
+		
 		return true;
 		
 	}
