@@ -4,24 +4,27 @@ using System;
 using System.Collections.Generic;
 
 public class Initialize : MonoBehaviour {
-
 	
-	IEnumerator Start () {
+	// this is called in FindAsteroid.cs
+	public void LandOnRandomAsteroid () {
 	
-		yield return Data.Start(); 
+		GetComponent<Data>().Load();
+		
+		
 		int id = UnityEngine.Random.Range(1,967);
 		string name = "/asteroid/" + id;
-		List<string> content = Request(name);
+		print(name);
+		List<string> content = GetComponent<FindAsteroids>().Request(name);
 		string info = content[0];
 		string [] split = info.Split((char[])null,StringSplitOptions.RemoveEmptyEntries);
 		float x = float.Parse(split[1]);
 		float y = float.Parse(split[2]);
 		float z = float.Parse(split[3]);
-		Vector3 pos = new Vector3(x,y+25,z);
+		Vector3 pos = new Vector3(x,y+100,z);
 		transform.position = pos;
 		ShowBoat(false);
 		
-		RenderAsteroid(info);
+		
 		
 //		Vector3 pos = Birth();
 //		transform.position = pos;
@@ -77,80 +80,4 @@ public class Initialize : MonoBehaviour {
 		return pos;
 	}
 	
-	string GetLabel(Vector3 position)
-	{
-		// decimal points in x,y,z
-		// will not be used in this funciton
-		
-		// get binaries
-		string xbits = Convert.ToString((int)position.x, 2).PadLeft(13,'0');
-		string ybits = Convert.ToString((int)position.y, 2).PadLeft(13,'0');
-		string zbits = Convert.ToString((int)position.z, 2).PadLeft(13,'0');
-		
-		
-		// reorganize
-		string L1bits = ""+xbits[0] + ybits[0] + zbits[0]; 
-		string L2bits = ""+xbits[1] + ybits[1] + zbits[1];
-		string L3bits = ""+xbits[2] + ybits[2] + zbits[2];
-		string L4bits = ""+xbits[3] + ybits[3] + zbits[3];
-		
-		int temp1 = Convert.ToInt32(L1bits, 2); 
-		int temp2 = Convert.ToInt32(L2bits, 2); 
-		int temp3 = Convert.ToInt32(L3bits, 2); 
-		int temp4 = Convert.ToInt32(L4bits, 2); 
-		
-		string L1 = Convert.ToString(temp1, 8);
-		string L2 = Convert.ToString(temp2, 8);
-		string L3 = Convert.ToString(temp3, 8);
-		string L4 = Convert.ToString(temp4, 8);
-		
-		string labels = ""+L1 + "/" + L2 + "/" + L3 + "/" + L4;
-		
-//		print(xbits);
-//		print(ybits);
-//		print(zbits);
-		print(labels);
-		
-		return labels;
-	}
-	
-	List<string> Request(string name)
-	{
-		
-		Dictionary<string, List<string>> source = Data.data;
-	
-		if(source.ContainsKey(name))
-		{
-			print("There's something in this octant.");
-			return source[name];
-		}
-		else
-		{
-			print("Nothing here!");
-			return null;
-		}
-	}
-	
-	void RenderAsteroid(string info)
-	{
-		print(info);
-		
-		string [] split = info.Split((char[])null,StringSplitOptions.RemoveEmptyEntries);
-		foreach(string s in split)
-			print(s);
-		
-		string id = split[0];
-		float x = float.Parse(split[1]);
-		float y = float.Parse(split[2]);
-		float z = float.Parse(split[3]);
-		string type = split[4];
-		
-		Vector3 pos = new Vector3(x,y,z);
-		GameObject asteroid1 = GameObject.Find("asteroid1");
-		
-		
-		GameObject newAsteroid = UnityEngine.Object.Instantiate(asteroid1, pos, Quaternion.identity) as GameObject;
-		newAsteroid.name = "asteroid/"+id;
-		newAsteroid.transform.localScale = new Vector3(500f,500f,500f);
-	}
 }

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class switchRole : MonoBehaviour {
+public class switchView : MonoBehaviour {
 
 	
 	Transform FPS;

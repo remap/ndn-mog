@@ -8,7 +8,8 @@ public class Data : MonoBehaviour {
 	public static bool ready = false;
 	public static Dictionary<string, List<string>> data = new Dictionary<string, List<string>>();
 	
-	public static bool Start () {
+	// this is called in Initialize.cs
+	public bool Load () {
 		
 		string line;
 		StreamReader file = new StreamReader("data.txt");
@@ -35,6 +36,7 @@ public class Data : MonoBehaviour {
 		
 //		foreach(string k in data.Keys)
 //			print(k);
+		
 		
 		return true;
 		

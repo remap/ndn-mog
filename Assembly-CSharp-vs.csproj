@@ -48,13 +48,14 @@
      <Compile Include="Assets\Scripts\Asteroids.cs" />
      <Compile Include="Assets\Scripts\CCNScript.cs" />
      <Compile Include="Assets\Scripts\Data.cs" />
+     <Compile Include="Assets\Scripts\FindAsteroids.cs" />
      <Compile Include="Assets\Scripts\GUIScript.cs" />
      <Compile Include="Assets\Scripts\GetAsteroidNames.cs" />
      <Compile Include="Assets\Scripts\Initialize.cs" />
      <Compile Include="Assets\Scripts\Motion.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\move.cs" />
-     <Compile Include="Assets\Scripts\switchRole.cs" />
+     <Compile Include="Assets\Scripts\switchView.cs" />
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurfacePro Hidden Front Cut Out Specular.shader" />
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurface Free Cut Out Opaque Bump.shader" />
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurfacePro Hidden Front Transparent.shader" />
