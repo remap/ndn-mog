@@ -19,6 +19,7 @@ public class Data : MonoBehaviour {
 			string [] split = line.Split(new char [] {','});
 			
 			string key = split[0];
+			key = key.Trim();
 			string singlevalue = split[1];
 			
 			if(data.ContainsKey(key))

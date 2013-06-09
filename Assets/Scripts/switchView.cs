@@ -17,13 +17,13 @@ public class switchView : MonoBehaviour {
 		
 	}
 	
-	void Update () {
-	
-		if (Input.GetKeyUp (KeyCode.Escape))
-		{
-			FPS.gameObject.SetActiveRecursively( !FPS.active );
-			TPS.gameObject.SetActiveRecursively( !TPS.active );
-			
-		}
-	}
+//	void Update () {
+//	
+//		if (Input.GetKeyUp (KeyCode.Escape))
+//		{
+//			FPS.gameObject.SetActiveRecursively( !FPS.active );
+//			TPS.gameObject.SetActiveRecursively( !TPS.active );
+//			
+//		}
+//	}
 }

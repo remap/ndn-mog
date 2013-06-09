@@ -22,7 +22,8 @@ public class Initialize : MonoBehaviour {
 		float z = float.Parse(split[3]);
 		Vector3 pos = new Vector3(x,y+100,z);
 		transform.position = pos;
-		ShowBoat(false);
+		GameObject.Find("MainCamera").transform.position = pos;
+		//ShowBoat(false);
 		
 		
 		

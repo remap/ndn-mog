@@ -45,7 +45,8 @@ public class FindAsteroids : MonoBehaviour {
 		AddAsteroidBySpace(nimbus);
 		
 		bry = GetBoundaries(aura[0]);
-		InvokeRepeating("CheckPos", 0, 0.3F);
+		
+		//InvokeRepeating("CheckPos", 0, 0.3F);
 	}
 	
 	void CheckPos() {
@@ -67,6 +68,10 @@ public class FindAsteroids : MonoBehaviour {
 			
 			AddAsteroidBySpace(newoct);
 			DeleteAsteroidBySpace(oldoct);
+			
+			nimbus.Clear();
+			nimbus.AddRange(newnimbus);
+			bry = GetBoundaries(aura[0]);
 			
 		}
 		
@@ -112,7 +117,7 @@ public class FindAsteroids : MonoBehaviour {
 			asteroidids = asteroidDic[o];
 			foreach(string id in asteroidids)
 			{
-				Destroy( GameObject.Find("asteroid/"+id) );
+				Destroy( GameObject.Find("asteroid"+id) );
 			}
 			asteroidDic.Remove(o);
 		}
@@ -346,7 +351,7 @@ public class FindAsteroids : MonoBehaviour {
 		
 		
 		GameObject newAsteroid = UnityEngine.Object.Instantiate(asteroid1, pos, Quaternion.identity) as GameObject;
-		newAsteroid.name = "asteroid/"+id;
+		newAsteroid.name = "asteroid"+id;
 		newAsteroid.transform.localScale = new Vector3(2000f,2000f,2000f);
 		
 		return id;
