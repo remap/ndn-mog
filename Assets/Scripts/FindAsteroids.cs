@@ -27,8 +27,8 @@ public class FindAsteroids : MonoBehaviour {
 	Boundary bry;
 	
 	// octant names
-	List<string> aura = new List<string>(); // <octant labels>
-	List<string> nimbus = new List<string>();
+	List<string> aura; // <octant labels>
+	List<string> nimbus;
 	
 	// object names
 	Dictionary<string,List<string>> asteroidDic = new Dictionary<string, List<string>>(); // <label,<id>>
@@ -37,25 +37,41 @@ public class FindAsteroids : MonoBehaviour {
 		
 		GetComponent<Initialize>().LandOnRandomAsteroid();
 		
-		aura.Add ( GetLabel(transform.position) );
+		aura = new List<string>();
+		nimbus = new List<string>();
 		
+		string temp = GetLabel(transform.position);
+		if(temp==null)
+		{
+			print("FindAsteroids.Start(): Aura is null!");
+			return;
+		}
+		
+		aura.Add ( temp );
 		nimbus.AddRange( aura ); // nimbus contains aura
 		nimbus.AddRange ( GetNeighbors(transform.position) );
-		
 		AddAsteroidBySpace(nimbus);
 		
 		bry = GetBoundaries(aura[0]);
 		
-		//InvokeRepeating("CheckPos", 0, 0.3F);
+		InvokeRepeating("CheckPos", 0, 0.3F);
 	}
 	
 	void CheckPos() {
 		
+		string temp = null;
 		
 		if( InBound(transform.position) == false )
 		{
 			aura.Clear();
-			aura.Add ( GetLabel(transform.position) );
+			temp = GetLabel(transform.position);
+			if(temp == null)
+			{
+				print("FindAsteroids.CheckPos(): Aura is null!");
+				return;
+			}
+			
+			aura.Add ( temp );
 			
 			List<string> newnimbus = new List<string>();
 			newnimbus.AddRange( aura );
@@ -63,24 +79,38 @@ public class FindAsteroids : MonoBehaviour {
 			
 			List<string> newoct = new List<string>(); // octants to be added to nimubs
 			List<string> oldoct = new List<string>(); // octants to be deleted from nimbus
-			List<string> sameoct = new List<string>();
-			CompareNimbus(nimbus, newnimbus, newoct, oldoct, sameoct);
 			
+			CompareNimbus(nimbus, newnimbus, newoct, oldoct);
+			
+//			print(string.Join(",  ", nimbus.ToArray()));
+//			print(string.Join(",  ", newnimbus.ToArray()));
+			print("new octant to be added: " + string.Join(",  ", newoct.ToArray()));
+			print("old octant to be deleted: " + string.Join(",  ", oldoct.ToArray()));
+			string sum = "";
+			foreach(string k in asteroidDic.Keys)
+			{
+				sum = sum + k + ",  ";
+			}
+			print("asteroidDictionary before +/-: " + sum);
+				
 			AddAsteroidBySpace(newoct);
 			DeleteAsteroidBySpace(oldoct);
+			
+			sum = "";
+			foreach(string k in asteroidDic.Keys)
+			{
+				sum = sum + k + ",  ";
+			}
+			print("asteroidDictionary after +/-: " + sum);
+			
+			newoct.Clear();
+			oldoct.Clear();
 			
 			nimbus.Clear();
 			nimbus.AddRange(newnimbus);
 			bry = GetBoundaries(aura[0]);
 			
 		}
-		
-        // check positon
-		// if out of boundary recompute labels
-		// query new octants
-		// parse, render, store new asteroids
-		// destroy old asteroids, using key "/L1/L2/L3/L4/asteroid"
-		// this will destroy all asteroids in the octant
 		
     }
 	
@@ -90,6 +120,12 @@ public class FindAsteroids : MonoBehaviour {
 		List<string> asteroidnames = null;
 		foreach(string n in nimbus)
 		{
+			if(asteroidDic.ContainsKey(n)==true)
+			{
+				// print("AddAsteroidBySpace(): this octant is not new! --" + n);
+				continue;
+			}
+			
 			asteroidnames = Request("/" + n + "/asteroid");
 			if(asteroidnames != null)
 			{ 
@@ -114,28 +150,36 @@ public class FindAsteroids : MonoBehaviour {
 		List<string> asteroidids;
 		foreach(string o in octs)
 		{
+			if(asteroidDic.ContainsKey(o) == false)
+			{
+				// print("DeleteAsteroidBySpace(): this octant is not old! --" + o);
+				continue;
+			}
+			
 			asteroidids = asteroidDic[o];
 			foreach(string id in asteroidids)
 			{
-				Destroy( GameObject.Find("asteroid"+id) );
+				GameObject t = GameObject.Find("asteroid"+id);
+				if(!t)
+				{
+					print("Can't destroy asteroid with given id.");
+				}
+				Destroy( t );
 			}
 			asteroidDic.Remove(o);
 		}
 	}
 	
 	void CompareNimbus(List<string> oldnimbus, List<string> newnimbus, 
-		List<string> newoct, List<string> oldoct, List<string> sameoct)
+		List<string> newoct, List<string> oldoct)
 	{
 		foreach(string o in oldnimbus)
 		{
-			if(newnimbus.Contains(o))
-			{
-				sameoct.Add(o);
-			}
-			else
+			if(newnimbus.Contains(o)==false)
 			{
 				oldoct.Add(o);
 			}
+			
 		}
 		
 		foreach(string n in newnimbus)
@@ -219,57 +263,38 @@ public class FindAsteroids : MonoBehaviour {
 	
 	List<string> GetNeighbors(Vector3 position)
 	{
-		List<string> temp = new List<string>();
+		List<string> neighborlist = new List<string>();
+		int[,] neighbors = {{1,0,0}, {-1,0,0}, // x
+							{0,1,0}, {0,-1,0}, // y
+							{0,0,1}, {0,0,-1}, // z
+							{1,1,0}, {1,-1,0}, {-1,1,0}, {-1,-1,0}, // x,y
+							{1,0,1}, {1,0,-1}, {-1,0,1}, {-1,0,-1}, // x,z
+							{0,1,1}, {0,1,-1}, {0,-1,1}, {0,-1,-1}, // y,z
+							{1,1,1}, {-1,1,1}, {1,-1,1}, {1,1,-1}, {1,-1,-1}, {-1,1,-1}, {-1,-1,1},{-1,-1,-1} // x,y,z
+		};
 		
-		// x
-		temp.Add ( GetLabel( new Vector3(position.x+512,position.y,position.z) ) );
-		temp.Add ( GetLabel( new Vector3(position.x-512,position.y,position.z) ) );
+		Vector3 offset = new Vector3();
+		string temp = null;
+		for(int i = 0; i<26; i++)
+		{
+			offset.x = neighbors[i,0] * 512;
+			offset.y = neighbors[i,1] * 512;
+			offset.z = neighbors[i,2] * 512;
+			
+			temp = GetLabel(position+offset);
+			if(temp!=null)
+			{
+				neighborlist.Add(temp);
+			}
+		}
 		
-		// z
-		temp.Add ( GetLabel( new Vector3(position.x,position.y,position.z+512) ) );
-		temp.Add ( GetLabel( new Vector3(position.x,position.y,position.z-512) ) );
 		
-		// y
-		temp.Add ( GetLabel( new Vector3(position.x,position.y+512,position.z) ) );
-		temp.Add ( GetLabel( new Vector3(position.x,position.y-512,position.z) ) );
-		
-		// x,z
-		temp.Add ( GetLabel( new Vector3(position.x+512,position.y,position.z+512) ) );
-		temp.Add ( GetLabel( new Vector3(position.x+512,position.y,position.z-512) ) );
-		temp.Add ( GetLabel( new Vector3(position.x-512,position.y,position.z+512) ) );
-		temp.Add ( GetLabel( new Vector3(position.x-512,position.y,position.z-512) ) );
-		
-		// x,y
-		temp.Add ( GetLabel( new Vector3(position.x+512,position.y+512,position.z) ) );
-		temp.Add ( GetLabel( new Vector3(position.x+512,position.y-512,position.z) ) );
-		temp.Add ( GetLabel( new Vector3(position.x-512,position.y+512,position.z) ) );
-		temp.Add ( GetLabel( new Vector3(position.x-512,position.y-512,position.z) ) );
-		
-		// y,z
-		temp.Add ( GetLabel( new Vector3(position.x,position.y+512,position.z+512) ) );
-		temp.Add ( GetLabel( new Vector3(position.x,position.y+512,position.z-512) ) );
-		temp.Add ( GetLabel( new Vector3(position.x,position.y-512,position.z+512) ) );
-		temp.Add ( GetLabel( new Vector3(position.x,position.y-512,position.z-512) ) );
-		
-		//x,y,z
-		temp.Add ( GetLabel( new Vector3(position.x+512,position.y+512,position.z+512) ) );
-		
-		temp.Add ( GetLabel( new Vector3(position.x-512,position.y+512,position.z+512) ) );
-		temp.Add ( GetLabel( new Vector3(position.x+512,position.y-512,position.z+512) ) );
-		temp.Add ( GetLabel( new Vector3(position.x+512,position.y+512,position.z-512) ) );
-		
-		temp.Add ( GetLabel( new Vector3(position.x+512,position.y-512,position.z-512) ) );
-		temp.Add ( GetLabel( new Vector3(position.x-512,position.y+512,position.z-512) ) );
-		temp.Add ( GetLabel( new Vector3(position.x-512,position.y-512,position.z+512) ) );
-		
-		temp.Add ( GetLabel( new Vector3(position.x-512,position.y-512,position.z-512) ) );
-		
-		return temp;
+		return neighborlist;
 	}
 	
 	Boundary GetBoundaries(string labels)
 	{
-		print(labels);
+		// print(labels);
 		string [] split = labels.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
 		
 		int L1oct = Convert.ToInt32(split[0],8);
@@ -322,23 +347,23 @@ public class FindAsteroids : MonoBehaviour {
 	
 		if(source.ContainsKey(name))
 		{
-			print("There's something in this octant.");
+			// print("There's something in this octant.");
 			return source[name];
 		}
 		else
 		{
-			print("Nothing here!");
+			// print("Nothing here!");
 			return null;
 		}
 	}
 	
 	string DoAsteroid(string info)
 	{
-		print(info);
+		//print(info);
 		
 		string [] split = info.Split((char[])null,StringSplitOptions.RemoveEmptyEntries);
-		foreach(string s in split)
-			print(s);
+//		foreach(string s in split)
+//			print(s);
 		
 		string id = split[0];
 		float x = float.Parse(split[1]);
@@ -347,7 +372,7 @@ public class FindAsteroids : MonoBehaviour {
 		string type = split[4];
 		
 		Vector3 pos = new Vector3(x,y,z);
-		GameObject asteroid1 = GameObject.Find("asteroid1");
+		GameObject asteroid1 = GameObject.Find("tree2");
 		
 		
 		GameObject newAsteroid = UnityEngine.Object.Instantiate(asteroid1, pos, Quaternion.identity) as GameObject;
