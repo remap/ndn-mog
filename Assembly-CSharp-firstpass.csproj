@@ -80,7 +80,6 @@
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurface Free Cut Out Specular.shader" />
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurfacePro Hidden Front Cut Out Opaque Diffuse.shader" />
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurfacePro Hidden Front Transparent Bump.shader" />
-     <None Include="Assets\data.txt" />
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurface Free Cut Out Bump.shader" />
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurface Free Opaque Specular.shader" />
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurfacePro Hidden Front Opaque Specular.shader" />
