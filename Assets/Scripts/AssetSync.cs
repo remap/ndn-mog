@@ -85,7 +85,7 @@ public class AssetSync : MonoBehaviour {
 		
 		IntPtr slice = Egal.ccns_slice_create();
 		Egal.ccns_slice_set_topo_prefix(slice, topo, prefix);
-		IntPtr h = CCNScript.GetHandle();
+		IntPtr h = Egal.GetHandle();
 		res = Egal.ccns_write_slice(h, slice, prefix);
     	Egal.ccn_destroy(ref h);
     	Egal.ccns_slice_destroy(ref slice); // after this, slice == 0
@@ -191,7 +191,7 @@ public class AssetSync : MonoBehaviour {
 	static void ReadFromRepo(string dst)
 	{
 		print("Reading from the repo.");
-		IntPtr ccn = CCNScript.GetHandle();
+		IntPtr ccn = Egal.GetHandle();
 		
 		IntPtr nm = Egal.ccn_charbuf_create();
 		Egal.ccn_name_from_uri(nm,dst);
@@ -221,7 +221,7 @@ public class AssetSync : MonoBehaviour {
 	{
 		// this is a C# expansion of Egal.WatchOverRepo
 		int res;
-		h_ccns_watch = CCNScript.GetHandle();
+		h_ccns_watch = Egal.GetHandle();
 		IntPtr prefix = Egal.ccn_charbuf_create();
 		IntPtr topo = Egal.ccn_charbuf_create();
 		
@@ -406,7 +406,7 @@ public class AssetSync : MonoBehaviour {
 		print ("Writing " + name + " to repo: " + content);
 		
 		int res;
-		IntPtr h = CCNScript.GetHandle();
+		IntPtr h = Egal.GetHandle();
 		IntPtr cb = Egal.ccn_charbuf_create();
 		IntPtr nm = Egal.ccn_charbuf_create();
 		IntPtr cmd = Egal.ccn_charbuf_create();

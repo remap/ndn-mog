@@ -25,7 +25,7 @@ public class GetAsteroidNames : MonoBehaviour {
 	
 	void Start () {
 	
-		IntPtr ccn = CCNScript.GetHandle();
+		IntPtr ccn = Egal.GetHandle();
 		IntPtr name = Egal.ccn_charbuf_create();
 		Egal.ccn_name_from_uri(name, "ccnx:/ndn/ucla.edu/airports/%C1.E.be");
 		

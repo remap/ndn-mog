@@ -86,6 +86,9 @@
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurface Free Opaque Specular.shader" />
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurfacePro Hidden Front Opaque Specular.shader" />
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurface SFX Depth Write Only.shader" />
+ <Reference Include="Assets\Plugins\Newtonsoft.Json">
+ <HintPath>Assets\Plugins\Newtonsoft.Json.dll</HintPath>
+ </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">

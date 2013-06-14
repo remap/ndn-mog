@@ -2,9 +2,128 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 public class Egal: MonoBehaviour {
 	
+	/////////////////////////////////////////////////////////////////
+	//////////////////////// Egal Library ///////////////////////////
+	/////////////////////////////////////////////////////////////////
+	
+	// GetHandle()
+	// create a handle and connect it to ccnd
+	// returns the handle if success
+	public static IntPtr GetHandle()
+	{
+		
+		IntPtr ccn = Egal.ccn_create();
+		if (Egal.ccn_connect(ccn, "") == -1) 
+        	print("could not connect to ccnd.");
+		else
+			print ("a handle is connected to ccnd.");
+		return ccn;
+	}
+	
+	
+	
+	
+	// ExpressInterest()
+	// takes handle, name, callback and template
+	public static int ExpressInterest(IntPtr ccn, string name, Egal.ccn_handler callback, IntPtr template)
+	{
+		IntPtr nm = Egal.ccn_charbuf_create();
+		Egal.ccn_name_from_uri(nm,name);
+		Egal.ccn_closure Action = new Egal.ccn_closure(callback, IntPtr.Zero, 0);
+		IntPtr pnt = Marshal.AllocHGlobal(Marshal.SizeOf(Action));
+		Marshal.StructureToPtr(Action, pnt, true);
+		
+		Egal.ccn_express_interest(ccn,nm,pnt,template);
+		
+		return 0;
+	}
+	
+	
+	
+	
+	// ccnRun()
+	// takes handle and time
+	// starts a new thread and run ccn_run on the handle for the specified time
+	public static Thread ccnRun(IntPtr ccn, int time)
+	{
+		
+		Thread oThread = new Thread(() => run(ccn, time));
+      	oThread.Start();
+		return oThread;
+	}
+	public static void run(IntPtr ccn, int time)
+	{
+		Thread t = Thread.CurrentThread;
+		// print (t.IsAlive);
+		while(t.IsAlive == true)
+		{
+			//while(counter_for_run>0)
+				//;
+			Egal.ccn_run(ccn, time);
+		}
+		
+	}
+	
+	
+	
+	
+	// killCurrentThread()
+	// for cleaning up
+	// should be called in callbacks (CCN_UPCALL_FINAL)
+	public static void killCurrentThread() 
+	{
+		print ("killing thread...");
+		Thread oThread = Thread.CurrentThread;
+		oThread.Abort();
+		oThread.Join();
+	}
+	
+	
+	
+	
+	// GetInfo()
+	// Marshal ccn_upcall_info
+	public static ccn_upcall_info GetInfo(IntPtr info)
+	{
+		ccn_upcall_info Info = new Egal.ccn_upcall_info();
+		Info = (ccn_upcall_info)Marshal.PtrToStructure(info, typeof(ccn_upcall_info));
+		return Info;
+	}
+	
+	
+	
+	// GetContentValue()
+	// core: ccn_content_get_value()
+	public static string GetContentValue(IntPtr content_ccnb, IntPtr pco)
+	{
+		
+		ccn_parsed_ContentObject Pco = new ccn_parsed_ContentObject();
+		Pco = (ccn_parsed_ContentObject)Marshal.PtrToStructure(content_ccnb, typeof(ccn_parsed_ContentObject));
+		UInt16 source_length = Pco.offset[(int)PCO.ccn_parsed_content_object_offsetid.CCN_PCO_E];
+		IntPtr result_ptr = IntPtr.Zero;
+		int result_length = 0;
+        ccn_content_get_value(content_ccnb, source_length, pco, ref result_ptr, ref result_length);
+		string content = Marshal.PtrToStringAnsi(result_ptr);
+		
+		return content;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/////////////////////////////////////////////////////////////////
+	//////////////////////// CCNx Library ///////////////////////////
+	/////////////////////////////////////////////////////////////////
 	
 	// Structs //
 	//==================================//
@@ -187,8 +306,8 @@ public class Egal: MonoBehaviour {
 	[DllImport ("Egal")]
 	public static extern IntPtr Buffer(char mode, string name, string content);
 	
-	[DllImport ("Egal")]
-	public static extern IntPtr GetHandle();
+//	[DllImport ("Egal")]
+//	public static extern IntPtr GetHandle();
 	
 	[DllImport ("Egal")]
 	public static extern int WatchOverRepo(IntPtr h, string p, string t);
