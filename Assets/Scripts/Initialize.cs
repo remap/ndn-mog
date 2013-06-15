@@ -51,10 +51,15 @@ public class Initialize : MonoBehaviour {
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT_UNVERIFIED:
         	case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT:
 				string content = Egal.GetContentValue(Info.content_ccnb, Info.pco); // it's a json object
-				print(content);
+				print("content value: " + content);
 				Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(content);
-				foreach(string k in values.Keys)
-					print(k);
+//				foreach(string k in values.Keys)
+//					print(k);
+			
+				// get content name
+				string contentname = Egal.GetContentName(Info.content_ccnb);
+				print("content name: " + contentname);
+			
 				break;
 			
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:

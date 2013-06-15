@@ -115,7 +115,20 @@ public class Egal: MonoBehaviour {
 	
 	
 	
-	
+	// GetContentName()
+	// get name from content object
+	public static string GetContentName(IntPtr content_ccnb)
+	{
+		IntPtr c = ccn_charbuf_create();
+		ccn_parsed_ContentObject Pco = new ccn_parsed_ContentObject();
+		Pco = (ccn_parsed_ContentObject)Marshal.PtrToStructure(content_ccnb, typeof(ccn_parsed_ContentObject));
+		UInt16 source_length = Pco.offset[(int)PCO.ccn_parsed_content_object_offsetid.CCN_PCO_E];
+		ccn_uri_append(c, content_ccnb, source_length, 0);
+		IntPtr temp = ccn_charbuf_as_string(c);
+		string contentname = Marshal.PtrToStringAnsi(temp);
+		
+		return contentname;
+	}
 	
 	
 	
