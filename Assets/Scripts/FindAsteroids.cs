@@ -35,7 +35,7 @@ public class FindAsteroids : MonoBehaviour {
 	
 	void Start () {
 		
-		GetComponent<Initialize>().LandOnRandomAsteroid();
+		//GetComponent<Initialize>().LandOnRandomAsteroid();
 		
 		aura = new List<string>();
 		nimbus = new List<string>();

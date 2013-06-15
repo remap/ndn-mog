@@ -117,6 +117,9 @@ public class Egal: MonoBehaviour {
 	
 	// GetContentName()
 	// get name from content object
+	// takes info->content_ccnb
+	// returns full content name
+	// core: ccn_uri_append()
 	public static string GetContentName(IntPtr content_ccnb)
 	{
 		IntPtr c = ccn_charbuf_create();
@@ -126,7 +129,7 @@ public class Egal: MonoBehaviour {
 		ccn_uri_append(c, content_ccnb, source_length, 0);
 		IntPtr temp = ccn_charbuf_as_string(c);
 		string contentname = Marshal.PtrToStringAnsi(temp);
-		
+		//string [] split = contentname.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
 		return contentname;
 	}
 	
