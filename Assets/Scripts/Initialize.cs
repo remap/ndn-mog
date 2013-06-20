@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 
 public class Initialize : MonoBehaviour {
 	
+	public static bool finished = false;
 	public static string FirstAsteroid = "";
 	public static string FirstAsteroidName;
 	
@@ -15,7 +16,7 @@ public class Initialize : MonoBehaviour {
 	
 		string name = "/ndn/ucla.edu/apps/matryoshka/asteroid/octant";
 		IntPtr ccn = Egal.GetHandle(); // connect to ccnd
-		Egal.ExpressInterest(ccn, name, RequestCallback, IntPtr.Zero); // express interest
+		Egal.ExpressInterest(ccn, name, RequestCallback, IntPtr.Zero, IntPtr.Zero); // express interest
 		Egal.ccnRun(ccn, -1); // ccnRun starts a new thread
 		
 		while(FirstAsteroid == "")
@@ -24,7 +25,7 @@ public class Initialize : MonoBehaviour {
 		}
 		LandOnFirstAsteroid();  // create the 1st asteroid based on received data
 								// & put the doll on this asteroid
-		
+		finished = true;
 	}
 	
 	void LandOnFirstAsteroid()

@@ -29,11 +29,11 @@ public class Egal: MonoBehaviour {
 	
 	// ExpressInterest()
 	// takes handle, name, callback and template
-	public static int ExpressInterest(IntPtr ccn, string name, Egal.ccn_handler callback, IntPtr template)
+	public static int ExpressInterest(IntPtr ccn, string name, Egal.ccn_handler callback, IntPtr pData, IntPtr template)
 	{
 		IntPtr nm = Egal.ccn_charbuf_create();
 		Egal.ccn_name_from_uri(nm,name);
-		Egal.ccn_closure Action = new Egal.ccn_closure(callback, IntPtr.Zero, 0);
+		Egal.ccn_closure Action = new Egal.ccn_closure(callback, pData, 0);
 		IntPtr pnt = Marshal.AllocHGlobal(Marshal.SizeOf(Action));
 		Marshal.StructureToPtr(Action, pnt, true);
 		
@@ -43,6 +43,7 @@ public class Egal: MonoBehaviour {
 	}
 	
 	
+
 	
 	
 	// ccnRun()

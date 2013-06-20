@@ -2,9 +2,12 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Threading;
+using System.Runtime.InteropServices;
 
 public class FindAsteroids : MonoBehaviour {
 	
+	public string prefix = "/ndn/ucla.edu/apps/matryoshka";
 	// boundary: 512*512*512
 	struct Boundary{
 		public float xmin;
@@ -26,37 +29,52 @@ public class FindAsteroids : MonoBehaviour {
 	};
 	Boundary bry;
 	
-	// octant names
-	List<string> aura; // <octant labels>
+	// List <octant labels>
+	List<string> aura; 
 	List<string> nimbus;
 	
-	// object names
-	Dictionary<string,List<string>> asteroidDic = new Dictionary<string, List<string>>(); // <label,<id>>
+	// Dictionary < octant label, List <asteroid ids> >
+	Dictionary<string,List<string>> asteroidDic = new Dictionary<string, List<string>>(); 
 	
-	void Start () {
-		
-		//GetComponent<Initialize>().LandOnRandomAsteroid();
+	
+	public struct Exclude
+	{
+		public int n_excl;
+		public IntPtr exclist;
+	}
+	
+	
+	
+	IEnumerator Start () {
 		
 		aura = new List<string>();
 		nimbus = new List<string>();
+		
+		while(Initialize.finished != true)
+		{
+			yield return new WaitForSeconds(0.05f);
+		}
+		
+		print(transform.position);
 		
 		string temp = GetLabel(transform.position);
 		if(temp==null)
 		{
 			print("FindAsteroids.Start(): Aura is null!");
-			return;
+			return false;
 		}
 		
 		aura.Add ( temp );
-		nimbus.AddRange( aura ); // nimbus contains aura
+		nimbus.AddRange ( aura ); // nimbus contains aura
 		nimbus.AddRange ( GetNeighbors(transform.position) );
-		AddAsteroidBySpace(nimbus);
+		AddAsteroidBySpace ( nimbus );
 		
-		bry = GetBoundaries(aura[0]);
+		bry = GetBoundaries ( aura[0] );
 		
 		InvokeRepeating("CheckPos", 0, 0.3F);
 	}
 	
+
 	void CheckPos() {
 		
 		string temp = null;
@@ -126,21 +144,22 @@ public class FindAsteroids : MonoBehaviour {
 				continue;
 			}
 			
-			asteroidnames = Request("/" + n + "/asteroid");
-			if(asteroidnames != null)
-			{ 
-				foreach(string a in asteroidnames)
-				{
-					string id = DoAsteroid(a);
-					
-					if(asteroidDic.ContainsKey(n)==false)
-					{
-						asteroidDic.Add (n,new List<string>());
-					}
-					asteroidDic[n].Add(id);
-						
-				}
-			}
+			RequestAll( prefix + "/asteroid/octant/" + n);
+			
+//			if(asteroidnames != null)
+//			{ 
+//				foreach(string a in asteroidnames)
+//				{
+//					string id = DoAsteroid(a);
+//					
+//					if(asteroidDic.ContainsKey(n)==false)
+//					{
+//						asteroidDic.Add (n,new List<string>());
+//					}
+//					asteroidDic[n].Add(id);
+//						
+//				}
+//			}
 			
 		}
 	}
@@ -340,21 +359,42 @@ public class FindAsteroids : MonoBehaviour {
 		
 	}
 	
-	public List<string> Request(string name)
+	static Upcall.ccn_upcall_res RequestAllCallback (IntPtr selfp, Upcall.ccn_upcall_kind kind, IntPtr info)
 	{
+		print("RequestAllCallback: " + kind);
+		Egal.ccn_upcall_info Info = Egal.GetInfo(info);
+		IntPtr h=Info.h;
 		
-		Dictionary<string, List<string>> source = Data.data;
+		switch (kind) {
+			case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT_UNVERIFIED:
+        	case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT:
+				
+				
+				break;
+			
+			case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:
+				Egal.ccn_set_run_timeout(h, 0); 
+				Egal.killCurrentThread(); // kill current thread
+				break;
+			default: break;
+		}
+		return Upcall.ccn_upcall_res.CCN_UPCALL_RESULT_OK;
+	}
 	
-		if(source.ContainsKey(name))
-		{
-			// print("There's something in this octant.");
-			return source[name];
-		}
-		else
-		{
-			// print("Nothing here!");
-			return null;
-		}
+	public List<string> RequestAll(string name)
+	{
+		//print("requestall: " + name);
+		
+		Exclude Data = new Exclude();
+		IntPtr pData = Marshal.AllocHGlobal(Marshal.SizeOf(Data));
+		Marshal.StructureToPtr(Data, pData, true);
+		
+
+		IntPtr ccn = Egal.GetHandle(); // connect to ccnd
+		Egal.ExpressInterest(ccn, name, RequestAllCallback, pData, IntPtr.Zero); // express interest
+		Egal.ccnRun(ccn, -1); // ccnRun starts a new thread
+		
+		return null;
 	}
 	
 	string DoAsteroid(string info)
