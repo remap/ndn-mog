@@ -18,9 +18,13 @@ public class Egal: MonoBehaviour {
 		
 		IntPtr ccn = Egal.ccn_create();
 		if (Egal.ccn_connect(ccn, "") == -1) 
+		{
         	print("could not connect to ccnd.");
+		}
 		else
-			print ("a handle is connected to ccnd.");
+		{
+			//print ("a handle is connected to ccnd.");
+		}
 		return ccn;
 	}
 	
@@ -77,7 +81,7 @@ public class Egal: MonoBehaviour {
 	// should be called in callbacks (CCN_UPCALL_FINAL)
 	public static void killCurrentThread() 
 	{
-		print ("killing thread...");
+		// print ("killing thread...");
 		Thread oThread = Thread.CurrentThread;
 		oThread.Abort();
 		oThread.Join();

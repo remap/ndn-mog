@@ -361,14 +361,26 @@ public class FindAsteroids : MonoBehaviour {
 	
 	static Upcall.ccn_upcall_res RequestAllCallback (IntPtr selfp, Upcall.ccn_upcall_kind kind, IntPtr info)
 	{
-		print("RequestAllCallback: " + kind);
+		//print("RequestAllCallback: " + kind);
 		Egal.ccn_upcall_info Info = Egal.GetInfo(info);
 		IntPtr h=Info.h;
 		
 		switch (kind) {
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT_UNVERIFIED:
         	case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT:
+				IntPtr c;
+				IntPtr templ;
+				IntPtr comp;
+            	IntPtr ccnb;
+            	IntPtr comps;
+				string name = Egal.GetContentName(Info.content_ccnb);
 				
+				int index = name.IndexOf("/octant/");
+				string matchedprefix = name.Substring(0, index + 15);
+				string tail = name.Substring(index + 16);
+				string [] split = tail.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
+				string oldcomponent = split[0]; 
+				print("matched prefix: " + matchedprefix + ", component: " );
 				
 				break;
 			
