@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 public class FindAsteroids : MonoBehaviour {
 	
 	public string prefix = "/ndn/ucla.edu/apps/matryoshka";
+	
 	// boundary: 512*512*512
 	struct Boundary{
 		public float xmin;
@@ -28,15 +29,15 @@ public class FindAsteroids : MonoBehaviour {
 			zmax = f;
 		}
 	};
-	Boundary bry;
+	static Boundary bry;
 	
 	// List <octant labels>
 	List<string> aura; 
 	List<string> nimbus;
 	
 	// Dictionary < octant label, List <asteroid ids> >
-	static Dictionary<string,List<string>> asteroidDic = new Dictionary<string, List<string>>(); 
-	static Dictionary<string, string> asteroidBuffer = new Dictionary<string, string> ();
+	public static Dictionary<string,List<string>> asteroidDic = new Dictionary<string, List<string>>(); 
+	public static Dictionary<string, string> asteroidBuffer = new Dictionary<string, string> ();
 	
 	public struct Exclude
 	{
@@ -58,7 +59,7 @@ public class FindAsteroids : MonoBehaviour {
 		
 		print(transform.position);
 		
-		string temp = GetLabel(transform.position);
+		string temp = M.GetLabel(transform.position);
 		if(temp==null)
 		{
 			print("FindAsteroids.Start(): Aura is null!");
@@ -83,11 +84,21 @@ public class FindAsteroids : MonoBehaviour {
 		{ 
 			foreach(string name in asteroidBuffer.Keys)
 			{
-				
-				string n = GetLabelFromName(name);
-				print(n);
 				string info = asteroidBuffer[name];
-				string id = DoAsteroid(info);
+				string n = M.GetLabelFromName(name);
+				print(n);
+				Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(info);
+				string id = values["fs"];
+				if(asteroidDic.ContainsKey(n)==true)
+				{
+					if(asteroidDic[n].Contains(id))
+					{
+						continue;
+					}
+				}
+				
+				
+				DoAsteroid(info);
 					
 				if(asteroidDic.ContainsKey(n)==false)
 				{
@@ -101,12 +112,7 @@ public class FindAsteroids : MonoBehaviour {
 		
 	}
 	
-	string GetLabelFromName(string name)
-	{
-		int index = name.IndexOf("/octant/");
-		string n = name.Substring(index+8,7);
-		return n;
-	}
+	
 	
 	void CheckPos() {
 		
@@ -115,7 +121,7 @@ public class FindAsteroids : MonoBehaviour {
 		if( InBound(transform.position) == false )
 		{
 			aura.Clear();
-			temp = GetLabel(transform.position);
+			temp = M.GetLabel(transform.position);
 			if(temp == null)
 			{
 				print("FindAsteroids.CheckPos(): Aura is null!");
@@ -231,7 +237,7 @@ public class FindAsteroids : MonoBehaviour {
 			
 	}
 	
-	bool InBound(Vector3 position)
+	static bool InBound(Vector3 position)
 	{
 		if(position.x<bry.xmin || position.y<bry.ymin || position.z<bry.zmin)
 		{
@@ -244,61 +250,8 @@ public class FindAsteroids : MonoBehaviour {
 		return true;
 	}
 	
-	bool InWorld(Vector3 position)
-	{
-		if(position.x<0 || position.y<0 || position.z<0)
-		{
-			return false;
-		}
-		if(position.x>8192 || position.y>8192 || position.z>8192)
-		{
-			return false;
-		}
-		return true;
-	}
+
 	
-	string GetLabel(Vector3 position)
-	{
-		// decimal points in x,y,z
-		// will not be used in this funciton
-		
-		// check if the point is in the game world
-		if(InWorld(position) == false)
-		{
-			return null;
-		}
-		
-		// get binaries
-		string xbits = Convert.ToString((int)position.x, 2).PadLeft(13,'0');
-		string ybits = Convert.ToString((int)position.y, 2).PadLeft(13,'0');
-		string zbits = Convert.ToString((int)position.z, 2).PadLeft(13,'0');
-		
-		
-		// reorganize
-		string L1bits = ""+xbits[0] + ybits[0] + zbits[0]; 
-		string L2bits = ""+xbits[1] + ybits[1] + zbits[1];
-		string L3bits = ""+xbits[2] + ybits[2] + zbits[2];
-		string L4bits = ""+xbits[3] + ybits[3] + zbits[3];
-		
-		int temp1 = Convert.ToInt32(L1bits, 2); 
-		int temp2 = Convert.ToInt32(L2bits, 2); 
-		int temp3 = Convert.ToInt32(L3bits, 2); 
-		int temp4 = Convert.ToInt32(L4bits, 2); 
-		
-		string L1 = Convert.ToString(temp1, 8);
-		string L2 = Convert.ToString(temp2, 8);
-		string L3 = Convert.ToString(temp3, 8);
-		string L4 = Convert.ToString(temp4, 8);
-		
-		string labels = ""+L1 + "/" + L2 + "/" + L3 + "/" + L4;
-		
-//		print(xbits);
-//		print(ybits);
-//		print(zbits);
-		
-		
-		return labels;
-	}
 	
 	List<string> GetNeighbors(Vector3 position)
 	{
@@ -320,7 +273,7 @@ public class FindAsteroids : MonoBehaviour {
 			offset.y = neighbors[i,1] * 512;
 			offset.z = neighbors[i,2] * 512;
 			
-			temp = GetLabel(position+offset);
+			temp = M.GetLabel(position+offset);
 			if(temp!=null)
 			{
 				neighborlist.Add(temp);
@@ -477,10 +430,10 @@ public class FindAsteroids : MonoBehaviour {
 	{
 		//print(info);
 		Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(info);
-		Vector3 pos = Initialize.GetGameCoordinates(values["latitude"], values["longitude"]);
+		Vector3 pos = M.GetGameCoordinates(values["latitude"], values["longitude"]);
 		Initialize.MakeAnAsteroid(pos, values["fs"]);
-		
-		
+		string label = M.GetLabel(pos);
+		print("fs: " + values["fs"] + ", label: " + label);
 		return values["fs"];
 	}
 }

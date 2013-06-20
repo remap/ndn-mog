@@ -25,14 +25,31 @@ public class Initialize : MonoBehaviour {
 		}
 		LandOnFirstAsteroid();  // create the 1st asteroid based on received data
 								// & put the doll on this asteroid
+		
 		finished = true;
 	}
 	
 	void LandOnFirstAsteroid()
 	{
+		string n = M.GetLabelFromName(FirstAsteroidName);
 		Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(FirstAsteroid);
-		Vector3 pos = GetGameCoordinates(values["latitude"], values["longitude"]);
+		string id = values["fs"];
+		if(FindAsteroids.asteroidDic.ContainsKey(n)==true)
+		{
+			if(FindAsteroids.asteroidDic[n].Contains(id))
+			{
+				print("Initialize failed!");
+				return;
+			}
+		}
+		Vector3 pos = M.GetGameCoordinates(values["latitude"], values["longitude"]);
 		MakeAnAsteroid(pos, values["fs"]);
+		if(FindAsteroids.asteroidDic.ContainsKey(n)==false)
+		{
+			FindAsteroids.asteroidDic.Add (n,new List<string>());
+		}
+		FindAsteroids.asteroidDic[n].Add(id);
+		
 		
 		Vector3 dollpos = pos + new Vector3(0, 95, 0);
 		transform.position = dollpos;
@@ -47,7 +64,9 @@ public class Initialize : MonoBehaviour {
 		GameObject asteroid1 = GameObject.Find("tree2");
 		GameObject newAsteroid = UnityEngine.Object.Instantiate(asteroid1, position, Quaternion.identity) as GameObject;
 		newAsteroid.name = "asteroid-"+id;
-		newAsteroid.transform.localScale = new Vector3(2000f,2000f,2000f);
+		newAsteroid.transform.localScale = new Vector3(1000f,1000f,1000f);
+		
+		
 	}
 	
 	
@@ -75,33 +94,7 @@ public class Initialize : MonoBehaviour {
 	}
 	
 	
-	public static Vector3 GetGameCoordinates(string str_lati, string str_longi)
-	{
-		// convert from latitude and longitude to game coordinates
-		
-		float latitude = Convert.ToSingle( str_lati );
-		float longitude = Convert.ToSingle( str_longi ) ;
-				
-		float theta = (float)(3.14*(1.0/2.0 + latitude/180));
-		float fi = (float)(3.14*(longitude/180));
-		double x = 4000* 0.78*Mathf.Cos(theta/4)*Mathf.Sin(theta)*Mathf.Sin(fi);
-		double y = 4000*1.0*Mathf.Cos(theta);
-        double z = 4000* 0.78*Mathf.Cos(theta/4)*Mathf.Sin(theta)*Mathf.Cos(fi);
-
-		// rotate the egg
-		double xx = x;
-		double yy = 0.7071*y - 0.7071*z;
-		double zz = 0.7071*y + 0.7071*z;
-
-		// translate the egg
-		double xxx = xx + 4000;
-		double yyy = yy + 4000;
-		double zzz = zz + 4000;
-
-		Vector3 pos = new Vector3((float)xxx,(float)yyy,(float)zzz);
-
-		return pos;
-	}
+	
 
 	
 }

@@ -52,6 +52,7 @@
      <Compile Include="Assets\Scripts\GUIScript.cs" />
      <Compile Include="Assets\Scripts\GetAsteroidNames.cs" />
      <Compile Include="Assets\Scripts\Initialize.cs" />
+     <Compile Include="Assets\Scripts\M.cs" />
      <Compile Include="Assets\Scripts\Motion.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\move.cs" />
