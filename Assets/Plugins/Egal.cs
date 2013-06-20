@@ -376,6 +376,9 @@ public class Egal: MonoBehaviour {
 	public static extern int ccn_charbuf_append(IntPtr c, string p, int n);
 	
 	[DllImport ("Egal")]
+	public static extern int ccn_charbuf_append2(IntPtr templ, IntPtr comp);
+	
+	[DllImport ("Egal")]
 	public static extern int ccn_charbuf_append_charbuf(IntPtr c, IntPtr n);
 
 	[DllImport ("Egal")]
@@ -405,6 +408,15 @@ public class Egal: MonoBehaviour {
 	
 	[DllImport ("Egal")]
 	public static extern int ccn_name_chop(IntPtr c, IntPtr components, int n);
+	
+	[DllImport ("Egal")]
+	public static extern int ccn_name_append_str(IntPtr c, string s);
+	
+	[DllImport ("Egal")]
+	public static extern int ccn_charbuf_append_tt (IntPtr c, int val, int tt);
+	
+	[DllImport ("Egal")]
+	public static extern int ccn_charbuf_append_closer (IntPtr c);
 
 
 	// slice, ccns

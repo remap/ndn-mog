@@ -39,8 +39,8 @@ public class FindAsteroids : MonoBehaviour {
 	
 	public struct Exclude
 	{
-		public int n_excl;
-		public IntPtr exclist;
+		public string filter; // components, seperated by ','
+		
 	}
 	
 	
@@ -67,11 +67,13 @@ public class FindAsteroids : MonoBehaviour {
 		aura.Add ( temp );
 		nimbus.AddRange ( aura ); // nimbus contains aura
 		nimbus.AddRange ( GetNeighbors(transform.position) );
-		AddAsteroidBySpace ( nimbus );
+		//AddAsteroidBySpace ( nimbus );
 		
 		bry = GetBoundaries ( aura[0] );
 		
-		InvokeRepeating("CheckPos", 0, 0.3F);
+		//InvokeRepeating("CheckPos", 0, 0.3F);
+		
+		RequestAll("/ndn/ucla.edu/apps/matryoshka/asteroid/octant/0/0/0/0");
 	}
 	
 
@@ -368,20 +370,61 @@ public class FindAsteroids : MonoBehaviour {
 		switch (kind) {
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT_UNVERIFIED:
         	case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT:
-				IntPtr c;
-				IntPtr templ;
-				IntPtr comp;
-            	IntPtr ccnb;
-            	IntPtr comps;
+				IntPtr c = Egal.ccn_charbuf_create();
+				IntPtr templ = Egal.ccn_charbuf_create();
+				IntPtr comp = Egal.ccn_charbuf_create();
+            	Egal.ccn_name_init(c);
+				Egal.ccn_name_init(comp);
+			
 				string name = Egal.GetContentName(Info.content_ccnb);
-				
+				print("received: " + name);
+			
 				int index = name.IndexOf("/octant/");
 				string matchedprefix = name.Substring(0, index + 15);
+				string [] split = matchedprefix.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
+				foreach(string s in split)
+				{
+					Egal.ccn_name_append_str(c, s);
+				}
+			
 				string tail = name.Substring(index + 16);
-				string [] split = tail.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
+				split = tail.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
 				string oldcomponent = split[0]; 
-				print("matched prefix: " + matchedprefix + ", component: " );
+				//Egal.ccn_name_append_str(comp, oldcomponent);
+			
+				Egal.ccn_charbuf_append_tt(templ, (int)Dtag.ccn_dtag.CCN_DTAG_Interest, (int)TT.ccn_tt.CCN_DTAG);
+				Egal.ccn_charbuf_append_tt(templ, (int)Dtag.ccn_dtag.CCN_DTAG_Name, (int)TT.ccn_tt.CCN_DTAG);
+            	Egal.ccn_charbuf_append_closer(templ); // </Name> 
+			
+				Egal.ccn_charbuf_append_tt(templ, (int)Dtag.ccn_dtag.CCN_DTAG_Exclude, (int)TT.ccn_tt.CCN_DTAG);
+			
+				Egal.ccn_closure Selfp = (Egal.ccn_closure)Marshal.PtrToStructure(selfp, typeof(Egal.ccn_closure));
+				Exclude Data = (Exclude) Marshal.PtrToStructure(Selfp.data, typeof(Exclude));	
+				print("exclusion filter: " + Data.filter);
+				Data.filter = Data.filter + "," + oldcomponent;
+				IntPtr pData = Marshal.AllocHGlobal(Marshal.SizeOf(Data));
+				Marshal.StructureToPtr(Data, pData, true);
+				Selfp.data = pData;
+				Marshal.StructureToPtr(Selfp, selfp, true);
+			
+				string newfilterlist = Data.filter;
 				
+				string [] filters = newfilterlist.Split(new char [] {','},StringSplitOptions.RemoveEmptyEntries);
+				foreach(string s in filters)
+				{
+					Egal.ccn_name_append_str(comp, s);
+				}
+				
+				Egal.ccn_charbuf_append2(templ, comp);
+			
+				Egal.ccn_charbuf_append_closer(templ); // </Exclude>
+				Egal.ccn_charbuf_append_closer(templ); // </Interest>
+			
+				
+		
+				// express interest again
+				Egal.ccn_express_interest(h,c,selfp,templ);
+			
 				break;
 			
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:
