@@ -31,25 +31,9 @@ public class Initialize : MonoBehaviour {
 	
 	void LandOnFirstAsteroid()
 	{
-		string n = M.GetLabelFromName(FirstAsteroidName);
-		Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(FirstAsteroid);
-		string id = values["fs"];
-		if(FindAsteroids.asteroidDic.ContainsKey(n)==true)
-		{
-			if(FindAsteroids.asteroidDic[n].Contains(id))
-			{
-				print("Initialize failed!");
-				return;
-			}
-		}
-		Vector3 pos = M.GetGameCoordinates(values["latitude"], values["longitude"]);
-		MakeAnAsteroid(pos, values["fs"]);
-		if(FindAsteroids.asteroidDic.ContainsKey(n)==false)
-		{
-			FindAsteroids.asteroidDic.Add (n,new List<string>());
-		}
-		FindAsteroids.asteroidDic[n].Add(id);
 		
+		Vector3 pos = FindAsteroids.MakeAnAsteroid(FirstAsteroid);
+		// no need to add to dictionary here
 		
 		Vector3 dollpos = pos + new Vector3(0, 95, 0);
 		transform.position = dollpos;
@@ -57,17 +41,6 @@ public class Initialize : MonoBehaviour {
 		
 	}
 	
-	public static void MakeAnAsteroid(Vector3 position, string id)
-	{
-		// instantiate an asteroid
-		
-		GameObject asteroid1 = GameObject.Find("tree2");
-		GameObject newAsteroid = UnityEngine.Object.Instantiate(asteroid1, position, Quaternion.identity) as GameObject;
-		newAsteroid.name = "asteroid-"+id;
-		newAsteroid.transform.localScale = new Vector3(1000f,1000f,1000f);
-		
-		
-	}
 	
 	
 	static Upcall.ccn_upcall_res RequestCallback (IntPtr selfp, Upcall.ccn_upcall_kind kind, IntPtr info)
@@ -79,16 +52,18 @@ public class Initialize : MonoBehaviour {
 		IntPtr h=Info.h;
 		
 		switch (kind) {
-			case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT_UNVERIFIED:
-        	case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT:
-				FirstAsteroidName = Egal.GetContentName(Info.content_ccnb);
-				FirstAsteroid = Egal.GetContentValue(Info.content_ccnb, Info.pco); 
-				break;
-			
-			case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:
-				Egal.ccn_set_run_timeout(h, 0); 
-				Egal.killCurrentThread(); // kill current thread
-				break;
+		case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT_UNVERIFIED:
+        case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT:
+			FirstAsteroidName = Egal.GetContentName(Info.content_ccnb);
+			FirstAsteroid = Egal.GetContentValue(Info.content_ccnb, Info.pco); 
+			break;
+		case Upcall.ccn_upcall_kind.CCN_UPCALL_INTEREST_TIMED_OUT:
+			print("Initialize: request first asteroid interest timed out.");
+			break;
+		case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:
+			Egal.ccn_set_run_timeout(h, 0); 
+			Egal.killCurrentThread(); // kill current thread
+			break;
 		}
 		return Upcall.ccn_upcall_res.CCN_UPCALL_RESULT_OK;
 	}

@@ -36,8 +36,100 @@ public class FindAsteroids : MonoBehaviour {
 	List<string> nimbus;
 	
 	// Dictionary < octant label, List <asteroid ids> >
-	public static Dictionary<string,List<string>> asteroidDic = new Dictionary<string, List<string>>(); 
-	public static Dictionary<string, string> asteroidBuffer = new Dictionary<string, string> ();
+	public static Dictionary<string,List<string>> OctAstDic = new Dictionary<string, List<string>>(); 
+	public static void AddToDic(string oct, string id)
+	{
+		if(OctAstDic.ContainsKey(oct)==false)
+		{
+			OctAstDic.Add (oct,new List<string>());
+		}
+		OctAstDic[oct].Add(id);
+	}
+	public static bool DicContains(string oct, string id)
+	{
+		if(OctAstDic.ContainsKey(oct)==true)
+		{
+			if(OctAstDic[oct].Contains(id))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	// Dictionary < asteroid name, asteroid content >
+	public static NameContBuf AstNameContBuf = new NameContBuf();
+		
+	public class NameContBuf
+	{
+		private Dictionary<string, string> buf = new Dictionary<string, string> ();
+		private bool readerFlag = false;
+		
+		public Dictionary<string, string> Read()
+		{
+			Dictionary<string, string> copy;
+			lock(this)
+      		{
+         		if (!readerFlag)
+         		{            
+            		try
+            		{
+               			Monitor.Wait(this);
+            		}
+            		catch (SynchronizationLockException e)
+            		{
+               			Console.WriteLine(e);
+            		}
+            		catch (ThreadInterruptedException e)
+            		{
+               			Console.WriteLine(e);
+            		}
+         		}
+         		// read here
+				copy = new Dictionary<string, string>(buf);
+				buf.Clear();
+         		readerFlag = false;    
+         		Monitor.Pulse(this);   
+      		}   
+      		return copy;
+		}
+		
+		public void Write(string name, string content)
+		{
+			lock(this)  
+      		{
+         		if (readerFlag)
+         		{      
+            		try
+            		{
+               			Monitor.Wait(this);   
+            		}
+            		catch (SynchronizationLockException e)
+            		{
+               			Console.WriteLine(e);
+            		}
+            		catch (ThreadInterruptedException e)
+            		{
+               			Console.WriteLine(e);
+            		}
+         		}
+         		// write here
+				buf.Add (name, content);
+         		readerFlag = true;   
+         		Monitor.Pulse(this);  
+      		}   
+		}
+		
+		public bool IsEmpty()
+		{
+			if(buf.Count == 0)
+				return true;
+			else
+				return false;
+		}
+		
+		
+	}
 	
 	public struct Exclude
 	{
@@ -68,52 +160,48 @@ public class FindAsteroids : MonoBehaviour {
 		
 		aura.Add ( temp );
 		nimbus.AddRange ( aura ); // nimbus contains aura
+		
 		nimbus.AddRange ( GetNeighbors(transform.position) );
 		AddAsteroidBySpace ( nimbus );
 		
 		bry = GetBoundaries ( aura[0] );
 		
-		InvokeRepeating("CheckPos", 0, 0.3F);
-		InvokeRepeating("Render", 0, 0.1F);
+		InvokeRepeating("CheckPos", 0, 1F);
+		InvokeRepeating("Render", 0, 1F);
 		//RequestAll("/ndn/ucla.edu/apps/matryoshka/asteroid/octant/0/0/0/0");
 	}
 	
 	void Render()
 	{
-		if(asteroidBuffer.Count != 0)
+		if(AstNameContBuf.IsEmpty() == false)
 		{ 
-			foreach(string name in asteroidBuffer.Keys)
+			Dictionary<string, string> buf = AstNameContBuf.Read();
+			
+			foreach(string name in buf.Keys)
 			{
-				string info = asteroidBuffer[name];
+				print("name in buffer: " + name);
+				string info = buf[name];
+				
 				string n = M.GetLabelFromName(name);
-				print(n);
+				
 				Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(info);
 				string id = values["fs"];
-				if(asteroidDic.ContainsKey(n)==true)
+				
+				if(DicContains(n, id)==true)
 				{
-					if(asteroidDic[n].Contains(id))
-					{
-						continue;
-					}
+					continue;
 				}
 				
-				
-				DoAsteroid(info);
+				MakeAnAsteroid(info);
 					
-				if(asteroidDic.ContainsKey(n)==false)
-				{
-					asteroidDic.Add (n,new List<string>());
-				}
-				asteroidDic[n].Add(id);
+				AddToDic(n,id);
 				
 			}
-			asteroidBuffer.Clear();
+			
 		}
 		
 	}
-	
-	
-	
+		
 	void CheckPos() {
 		
 		string temp = null;
@@ -144,21 +232,21 @@ public class FindAsteroids : MonoBehaviour {
 			print("new octant to be added: " + string.Join(",  ", newoct.ToArray()));
 			print("old octant to be deleted: " + string.Join(",  ", oldoct.ToArray()));
 			string sum = "";
-			foreach(string k in asteroidDic.Keys)
+			foreach(string k in OctAstDic.Keys)
 			{
 				sum = sum + k + ",  ";
 			}
-			print("asteroidDictionary before +/-: " + sum);
+			print("OctAstDictionary before +/-: " + sum);
 				
 			AddAsteroidBySpace(newoct);
 			DeleteAsteroidBySpace(oldoct);
 			
 			sum = "";
-			foreach(string k in asteroidDic.Keys)
+			foreach(string k in OctAstDic.Keys)
 			{
 				sum = sum + k + ",  ";
 			}
-			print("asteroidDictionary after +/-: " + sum);
+			print("OctAstDictionary after +/-: " + sum);
 			
 			newoct.Clear();
 			oldoct.Clear();
@@ -171,22 +259,17 @@ public class FindAsteroids : MonoBehaviour {
 		
     }
 	
-	
 	void AddAsteroidBySpace(List<string> nimbus)
 	{
 		List<string> asteroidnames = null;
 		foreach(string n in nimbus)
 		{
-			if(asteroidDic.ContainsKey(n)==true)
+			if(OctAstDic.ContainsKey(n)==true)
 			{
 				// print("AddAsteroidBySpace(): this octant is not new! --" + n);
 				continue;
 			}
-			
 			RequestAll( prefix + "/asteroid/octant/" + n);
-			
-
-			
 		}
 	}
 	
@@ -195,13 +278,13 @@ public class FindAsteroids : MonoBehaviour {
 		List<string> asteroidids;
 		foreach(string o in octs)
 		{
-			if(asteroidDic.ContainsKey(o) == false)
+			if(OctAstDic.ContainsKey(o) == false)
 			{
 				// print("DeleteAsteroidBySpace(): this octant is not old! --" + o);
 				continue;
 			}
 			
-			asteroidids = asteroidDic[o];
+			asteroidids = OctAstDic[o];
 			foreach(string id in asteroidids)
 			{
 				GameObject t = GameObject.Find("asteroid-"+id);
@@ -211,7 +294,7 @@ public class FindAsteroids : MonoBehaviour {
 				}
 				Destroy( t );
 			}
-			asteroidDic.Remove(o);
+			OctAstDic.Remove(o);
 		}
 	}
 	
@@ -249,10 +332,7 @@ public class FindAsteroids : MonoBehaviour {
 		}
 		return true;
 	}
-	
-
-	
-	
+		
 	List<string> GetNeighbors(Vector3 position)
 	{
 		List<string> neighborlist = new List<string>();
@@ -351,7 +431,7 @@ public class FindAsteroids : MonoBehaviour {
 				print("received: " + name);
 				string content = Egal.GetContentValue(Info.content_ccnb, Info.pco); 
 			
-				asteroidBuffer.Add (name, content);
+				AstNameContBuf.Write (name, content);
 			
 				int index = name.IndexOf("/octant/");
 				string matchedprefix = name.Substring(0, index + 15);
@@ -410,7 +490,7 @@ public class FindAsteroids : MonoBehaviour {
 		return Upcall.ccn_upcall_res.CCN_UPCALL_RESULT_OK;
 	}
 	
-	public List<string> RequestAll(string name)
+	public void RequestAll(string name)
 	{
 		//print("requestall: " + name);
 		
@@ -418,22 +498,32 @@ public class FindAsteroids : MonoBehaviour {
 		IntPtr pData = Marshal.AllocHGlobal(Marshal.SizeOf(Data));
 		Marshal.StructureToPtr(Data, pData, true);
 		
-
 		IntPtr ccn = Egal.GetHandle(); // connect to ccnd
 		Egal.ExpressInterest(ccn, name, RequestAllCallback, pData, IntPtr.Zero); // express interest
 		Egal.ccnRun(ccn, -1); // ccnRun starts a new thread
-		
-		return null;
 	}
 	
-	string DoAsteroid(string info)
+	public static Vector3 MakeAnAsteroid(string info)
 	{
-		//print(info);
 		Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(info);
 		Vector3 pos = M.GetGameCoordinates(values["latitude"], values["longitude"]);
-		Initialize.MakeAnAsteroid(pos, values["fs"]);
+		RenderAnAsteroid(pos, values["fs"]);
 		string label = M.GetLabel(pos);
 		print("fs: " + values["fs"] + ", label: " + label);
-		return values["fs"];
+		return pos;
 	}
+	
+	public static void RenderAnAsteroid(Vector3 position, string id)
+	{
+		// instantiate an asteroid
+		
+		GameObject asteroid1 = GameObject.Find("tree2");
+		GameObject newAsteroid = UnityEngine.Object.Instantiate(asteroid1, position, Quaternion.identity) as GameObject;
+		newAsteroid.name = "asteroid-"+id;
+		newAsteroid.transform.localScale = new Vector3(1000f,1000f,1000f);
+		
+		
+	}
+	
+
 }

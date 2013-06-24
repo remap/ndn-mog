@@ -99,6 +99,7 @@ public class M : MonoBehaviour {
 	public static string GetLabelFromName(string name)
 	{
 		int index = name.IndexOf("/octant/");
+		print("index: " + index + ", name: " + name);
 		string n = name.Substring(index+8,7);
 		return n;
 	}
