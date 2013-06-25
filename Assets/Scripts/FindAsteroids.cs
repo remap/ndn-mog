@@ -173,12 +173,12 @@ public class FindAsteroids : MonoBehaviour {
 		aura.Add ( temp );
 		nimbus.AddRange ( aura ); // nimbus contains aura
 		
-		nimbus.AddRange ( GetNeighbors(transform.position) );
+		//nimbus.AddRange ( GetNeighbors(transform.position) );
 		AddAsteroidBySpace ( nimbus );
 		
 		bry = GetBoundaries ( aura[0] );
 		
-		InvokeRepeating("CheckPos", 0, 1F);
+		InvokeRepeating("CheckPos", 0, 0.05F);
 		InvokeRepeating("Render", 0, 1F);
 		//RequestAll("/ndn/ucla.edu/apps/matryoshka/asteroid/octant/0/0/0/0");
 	}
@@ -236,41 +236,17 @@ public class FindAsteroids : MonoBehaviour {
 			
 			List<string> newnimbus = new List<string>();
 			newnimbus.AddRange( aura );
-			newnimbus.AddRange ( GetNeighbors(transform.position) );
+			//newnimbus.AddRange ( GetNeighbors(transform.position) );
 			
 			List<string> newoct = newnimbus.Except(OctAstDic.Keys).ToList();
 			List<string> datedoct = OctAstDic.Keys.Except(newnimbus).ToList();
 			
-//			List<string> newoct = new List<string>(); // octants to be added to nimubs
-//			List<string> oldoct = new List<string>(); // octants to be deleted from nimbus
-//			
-//			CompareNimbus(nimbus, newnimbus, newoct, oldoct);
-			
-//			print("new oct: " + string.Join(",  ", newoct.ToArray()));
-//			print(string.Join(",  ", newnimbus.ToArray()));
-//			print("new octant to be added: " + string.Join(",  ", newoct.ToArray()));
-//			print("old octant to be deleted: " + string.Join(",  ", oldoct.ToArray()));
-			
-//			string sum = "";
-//			foreach(string k in OctAstDic.Keys)
-//			{
-//				sum = sum + k + ",  ";
-//			}
-//			print("OctAstDictionary before +/-: " + sum);
-//				
+
 			AddAsteroidBySpace(newoct);
 			DeleteAsteroidBySpace(datedoct);
 			
 			nimbus.Clear();
 			nimbus.AddRange(newnimbus);
-			
-//			sum = "";
-//			foreach(string k in OctAstDic.Keys)
-//			{
-//				sum = sum + k + ",  ";
-//			}
-//			print("OctAstDictionary after +/-: " + sum);
-			
 			
 		}
 		
@@ -446,8 +422,9 @@ public class FindAsteroids : MonoBehaviour {
 				string labels = M.GetLabelFromName(name);
 				if(nimbus.Contains(labels)==false) // we don't care about this octant any more
 				{
-					Egal.ccn_set_run_timeout(h, 0); 
-					Egal.killCurrentThread(); // kill current thread
+					new GameObject().GetComponent<HandlePool>().Delete(h);
+//					Egal.ccn_set_run_timeout(h, 0); 
+//					Egal.killCurrentThread(); // kill current thread
 				}
 			
 				IntPtr c = Egal.ccn_charbuf_create();
@@ -506,8 +483,9 @@ public class FindAsteroids : MonoBehaviour {
 				break;
 			
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:
-				Egal.ccn_set_run_timeout(h, 0); 
-				Egal.killCurrentThread(); // kill current thread
+				new GameObject().GetComponent<HandlePool>().Delete(h);
+//				Egal.ccn_set_run_timeout(h, 0); 
+//				Egal.killCurrentThread(); // kill current thread
 				break;
 			default: break;
 		}
@@ -524,7 +502,10 @@ public class FindAsteroids : MonoBehaviour {
 		
 		IntPtr ccn = Egal.GetHandle(); // connect to ccnd
 		Egal.ExpressInterest(ccn, name, RequestAllCallback, pData, IntPtr.Zero); // express interest
-		Egal.ccnRun(ccn, -1); // ccnRun starts a new thread
+		
+		
+		transform.gameObject.GetComponent<HandlePool>().Add(ccn);
+		//Egal.ccnRun(ccn, -1); // ccnRun starts a new thread
 	}
 	
 	public static Vector3 MakeAnAsteroid(string info)

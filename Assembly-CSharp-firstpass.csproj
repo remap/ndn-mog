@@ -48,6 +48,7 @@
      <Compile Include="Assets\Plugins\Content.cs" />
      <Compile Include="Assets\Plugins\Dtag.cs" />
      <Compile Include="Assets\Plugins\Egal.cs" />
+     <Compile Include="Assets\Plugins\HandleState.cs" />
      <Compile Include="Assets\Plugins\Marker.cs" />
      <Compile Include="Assets\Plugins\PCO.cs" />
      <Compile Include="Assets\Plugins\SP.cs" />

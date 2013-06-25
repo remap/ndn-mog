@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Collections.Generic;
 
 public class Egal: MonoBehaviour {
 	
@@ -70,7 +71,12 @@ public class Egal: MonoBehaviour {
 				//;
 			Egal.ccn_run(ccn, time);
 		}
-		
+	}
+	
+	public static void run(System.Object state)
+	{
+		HandleState hs = (HandleState)state;
+		ccn_run (hs.ccn, hs.timeout);
 	}
 	
 	
@@ -137,6 +143,7 @@ public class Egal: MonoBehaviour {
 		//string [] split = contentname.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
 		return contentname;
 	}
+	
 	
 	
 	
@@ -357,7 +364,7 @@ public class Egal: MonoBehaviour {
 	public static extern int ccn_connect(IntPtr h, string name);
 
 	[DllImport ("Egal")]
-	public static extern int ccn_run(IntPtr h, int timeout);
+	public static extern int ccn_run(IntPtr h, int timeout); // timeout is in milliseconds
 	
 	[DllImport ("Egal")]
 	public static extern int ccn_set_run_timeout(IntPtr h, int timeout);
