@@ -161,8 +161,6 @@ public class FindAsteroids : MonoBehaviour {
 			yield return new WaitForSeconds(0.05f);
 		}
 		
-		print(transform.position);
-		
 		string temp = M.GetLabel(transform.position);
 		if(temp==null)
 		{
@@ -241,7 +239,6 @@ public class FindAsteroids : MonoBehaviour {
 			List<string> newoct = newnimbus.Except(OctAstDic.Keys).ToList();
 			List<string> datedoct = OctAstDic.Keys.Except(newnimbus).ToList();
 			
-
 			AddAsteroidBySpace(newoct);
 			DeleteAsteroidBySpace(datedoct);
 			
@@ -422,7 +419,7 @@ public class FindAsteroids : MonoBehaviour {
 				string labels = M.GetLabelFromName(name);
 				if(nimbus.Contains(labels)==false) // we don't care about this octant any more
 				{
-					new GameObject().GetComponent<HandlePool>().Delete(h);
+					TPool.AllHandles.Delete(h);
 //					Egal.ccn_set_run_timeout(h, 0); 
 //					Egal.killCurrentThread(); // kill current thread
 				}
@@ -483,7 +480,7 @@ public class FindAsteroids : MonoBehaviour {
 				break;
 			
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:
-				new GameObject().GetComponent<HandlePool>().Delete(h);
+				TPool.AllHandles.Delete(h);
 //				Egal.ccn_set_run_timeout(h, 0); 
 //				Egal.killCurrentThread(); // kill current thread
 				break;
@@ -493,18 +490,15 @@ public class FindAsteroids : MonoBehaviour {
 	}
 	
 	public void RequestAll(string name)
-	{
-		//print("requestall: " + name);
-		
+	{	
 		Exclude Data = new Exclude();
 		IntPtr pData = Marshal.AllocHGlobal(Marshal.SizeOf(Data));
 		Marshal.StructureToPtr(Data, pData, true);
 		
 		IntPtr ccn = Egal.GetHandle(); // connect to ccnd
 		Egal.ExpressInterest(ccn, name, RequestAllCallback, pData, IntPtr.Zero); // express interest
-		
-		
-		transform.gameObject.GetComponent<HandlePool>().Add(ccn);
+		print("Add");
+		TPool.AllHandles.Add(ccn);
 		//Egal.ccnRun(ccn, -1); // ccnRun starts a new thread
 	}
 	

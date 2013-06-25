@@ -5,18 +5,21 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-public class HandlePool : MonoBehaviour
-{
-	private List<IntPtr> handles;
-	private bool readerFlag = false;
-		
-	void Start()
-	{
-		print("Start of something new!");
-		this.Run ();
+public class TPool : MonoBehaviour {
+
+	public static HandlePool AllHandles;
+	
+	void Awake () {
+		AllHandles = new HandlePool();
+		StartCoroutine(AllHandles.Run());;
 	}
+	
+	public class HandlePool
+	{
+		private List<IntPtr> handles = new List<IntPtr>();
+		private bool readerFlag = false;
 		
-	public void Delete(IntPtr ccn)
+		public void Delete(IntPtr ccn)
 		{
 			
 			lock(this)
@@ -43,8 +46,9 @@ public class HandlePool : MonoBehaviour
       		}   
 		}
 		
-	public void Add(IntPtr ccn)
+		public void Add(IntPtr ccn)
 		{	
+			
 			lock(this)  
       		{
          		if (readerFlag)
@@ -69,26 +73,29 @@ public class HandlePool : MonoBehaviour
       		}   
 		}	
 		
-	public IEnumerator Run()
+		public IEnumerator Run()
 		{
 			print("Handle Pool starts to run.");
 			while(Application.isPlaying)
 			{
-				if(handles.Count==0)
+				while(handles.Count==0)
 				{
 					yield return new WaitForSeconds(0.5f);
 				}
-				else
+				
+				foreach(IntPtr h in handles)
 				{
-					foreach(IntPtr h in handles)
-					{
-						HandleState state = new HandleState(h, 200);
-						ThreadPool.QueueUserWorkItem(Egal.run,state);
-					}
-					return true;
-				}	
+					HandleState state = new HandleState(h, 20);
+					ThreadPool.QueueUserWorkItem(Egal.run,state);
+				}
 				
 			}
 		}
+		
+		
+	}
 }
+
+
+
 	
