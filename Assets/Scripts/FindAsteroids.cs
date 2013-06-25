@@ -287,27 +287,6 @@ public class FindAsteroids : MonoBehaviour {
 		}
 	}
 	
-	void CompareNimbus(List<string> oldnimbus, List<string> newnimbus, 
-		List<string> newoct, List<string> oldoct)
-	{
-		foreach(string o in oldnimbus)
-		{
-			if(newnimbus.Contains(o)==false)
-			{
-				oldoct.Add(o);
-			}
-			
-		}
-		
-		foreach(string n in newnimbus)
-		{
-			if(oldnimbus.Contains(n)==false)
-			{
-				newoct.Add(n);
-			}
-		}
-			
-	}
 	
 	static bool InBound(Vector3 position)
 	{
