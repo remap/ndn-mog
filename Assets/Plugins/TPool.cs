@@ -7,10 +7,11 @@ using System.Threading;
 
 public class TPool : MonoBehaviour {
 
-	public static HandlePool AllHandles;
+	public static HandlePool AllHandles = new HandlePool();
+	private static Mutex mut = new Mutex();
 	
-	void Awake () {
-		AllHandles = new HandlePool();
+	void Start () {
+		
 		StartCoroutine(AllHandles.Run());;
 	}
 	
@@ -21,61 +22,22 @@ public class TPool : MonoBehaviour {
 		
 		public void Delete(IntPtr ccn)
 		{
-			
-			lock(this)
-      		{
-         		if (!readerFlag)
-         		{            
-            		try
-            		{
-               			Monitor.Wait(this);
-            		}
-            		catch (SynchronizationLockException e)
-            		{
-               			Console.WriteLine(e);
-            		}
-            		catch (ThreadInterruptedException e)
-            		{
-               			Console.WriteLine(e);
-            		}
-         		}
-         		// delete here
-				handles.Remove(ccn);
-         		readerFlag = false;    
-         		Monitor.Pulse(this);   
-      		}   
+			mut.WaitOne();
+			print("Delete");
+			handles.Remove(ccn);
+         	mut.ReleaseMutex(); 
 		}
 		
 		public void Add(IntPtr ccn)
 		{	
-			
-			lock(this)  
-      		{
-         		if (readerFlag)
-         		{      
-            		try
-            		{
-               			Monitor.Wait(this);   
-            		}
-            		catch (SynchronizationLockException e)
-            		{
-               			Console.WriteLine(e);
-            		}
-            		catch (ThreadInterruptedException e)
-            		{
-               			Console.WriteLine(e);
-            		}
-         		}
-         		// add here
-				handles.Add (ccn);
-         		readerFlag = true;   
-         		Monitor.Pulse(this);  
-      		}   
+			mut.WaitOne();
+			print("Add");
+			handles.Add (ccn);
+      		mut.ReleaseMutex();
 		}	
 		
 		public IEnumerator Run()
 		{
-			print("Handle Pool starts to run.");
 			while(Application.isPlaying)
 			{
 				while(handles.Count==0)
@@ -83,12 +45,17 @@ public class TPool : MonoBehaviour {
 					yield return new WaitForSeconds(0.5f);
 				}
 				
+				print("outside mutex");
+				mut.WaitOne();
 				foreach(IntPtr h in handles)
 				{
+					print("Run" + h);
 					HandleState state = new HandleState(h, 20);
 					ThreadPool.QueueUserWorkItem(Egal.run,state);
 				}
+				mut.ReleaseMutex();
 				
+				yield return null;
 			}
 		}
 		

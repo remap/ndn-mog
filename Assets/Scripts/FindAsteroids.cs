@@ -176,8 +176,8 @@ public class FindAsteroids : MonoBehaviour {
 		
 		bry = GetBoundaries ( aura[0] );
 		
-		InvokeRepeating("CheckPos", 0, 0.05F);
-		InvokeRepeating("Render", 0, 1F);
+		InvokeRepeating("CheckPos", 0, 0.1F);
+		InvokeRepeating("Render", 0, 0.1F);
 		//RequestAll("/ndn/ucla.edu/apps/matryoshka/asteroid/octant/0/0/0/0");
 	}
 	
@@ -497,7 +497,7 @@ public class FindAsteroids : MonoBehaviour {
 		
 		IntPtr ccn = Egal.GetHandle(); // connect to ccnd
 		Egal.ExpressInterest(ccn, name, RequestAllCallback, pData, IntPtr.Zero); // express interest
-		print("Add");
+		
 		TPool.AllHandles.Add(ccn);
 		//Egal.ccnRun(ccn, -1); // ccnRun starts a new thread
 	}
