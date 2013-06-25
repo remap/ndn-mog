@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
+
 public class M : MonoBehaviour {
 	
 	
@@ -102,5 +103,22 @@ public class M : MonoBehaviour {
 		print("index: " + index + ", name: " + name);
 		string n = name.Substring(index+8,7);
 		return n;
+	}
+	
+	public static string GetIDFromName(string name)
+	{
+		if(name.Contains("/octant/"))
+		{
+			int index = name.IndexOf("/octant/");
+			print("index: " + index + ", name: " + name);
+			
+			string tail = name.Substring(index + 16);
+			string[] split = tail.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
+			string id = split[0]; 
+			
+			return id;
+		}
+		
+		return null;
 	}
 }

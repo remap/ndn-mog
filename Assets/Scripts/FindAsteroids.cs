@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json;
+using System.Linq;
 
 public class FindAsteroids : MonoBehaviour {
 	
@@ -32,13 +33,24 @@ public class FindAsteroids : MonoBehaviour {
 	static Boundary bry;
 	
 	// List <octant labels>
-	List<string> aura; 
-	List<string> nimbus;
+	public static List<string> aura; 
+	public static List<string> nimbus;
 	
 	// Dictionary < octant label, List <asteroid ids> >
 	public static Dictionary<string,List<string>> OctAstDic = new Dictionary<string, List<string>>(); 
 	public static void AddToDic(string oct, string id)
 	{
+		if(OctAstDic.ContainsKey(oct)==false)
+		{
+			OctAstDic.Add (oct,new List<string>());
+		}
+		OctAstDic[oct].Add(id);
+	}
+	public static void AddToDic(string name)
+	{
+		string oct = M.GetLabelFromName(name);
+		string id = M.GetIDFromName(name);
+		
 		if(OctAstDic.ContainsKey(oct)==false)
 		{
 			OctAstDic.Add (oct,new List<string>());
@@ -179,13 +191,16 @@ public class FindAsteroids : MonoBehaviour {
 			
 			foreach(string name in buf.Keys)
 			{
+				if(name == Initialize.FirstAsteroidName)
+				{
+					continue;
+				}
+				
 				print("name in buffer: " + name);
 				string info = buf[name];
 				
 				string n = M.GetLabelFromName(name);
-				
-				Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(info);
-				string id = values["fs"];
+				string id = M.GetIDFromName(name);
 				
 				if(DicContains(n, id)==true)
 				{
@@ -217,43 +232,45 @@ public class FindAsteroids : MonoBehaviour {
 			}
 			
 			aura.Add ( temp );
+			bry = GetBoundaries(aura[0]); // update the boundaries
 			
 			List<string> newnimbus = new List<string>();
 			newnimbus.AddRange( aura );
 			newnimbus.AddRange ( GetNeighbors(transform.position) );
 			
-			List<string> newoct = new List<string>(); // octants to be added to nimubs
-			List<string> oldoct = new List<string>(); // octants to be deleted from nimbus
+			List<string> newoct = newnimbus.Except(OctAstDic.Keys).ToList();
+			List<string> datedoct = OctAstDic.Keys.Except(newnimbus).ToList();
 			
-			CompareNimbus(nimbus, newnimbus, newoct, oldoct);
+//			List<string> newoct = new List<string>(); // octants to be added to nimubs
+//			List<string> oldoct = new List<string>(); // octants to be deleted from nimbus
+//			
+//			CompareNimbus(nimbus, newnimbus, newoct, oldoct);
 			
-//			print(string.Join(",  ", nimbus.ToArray()));
+//			print("new oct: " + string.Join(",  ", newoct.ToArray()));
 //			print(string.Join(",  ", newnimbus.ToArray()));
-			print("new octant to be added: " + string.Join(",  ", newoct.ToArray()));
-			print("old octant to be deleted: " + string.Join(",  ", oldoct.ToArray()));
-			string sum = "";
-			foreach(string k in OctAstDic.Keys)
-			{
-				sum = sum + k + ",  ";
-			}
-			print("OctAstDictionary before +/-: " + sum);
-				
+//			print("new octant to be added: " + string.Join(",  ", newoct.ToArray()));
+//			print("old octant to be deleted: " + string.Join(",  ", oldoct.ToArray()));
+			
+//			string sum = "";
+//			foreach(string k in OctAstDic.Keys)
+//			{
+//				sum = sum + k + ",  ";
+//			}
+//			print("OctAstDictionary before +/-: " + sum);
+//				
 			AddAsteroidBySpace(newoct);
-			DeleteAsteroidBySpace(oldoct);
-			
-			sum = "";
-			foreach(string k in OctAstDic.Keys)
-			{
-				sum = sum + k + ",  ";
-			}
-			print("OctAstDictionary after +/-: " + sum);
-			
-			newoct.Clear();
-			oldoct.Clear();
+			DeleteAsteroidBySpace(datedoct);
 			
 			nimbus.Clear();
 			nimbus.AddRange(newnimbus);
-			bry = GetBoundaries(aura[0]);
+			
+//			sum = "";
+//			foreach(string k in OctAstDic.Keys)
+//			{
+//				sum = sum + k + ",  ";
+//			}
+//			print("OctAstDictionary after +/-: " + sum);
+			
 			
 		}
 		
@@ -264,7 +281,7 @@ public class FindAsteroids : MonoBehaviour {
 		List<string> asteroidnames = null;
 		foreach(string n in nimbus)
 		{
-			if(OctAstDic.ContainsKey(n)==true)
+			if(OctAstDic.ContainsKey(n)==true && n!=Initialize.FirstAsteroidLabel)
 			{
 				// print("AddAsteroidBySpace(): this octant is not new! --" + n);
 				continue;
@@ -421,16 +438,23 @@ public class FindAsteroids : MonoBehaviour {
 		switch (kind) {
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT_UNVERIFIED:
         	case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT:
-				IntPtr c = Egal.ccn_charbuf_create();
-				IntPtr templ = Egal.ccn_charbuf_create();
-				IntPtr comp = Egal.ccn_charbuf_create();
-            	Egal.ccn_name_init(c);
-				Egal.ccn_name_init(comp);
 			
 				string name = Egal.GetContentName(Info.content_ccnb);
 				print("received: " + name);
 				string content = Egal.GetContentValue(Info.content_ccnb, Info.pco); 
 			
+				string labels = M.GetLabelFromName(name);
+				if(nimbus.Contains(labels)==false) // we don't care about this octant any more
+				{
+					Egal.ccn_set_run_timeout(h, 0); 
+					Egal.killCurrentThread(); // kill current thread
+				}
+			
+				IntPtr c = Egal.ccn_charbuf_create();
+				IntPtr templ = Egal.ccn_charbuf_create();
+				IntPtr comp = Egal.ccn_charbuf_create();
+            	Egal.ccn_name_init(c);
+				Egal.ccn_name_init(comp);
 				AstNameContBuf.Write (name, content);
 			
 				int index = name.IndexOf("/octant/");

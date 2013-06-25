@@ -11,6 +11,7 @@ public class Initialize : MonoBehaviour {
 	public static bool finished = false;
 	public static string FirstAsteroid = "";
 	public static string FirstAsteroidName;
+	public static string FirstAsteroidLabel;
 	
 	public IEnumerator Start () {
 	
@@ -33,7 +34,7 @@ public class Initialize : MonoBehaviour {
 	{
 		
 		Vector3 pos = FindAsteroids.MakeAnAsteroid(FirstAsteroid);
-		// no need to add to dictionary here
+		FindAsteroids.AddToDic(FirstAsteroidName);
 		
 		Vector3 dollpos = pos + new Vector3(0, 95, 0);
 		transform.position = dollpos;
@@ -56,6 +57,7 @@ public class Initialize : MonoBehaviour {
         case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT:
 			FirstAsteroidName = Egal.GetContentName(Info.content_ccnb);
 			FirstAsteroid = Egal.GetContentValue(Info.content_ccnb, Info.pco); 
+			FirstAsteroidLabel = M.GetLabelFromName(FirstAsteroidName);
 			break;
 		case Upcall.ccn_upcall_kind.CCN_UPCALL_INTEREST_TIMED_OUT:
 			print("Initialize: request first asteroid interest timed out.");
