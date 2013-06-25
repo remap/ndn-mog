@@ -45,11 +45,11 @@ public class TPool : MonoBehaviour {
 					yield return new WaitForSeconds(0.5f);
 				}
 				
-				print("outside mutex");
+				//print("outside mutex");
 				mut.WaitOne();
 				foreach(IntPtr h in handles)
 				{
-					print("Run" + h);
+					//print("Run" + h);
 					HandleState state = new HandleState(h, 20);
 					ThreadPool.QueueUserWorkItem(Egal.run,state);
 				}

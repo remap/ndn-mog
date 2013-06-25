@@ -194,7 +194,6 @@ public class FindAsteroids : MonoBehaviour {
 					continue;
 				}
 				
-				print("name in buffer: " + name);
 				string info = buf[name];
 				
 				string n = M.GetLabelFromName(name);
@@ -404,7 +403,7 @@ public class FindAsteroids : MonoBehaviour {
 	
 	static Upcall.ccn_upcall_res RequestAllCallback (IntPtr selfp, Upcall.ccn_upcall_kind kind, IntPtr info)
 	{
-		//print("RequestAllCallback: " + kind);
+		print("RequestAllCallback: " + kind);
 		Egal.ccn_upcall_info Info = Egal.GetInfo(info);
 		IntPtr h=Info.h;
 		
@@ -413,7 +412,7 @@ public class FindAsteroids : MonoBehaviour {
         	case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT:
 			
 				string name = Egal.GetContentName(Info.content_ccnb);
-				print("received: " + name);
+				//print("received: " + name);
 				string content = Egal.GetContentValue(Info.content_ccnb, Info.pco); 
 			
 				string labels = M.GetLabelFromName(name);
@@ -452,7 +451,7 @@ public class FindAsteroids : MonoBehaviour {
 			
 				Egal.ccn_closure Selfp = (Egal.ccn_closure)Marshal.PtrToStructure(selfp, typeof(Egal.ccn_closure));
 				Exclude Data = (Exclude) Marshal.PtrToStructure(Selfp.data, typeof(Exclude));	
-				print("exclusion filter: " + Data.filter);
+				//print("exclusion filter: " + Data.filter);
 				Data.filter = Data.filter + "," + oldcomponent;
 				IntPtr pData = Marshal.AllocHGlobal(Marshal.SizeOf(Data));
 				Marshal.StructureToPtr(Data, pData, true);
@@ -508,7 +507,7 @@ public class FindAsteroids : MonoBehaviour {
 		Vector3 pos = M.GetGameCoordinates(values["latitude"], values["longitude"]);
 		RenderAnAsteroid(pos, values["fs"]);
 		string label = M.GetLabel(pos);
-		print("fs: " + values["fs"] + ", label: " + label);
+		//print("fs: " + values["fs"] + ", label: " + label);
 		return pos;
 	}
 	

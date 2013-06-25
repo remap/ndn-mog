@@ -100,7 +100,6 @@ public class M : MonoBehaviour {
 	public static string GetLabelFromName(string name)
 	{
 		int index = name.IndexOf("/octant/");
-		//print("index: " + index + ", name: " + name);
 		string n = name.Substring(index+8,7);
 		return n;
 	}
@@ -110,7 +109,6 @@ public class M : MonoBehaviour {
 		if(name.Contains("/octant/"))
 		{
 			int index = name.IndexOf("/octant/");
-			print("index: " + index + ", name: " + name);
 			
 			string tail = name.Substring(index + 16);
 			string[] split = tail.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
