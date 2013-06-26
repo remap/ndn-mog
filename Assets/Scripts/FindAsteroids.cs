@@ -372,7 +372,7 @@ public class FindAsteroids : MonoBehaviour {
 	
 	static Upcall.ccn_upcall_res RequestAllCallback (IntPtr selfp, Upcall.ccn_upcall_kind kind, IntPtr info)
 	{
-		print("RequestAllCallback: " + kind + " long... long... long... long... long... long... long... long...");
+		//print("RequestAllCallback: " + kind + " long... long... long... long... long... long... long... long...");
 		Egal.ccn_upcall_info Info = Egal.GetInfo(info);
 		IntPtr h=Info.h;
 		//TPool.AllHandles.Update(h); // update the last active time
@@ -446,9 +446,13 @@ public class FindAsteroids : MonoBehaviour {
 				break;
 			
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:
+				print("CCN_UPCALL_FINAL: " + h);
 				TPool.AllHandles.Delete(h);
 //				Egal.ccn_set_run_timeout(h, 0); 
 //				Egal.killCurrentThread(); // kill current thread
+				break;
+			case Upcall.ccn_upcall_kind.CCN_UPCALL_INTEREST_TIMED_OUT:
+				print("CCN_UPCALL_INTEREST_TIMED_OUT: " + h);
 				break;
 			default: break;
 		}
