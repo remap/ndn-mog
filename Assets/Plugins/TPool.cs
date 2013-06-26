@@ -17,14 +17,15 @@ public class TPool : MonoBehaviour {
 	
 	public class HandlePool
 	{
-		private HashSet<IntPtr> handles = new HashSet<IntPtr>(); // HashSet does not allow duplicates
-		private bool readerFlag = false;
+		// dictionary <handle, time when the closure was last called back>
+		private Dictionary<IntPtr, float> handles = new Dictionary<IntPtr, float>(); 
+		
 		
 		public void Delete(IntPtr ccn)
 		{
 			mut.WaitOne();
 			print("Delete");
-			if(handles.Contains(ccn) == true)
+			if(handles.ContainsKey(ccn) == true)
 			{
 				handles.Remove(ccn);
 			}
@@ -35,15 +36,26 @@ public class TPool : MonoBehaviour {
 		{	
 			mut.WaitOne();
 			print("Add");
-			if(handles.Contains(ccn) == false)
+			if(handles.ContainsKey(ccn) == false)
 			{
-				handles.Add (ccn);
+				handles.Add (ccn, Time.time);
 			}
       		mut.ReleaseMutex();
 		}	
 		
-		public void Update(IntPtr ccn, float last_active_time)
+		public void Update(IntPtr ccn)
 		{
+			print("Update");
+			mut.WaitOne();
+			if(handles.ContainsKey(ccn) == false)
+			{
+				handles.Add (ccn, Time.time);
+			}
+			else
+			{
+				handles[ccn] = Time.time;
+			}
+			mut.ReleaseMutex();
 		}
 		
 		public IEnumerator Run()
@@ -57,11 +69,22 @@ public class TPool : MonoBehaviour {
 				
 				//print("outside mutex");
 				mut.WaitOne();
-				foreach(IntPtr h in handles)
+				List<IntPtr> keystodelete = new List<IntPtr>();
+				foreach(IntPtr h in handles.Keys)
 				{
 					print("Run: " + h + "long... long... long... long... long... long... long... long... long... long... long... long...");
+					float delta = Time.time - handles[h];
+					if(delta>3)
+					{
+						keystodelete.Add(h);
+						continue;
+					}
 					HandleState state = new HandleState(h, 20);
 					ThreadPool.QueueUserWorkItem(Egal.run,state);
+				}
+				foreach(IntPtr k in keystodelete)
+				{
+					handles.Remove(k);
 				}
 				mut.ReleaseMutex();
 				

@@ -178,7 +178,7 @@ public class FindAsteroids : MonoBehaviour {
 		
 		bry = GetBoundaries ( aura[0] );
 		
-		//InvokeRepeating("CheckPos", 0, 0.1F);
+		InvokeRepeating("CheckPos", 0, 0.1F);
 		InvokeRepeating("Render", 0, 0.1F);
 		//RequestAll("/ndn/ucla.edu/apps/matryoshka/asteroid/octant/0/0/0/0");
 	}
@@ -375,6 +375,7 @@ public class FindAsteroids : MonoBehaviour {
 		print("RequestAllCallback: " + kind + " long... long... long... long... long... long... long... long...");
 		Egal.ccn_upcall_info Info = Egal.GetInfo(info);
 		IntPtr h=Info.h;
+		//TPool.AllHandles.Update(h); // update the last active time
 		
 		switch (kind) {
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT_UNVERIFIED:
