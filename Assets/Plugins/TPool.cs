@@ -49,7 +49,7 @@ public class TPool : MonoBehaviour {
 				mut.WaitOne();
 				foreach(IntPtr h in handles)
 				{
-					//print("Run" + h);
+					print("Run" + h);
 					HandleState state = new HandleState(h, 20);
 					ThreadPool.QueueUserWorkItem(Egal.run,state);
 				}

@@ -51,6 +51,9 @@ public class FindAsteroids : MonoBehaviour {
 		string oct = M.GetLabelFromName(name);
 		string id = M.GetIDFromName(name);
 		
+		if(oct == null || id == null)
+			return;
+		
 		if(OctAstDic.ContainsKey(oct)==false)
 		{
 			OctAstDic.Add (oct,new List<string>());
@@ -199,10 +202,10 @@ public class FindAsteroids : MonoBehaviour {
 				string n = M.GetLabelFromName(name);
 				string id = M.GetIDFromName(name);
 				
-				if(DicContains(n, id)==true || n == null || id == null)
-				{
+				if(n == null || id == null)
 					continue;
-				}
+				if(DicContains(n, id)==true)
+					continue;
 				
 				MakeAnAsteroid(info);
 					
@@ -432,11 +435,8 @@ public class FindAsteroids : MonoBehaviour {
 			
 				Egal.ccn_closure Selfp = (Egal.ccn_closure)Marshal.PtrToStructure(selfp, typeof(Egal.ccn_closure));
 				Exclude Data = (Exclude) Marshal.PtrToStructure(Selfp.data, typeof(Exclude));	
-				//print("exclusion filter: " + Data.filter);
 				Data.filter = Data.filter + "," + oldcomponent;
-				//IntPtr pData = Marshal.AllocHGlobal(Marshal.SizeOf(Data));
 				Marshal.StructureToPtr(Data, Selfp.data, true);
-				//Selfp.data = pData;
 				Marshal.StructureToPtr(Selfp, selfp, true);
 			
 				string newfilterlist = Data.filter;
