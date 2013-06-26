@@ -336,7 +336,6 @@ public class FindAsteroids : MonoBehaviour {
 	
 	Boundary GetBoundaries(string labels)
 	{
-		// print(labels);
 		string [] split = labels.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
 		
 		int L1oct = Convert.ToInt32(split[0],8);
@@ -375,7 +374,6 @@ public class FindAsteroids : MonoBehaviour {
 		//print("RequestAllCallback: " + kind + " long... long... long... long... long... long... long... long...");
 		Egal.ccn_upcall_info Info = Egal.GetInfo(info);
 		IntPtr h=Info.h;
-		//TPool.AllHandles.Update(h); // update the last active time
 		
 		switch (kind) {
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT_UNVERIFIED:
@@ -391,8 +389,6 @@ public class FindAsteroids : MonoBehaviour {
 				if(nimbus.Contains(labels)==false) // we don't care about this octant any more
 				{
 					TPool.AllHandles.Delete(h);
-//					Egal.ccn_set_run_timeout(h, 0); 
-//					Egal.killCurrentThread(); // kill current thread
 				}
 			
 				IntPtr c = Egal.ccn_charbuf_create();
@@ -448,8 +444,7 @@ public class FindAsteroids : MonoBehaviour {
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:
 				print("CCN_UPCALL_FINAL: " + h);
 				TPool.AllHandles.Delete(h);
-//				Egal.ccn_set_run_timeout(h, 0); 
-//				Egal.killCurrentThread(); // kill current thread
+
 				break;
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_INTEREST_TIMED_OUT:
 				print("CCN_UPCALL_INTEREST_TIMED_OUT: " + h);
@@ -469,7 +464,6 @@ public class FindAsteroids : MonoBehaviour {
 		Egal.ExpressInterest(ccn, name, RequestAllCallback, pData, IntPtr.Zero); // express interest
 		
 		TPool.AllHandles.Add(ccn);
-		//Egal.ccnRun(ccn, -1); // ccnRun starts a new thread
 	}
 	
 	public static Vector3 MakeAnAsteroid(string info)
@@ -478,20 +472,16 @@ public class FindAsteroids : MonoBehaviour {
 		Vector3 pos = M.GetGameCoordinates(values["latitude"], values["longitude"]);
 		RenderAnAsteroid(pos, values["fs"]);
 		string label = M.GetLabel(pos);
-		//print("fs: " + values["fs"] + ", label: " + label);
 		return pos;
 	}
 	
 	public static void RenderAnAsteroid(Vector3 position, string id)
 	{
 		// instantiate an asteroid
-		
 		GameObject asteroid1 = GameObject.Find("tree2");
 		GameObject newAsteroid = UnityEngine.Object.Instantiate(asteroid1, position, Quaternion.identity) as GameObject;
 		newAsteroid.name = "asteroid-"+id;
 		newAsteroid.transform.localScale = new Vector3(1000f,1000f,1000f);
-		
-		
 	}
 	
 
