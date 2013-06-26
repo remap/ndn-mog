@@ -52,7 +52,6 @@ public class M : MonoBehaviour {
 		return labels;
 	}
 	
-	
 	public static Vector3 GetGameCoordinates(string str_lati, string str_longi)
 	{
 		// convert from latitude and longitude to game coordinates
@@ -81,7 +80,7 @@ public class M : MonoBehaviour {
 		return pos;
 	}
 	
-		static bool InWorld(Vector3 position)
+	static bool InWorld(Vector3 position)
 	{
 		if(position.x<0 || position.y<0 || position.z<0)
 		{
@@ -94,14 +93,18 @@ public class M : MonoBehaviour {
 		return true;
 	}
 	
-	
-	
-	
 	public static string GetLabelFromName(string name)
 	{
-		int index = name.IndexOf("/octant/");
-		string n = name.Substring(index+8,7);
-		return n;
+		if(name.Contains("/octant/"))
+		{
+			int index = name.IndexOf("/octant/");
+			
+			if(name.Length<(index+15))
+				return null;
+			
+			return name.Substring(index+8,7);
+		}
+		return null;
 	}
 	
 	public static string GetIDFromName(string name)
@@ -109,6 +112,8 @@ public class M : MonoBehaviour {
 		if(name.Contains("/octant/"))
 		{
 			int index = name.IndexOf("/octant/");
+			if(name.Length<(index+16))
+				return null;
 			
 			string tail = name.Substring(index + 16);
 			string[] split = tail.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);

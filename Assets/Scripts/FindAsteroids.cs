@@ -199,7 +199,7 @@ public class FindAsteroids : MonoBehaviour {
 				string n = M.GetLabelFromName(name);
 				string id = M.GetIDFromName(name);
 				
-				if(DicContains(n, id)==true)
+				if(DicContains(n, id)==true || n == null || id == null)
 				{
 					continue;
 				}
@@ -391,10 +391,12 @@ public class FindAsteroids : MonoBehaviour {
         	case Upcall.ccn_upcall_kind.CCN_UPCALL_CONTENT:
 			
 				string name = Egal.GetContentName(Info.content_ccnb);
-				//print("received: " + name);
 				string content = Egal.GetContentValue(Info.content_ccnb, Info.pco); 
+				AstNameContBuf.Write (name, content);
 			
 				string labels = M.GetLabelFromName(name);
+				if(labels == null) break;
+				 
 				if(nimbus.Contains(labels)==false) // we don't care about this octant any more
 				{
 					TPool.AllHandles.Delete(h);
@@ -407,7 +409,7 @@ public class FindAsteroids : MonoBehaviour {
 				IntPtr comp = Egal.ccn_charbuf_create();
             	Egal.ccn_name_init(c);
 				Egal.ccn_name_init(comp);
-				AstNameContBuf.Write (name, content);
+				
 			
 				int index = name.IndexOf("/octant/");
 				string matchedprefix = name.Substring(0, index + 15);
@@ -420,7 +422,7 @@ public class FindAsteroids : MonoBehaviour {
 				string tail = name.Substring(index + 16);
 				split = tail.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
 				string oldcomponent = split[0]; 
-				//Egal.ccn_name_append_str(comp, oldcomponent);
+				
 			
 				Egal.ccn_charbuf_append_tt(templ, (int)Dtag.ccn_dtag.CCN_DTAG_Interest, (int)TT.ccn_tt.CCN_DTAG);
 				Egal.ccn_charbuf_append_tt(templ, (int)Dtag.ccn_dtag.CCN_DTAG_Name, (int)TT.ccn_tt.CCN_DTAG);
@@ -432,9 +434,9 @@ public class FindAsteroids : MonoBehaviour {
 				Exclude Data = (Exclude) Marshal.PtrToStructure(Selfp.data, typeof(Exclude));	
 				//print("exclusion filter: " + Data.filter);
 				Data.filter = Data.filter + "," + oldcomponent;
-				IntPtr pData = Marshal.AllocHGlobal(Marshal.SizeOf(Data));
-				Marshal.StructureToPtr(Data, pData, true);
-				Selfp.data = pData;
+				//IntPtr pData = Marshal.AllocHGlobal(Marshal.SizeOf(Data));
+				Marshal.StructureToPtr(Data, Selfp.data, true);
+				//Selfp.data = pData;
 				Marshal.StructureToPtr(Selfp, selfp, true);
 			
 				string newfilterlist = Data.filter;
@@ -449,8 +451,6 @@ public class FindAsteroids : MonoBehaviour {
 			
 				Egal.ccn_charbuf_append_closer(templ); // </Exclude>
 				Egal.ccn_charbuf_append_closer(templ); // </Interest>
-			
-				
 		
 				// express interest again
 				Egal.ccn_express_interest(h,c,selfp,templ);
