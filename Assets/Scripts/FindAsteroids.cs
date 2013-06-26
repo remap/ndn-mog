@@ -149,7 +149,6 @@ public class FindAsteroids : MonoBehaviour {
 	public struct Exclude
 	{
 		public string filter; // components, seperated by ','
-		
 	}
 	
 	
@@ -174,12 +173,12 @@ public class FindAsteroids : MonoBehaviour {
 		aura.Add ( temp );
 		nimbus.AddRange ( aura ); // nimbus contains aura
 		
-		//nimbus.AddRange ( GetNeighbors(transform.position) );
+		nimbus.AddRange ( GetNeighbors(transform.position) );
 		AddAsteroidBySpace ( nimbus );
 		
 		bry = GetBoundaries ( aura[0] );
 		
-		InvokeRepeating("CheckPos", 0, 0.1F);
+		//InvokeRepeating("CheckPos", 0, 0.1F);
 		InvokeRepeating("Render", 0, 0.1F);
 		//RequestAll("/ndn/ucla.edu/apps/matryoshka/asteroid/octant/0/0/0/0");
 	}
@@ -236,7 +235,7 @@ public class FindAsteroids : MonoBehaviour {
 			
 			List<string> newnimbus = new List<string>();
 			newnimbus.AddRange( aura );
-			//newnimbus.AddRange ( GetNeighbors(transform.position) );
+			newnimbus.AddRange ( GetNeighbors(transform.position) );
 			
 			List<string> newoct = newnimbus.Except(OctAstDic.Keys).ToList();
 			List<string> datedoct = OctAstDic.Keys.Except(newnimbus).ToList();
@@ -366,18 +365,6 @@ public class FindAsteroids : MonoBehaviour {
 		int ymax = ymin + 512;
 		int zmax = zmin + 512;
 		
-		//print(labels + ":" + L1bits + "," + L2bits + "," + L3bits + "," + L4bits);
-		//print(xbits + "," + ybits + "," + zbits);
-//		
-//		print(transform.position.x>xmin);
-//		print(transform.position.x<xmax);
-//		
-//		print(transform.position.y>ymin);
-//		print(transform.position.y<ymax);
-//		
-//		print(transform.position.z>zmin);
-//		print(transform.position.z<zmax);
-		
 		Boundary bry = new Boundary(xmin, xmax, ymin, ymax, zmin, zmax);
 		return bry;
 		
@@ -385,7 +372,7 @@ public class FindAsteroids : MonoBehaviour {
 	
 	static Upcall.ccn_upcall_res RequestAllCallback (IntPtr selfp, Upcall.ccn_upcall_kind kind, IntPtr info)
 	{
-		print("RequestAllCallback: " + kind);
+		print("RequestAllCallback: " + kind + " long... long... long... long... long... long... long... long...");
 		Egal.ccn_upcall_info Info = Egal.GetInfo(info);
 		IntPtr h=Info.h;
 		

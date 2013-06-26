@@ -17,14 +17,17 @@ public class TPool : MonoBehaviour {
 	
 	public class HandlePool
 	{
-		private List<IntPtr> handles = new List<IntPtr>();
+		private HashSet<IntPtr> handles = new HashSet<IntPtr>(); // HashSet does not allow duplicates
 		private bool readerFlag = false;
 		
 		public void Delete(IntPtr ccn)
 		{
 			mut.WaitOne();
 			print("Delete");
-			handles.Remove(ccn);
+			if(handles.Contains(ccn) == true)
+			{
+				handles.Remove(ccn);
+			}
          	mut.ReleaseMutex(); 
 		}
 		
@@ -32,9 +35,16 @@ public class TPool : MonoBehaviour {
 		{	
 			mut.WaitOne();
 			print("Add");
-			handles.Add (ccn);
+			if(handles.Contains(ccn) == false)
+			{
+				handles.Add (ccn);
+			}
       		mut.ReleaseMutex();
 		}	
+		
+		public void Update(IntPtr ccn, float last_active_time)
+		{
+		}
 		
 		public IEnumerator Run()
 		{
@@ -49,7 +59,7 @@ public class TPool : MonoBehaviour {
 				mut.WaitOne();
 				foreach(IntPtr h in handles)
 				{
-					print("Run" + h);
+					print("Run: " + h + "long... long... long... long... long... long... long... long... long... long... long... long...");
 					HandleState state = new HandleState(h, 20);
 					ThreadPool.QueueUserWorkItem(Egal.run,state);
 				}
