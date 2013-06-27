@@ -100,7 +100,10 @@ public class M : MonoBehaviour {
 			int index = name.IndexOf("/octant/");
 			
 			if(name.Length<(index+15))
+			{
+				//print("Ill name: " + name);
 				return null;
+			}
 			
 			return name.Substring(index+8,7);
 		}

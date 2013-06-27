@@ -61,7 +61,7 @@ public class TPool : MonoBehaviour {
 				rwl.EnterReadLock();
 				foreach(IntPtr h in handles.Keys)
 				{
-					//print("Run: " + h + "long... long... long... long... long... long... long... long... long... long... long... long...");
+					print("Run: " + h + "long... long... long... long... long... long... long... long... long... long... long... long...");
 
 					HandleState state = new HandleState(h, 20);
 					ThreadPool.QueueUserWorkItem(Egal.run,state);

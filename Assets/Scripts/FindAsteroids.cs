@@ -173,7 +173,10 @@ public class FindAsteroids : MonoBehaviour {
 		aura.Add ( temp );
 		nimbus.AddRange ( aura ); // nimbus contains aura
 		
-		nimbus.AddRange ( GetNeighbors(transform.position) );
+		//nimbus.AddRange ( GetNeighbors(transform.position) );
+		
+		print("nimbus: " + string.Join(",", nimbus.ToArray())); // debug
+		
 		AddAsteroidBySpace ( nimbus );
 		
 		bry = GetBoundaries ( aura[0] );
@@ -235,7 +238,7 @@ public class FindAsteroids : MonoBehaviour {
 			
 			List<string> newnimbus = new List<string>();
 			newnimbus.AddRange( aura );
-			newnimbus.AddRange ( GetNeighbors(transform.position) );
+			//newnimbus.AddRange ( GetNeighbors(transform.position) );
 			
 			List<string> newoct = newnimbus.Except(OctAstDic.Keys).ToList();
 			List<string> datedoct = OctAstDic.Keys.Except(newnimbus).ToList();
@@ -329,8 +332,6 @@ public class FindAsteroids : MonoBehaviour {
 				neighborlist.Add(temp);
 			}
 		}
-		
-		
 		return neighborlist;
 	}
 	
@@ -384,7 +385,12 @@ public class FindAsteroids : MonoBehaviour {
 				AstNameContBuf.Write (name, content);
 			
 				string labels = M.GetLabelFromName(name);
-				if(labels == null) break;
+				string oldcomponent = M.GetIDFromName(name);
+				if(labels == null || oldcomponent == null) 
+				{
+					print("Ill name: " + name + ", belongs to: " + h);
+					break;
+				}
 				 
 				if(nimbus.Contains(labels)==false) // we don't care about this octant any more
 				{
@@ -406,9 +412,9 @@ public class FindAsteroids : MonoBehaviour {
 					Egal.ccn_name_append_str(c, s);
 				}
 			
-				string tail = name.Substring(index + 16);
-				split = tail.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
-				string oldcomponent = split[0]; 
+//				string tail = name.Substring(index + 16);
+//				split = tail.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
+//				string oldcomponent = split[0]; 
 				
 			
 				Egal.ccn_charbuf_append_tt(templ, (int)Dtag.ccn_dtag.CCN_DTAG_Interest, (int)TT.ccn_tt.CCN_DTAG);
