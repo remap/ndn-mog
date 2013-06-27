@@ -21,9 +21,9 @@ public class M : MonoBehaviour {
 		}
 		
 		// get binaries
-		string xbits = Convert.ToString((int)position.x, 2).PadLeft(13,'0');
-		string ybits = Convert.ToString((int)position.y, 2).PadLeft(13,'0');
-		string zbits = Convert.ToString((int)position.z, 2).PadLeft(13,'0');
+		string xbits = Convert.ToString((int)position.x, 2).PadLeft(16,'0');
+		string ybits = Convert.ToString((int)position.y, 2).PadLeft(16,'0');
+		string zbits = Convert.ToString((int)position.z, 2).PadLeft(16,'0');
 		
 		
 		// reorganize
@@ -31,18 +31,27 @@ public class M : MonoBehaviour {
 		string L2bits = ""+xbits[1] + ybits[1] + zbits[1];
 		string L3bits = ""+xbits[2] + ybits[2] + zbits[2];
 		string L4bits = ""+xbits[3] + ybits[3] + zbits[3];
+		string L5bits = ""+xbits[4] + ybits[4] + zbits[4];
+		string L6bits = ""+xbits[5] + ybits[5] + zbits[5];
+		string L7bits = ""+xbits[6] + ybits[6] + zbits[6];
 		
 		int temp1 = Convert.ToInt32(L1bits, 2); 
 		int temp2 = Convert.ToInt32(L2bits, 2); 
 		int temp3 = Convert.ToInt32(L3bits, 2); 
 		int temp4 = Convert.ToInt32(L4bits, 2); 
+		int temp5 = Convert.ToInt32(L5bits, 2); 
+		int temp6 = Convert.ToInt32(L6bits, 2); 
+		int temp7 = Convert.ToInt32(L7bits, 2); 
 		
 		string L1 = Convert.ToString(temp1, 8);
 		string L2 = Convert.ToString(temp2, 8);
 		string L3 = Convert.ToString(temp3, 8);
 		string L4 = Convert.ToString(temp4, 8);
+		string L5 = Convert.ToString(temp5, 8);
+		string L6 = Convert.ToString(temp6, 8);
+		string L7 = Convert.ToString(temp7, 8);
 		
-		string labels = ""+L1 + "/" + L2 + "/" + L3 + "/" + L4;
+		string labels = ""+L1 + "/" + L2 + "/" + L3 + "/" + L4 + "/" + L5 + "/" + L6 + "/" + L7;
 		
 //		print(xbits);
 //		print(ybits);
@@ -56,14 +65,16 @@ public class M : MonoBehaviour {
 	{
 		// convert from latitude and longitude to game coordinates
 		
+		double radius = 30000;
+		
 		float latitude = Convert.ToSingle( str_lati );
 		float longitude = Convert.ToSingle( str_longi ) ;
 		float pi = 3.14159265359f;
 		float theta = (float)(pi*(1.0/2.0 + latitude/180));
 		float fi = (float)(pi*(longitude/180));
-		double x = 4000* 0.78*Mathf.Cos(theta/4)*Mathf.Sin(theta)*Mathf.Sin(fi);
-		double y = 4000*1.0*Mathf.Cos(theta);
-        double z = 4000* 0.78*Mathf.Cos(theta/4)*Mathf.Sin(theta)*Mathf.Cos(fi);
+		double x = radius* 0.78*Mathf.Cos(theta/4)*Mathf.Sin(theta)*Mathf.Sin(fi);
+		double y = radius*1.0*Mathf.Cos(theta);
+        double z = radius* 0.78*Mathf.Cos(theta/4)*Mathf.Sin(theta)*Mathf.Cos(fi);
 
 		// rotate the egg
 		double xx = x;
@@ -71,22 +82,68 @@ public class M : MonoBehaviour {
 		double zz = Mathf.Sin(pi/4)*y + Mathf.Cos(pi/4)*z;
 
 		// translate the egg
-		double xxx = xx + 4000;
-		double yyy = yy + 4000;
-		double zzz = zz + 4000;
+		double xxx = xx + radius;
+		double yyy = yy + radius;
+		double zzz = zz + radius;
 
 		Vector3 pos = new Vector3((float)xxx,(float)yyy,(float)zzz);
 
 		return pos;
 	}
 	
+	
+	public static FindAsteroids.Boundary GetBoundaries(string labels)
+	{
+		string [] split = labels.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
+		
+		int L1oct = Convert.ToInt32(split[0],8);
+		int L2oct = Convert.ToInt32(split[1],8);
+		int L3oct = Convert.ToInt32(split[2],8);
+		int L4oct = Convert.ToInt32(split[3],8);
+		int L5oct = Convert.ToInt32(split[4],8);
+		int L6oct = Convert.ToInt32(split[5],8);
+		int L7oct = Convert.ToInt32(split[6],8);
+		
+		string L1bits = Convert.ToString (L1oct,2).PadLeft(3,'0');
+		string L2bits = Convert.ToString (L2oct,2).PadLeft(3,'0');
+		string L3bits = Convert.ToString (L3oct,2).PadLeft(3,'0');
+		string L4bits = Convert.ToString (L4oct,2).PadLeft(3,'0');
+		string L5bits = Convert.ToString (L5oct,2).PadLeft(3,'0');
+		string L6bits = Convert.ToString (L6oct,2).PadLeft(3,'0');
+		string L7bits = Convert.ToString (L7oct,2).PadLeft(3,'0');
+		
+		string xbits = "" + L1bits[0] + L2bits[0] + L3bits[0] + L4bits[0] + L5bits[0] + L6bits[0] + L7bits[0];
+		string ybits = "" + L1bits[1] + L2bits[1] + L3bits[1] + L4bits[1] + L5bits[1] + L6bits[1] + L7bits[1];
+		string zbits = "" + L1bits[2] + L2bits[2] + L3bits[2] + L4bits[2] + L5bits[2] + L6bits[2] + L7bits[2];
+		
+		int x = Convert.ToInt32 (xbits,2);
+		int y = Convert.ToInt32 (ybits,2);
+		int z = Convert.ToInt32 (zbits,2);
+		
+		int xmin = x * 512; 
+		int ymin = y * 512;
+		int zmin = z * 512;
+		
+		int xmax = xmin + 512;
+		int ymax = ymin + 512;
+		int zmax = zmin + 512;
+		
+		
+		FindAsteroids.Boundary bry = new FindAsteroids.Boundary(xmin, xmax, ymin, ymax, zmin, zmax);
+		return bry;
+		
+	}
+	
+	
 	static bool InWorld(Vector3 position)
 	{
+		float worldsize = 65536; // 2^16
+		
 		if(position.x<0 || position.y<0 || position.z<0)
 		{
 			return false;
 		}
-		if(position.x>8192 || position.y>8192 || position.z>8192)
+		if(position.x>worldsize || position.y>worldsize || position.z>worldsize)
 		{
 			return false;
 		}
@@ -99,13 +156,13 @@ public class M : MonoBehaviour {
 		{
 			int index = name.IndexOf("/octant/");
 			
-			if(name.Length<(index+15))
+			if(name.Length<(index+21))
 			{
 				//print("Ill name: " + name);
 				return null;
 			}
 			
-			return name.Substring(index+8,7);
+			return name.Substring(index+8,13);
 		}
 		return null;
 	}
@@ -115,16 +172,30 @@ public class M : MonoBehaviour {
 		if(name.Contains("/octant/"))
 		{
 			int index = name.IndexOf("/octant/");
-			if(name.Length<(index+16))
+			if(name.Length<(index+22))
 				return null;
 			
-			string tail = name.Substring(index + 16);
+			string tail = name.Substring(index + 22);
 			string[] split = tail.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
 			string id = split[0]; 
 			
 			return id;
 		}
-		
 		return null;
 	}
+	
+	public static string GetNameTillID(string name)
+	{
+		if(name.Contains("/octant/"))
+		{
+			int index = name.IndexOf("/octant/");
+			if(name.Length<(index+22))
+				return null;
+			
+			string namebeforeid = name.Substring(0, index + 21);
+			return namebeforeid;
+		}
+		return null;
+	}
+	
 }

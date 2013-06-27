@@ -36,7 +36,7 @@ public class Initialize : MonoBehaviour {
 		Vector3 pos = FindAsteroids.MakeAnAsteroid(FirstAsteroid);
 		FindAsteroids.AddToDic(FirstAsteroidName);
 		
-		Vector3 dollpos = pos + new Vector3(0, 95, 0);
+		Vector3 dollpos = pos + new Vector3(0, 50, 0);
 		transform.position = dollpos;
 		GameObject.Find("MainCamera").transform.position = dollpos;
 		

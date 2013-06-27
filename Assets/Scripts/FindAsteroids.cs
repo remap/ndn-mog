@@ -12,7 +12,7 @@ public class FindAsteroids : MonoBehaviour {
 	public string prefix = "/ndn/ucla.edu/apps/matryoshka";
 	
 	// boundary: 512*512*512
-	struct Boundary{
+	public struct Boundary{
 		public float xmin;
 		public float xmax;
 		public float ymin;
@@ -172,16 +172,13 @@ public class FindAsteroids : MonoBehaviour {
 		
 		aura.Add ( temp );
 		nimbus.AddRange ( aura ); // nimbus contains aura
-		
-		//nimbus.AddRange ( GetNeighbors(transform.position) );
-		
-		print("nimbus: " + string.Join(",", nimbus.ToArray())); // debug
+		nimbus.AddRange ( GetNeighbors(transform.position) );
 		
 		AddAsteroidBySpace ( nimbus );
 		
-		bry = GetBoundaries ( aura[0] );
+		bry = M.GetBoundaries ( aura[0] );
 		
-		InvokeRepeating("CheckPos", 0, 0.1F);
+		InvokeRepeating("CheckPos", 0, 0.1F); // actually this does not have to run so often :)
 		InvokeRepeating("Render", 0, 0.1F);
 		//RequestAll("/ndn/ucla.edu/apps/matryoshka/asteroid/octant/0/0/0/0");
 	}
@@ -234,11 +231,11 @@ public class FindAsteroids : MonoBehaviour {
 			}
 			
 			aura.Add ( temp );
-			bry = GetBoundaries(aura[0]); // update the boundaries
+			bry = M.GetBoundaries(aura[0]); // update the boundaries
 			
 			List<string> newnimbus = new List<string>();
 			newnimbus.AddRange( aura );
-			//newnimbus.AddRange ( GetNeighbors(transform.position) );
+			newnimbus.AddRange ( GetNeighbors(transform.position) );
 			
 			List<string> newoct = newnimbus.Except(OctAstDic.Keys).ToList();
 			List<string> datedoct = OctAstDic.Keys.Except(newnimbus).ToList();
@@ -335,40 +332,7 @@ public class FindAsteroids : MonoBehaviour {
 		return neighborlist;
 	}
 	
-	Boundary GetBoundaries(string labels)
-	{
-		string [] split = labels.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
-		
-		int L1oct = Convert.ToInt32(split[0],8);
-		int L2oct = Convert.ToInt32(split[1],8);
-		int L3oct = Convert.ToInt32(split[2],8);
-		int L4oct = Convert.ToInt32(split[3],8);
-		
-		string L1bits = Convert.ToString (L1oct,2).PadLeft(3,'0');
-		string L2bits = Convert.ToString (L2oct,2).PadLeft(3,'0');
-		string L3bits = Convert.ToString (L3oct,2).PadLeft(3,'0');
-		string L4bits = Convert.ToString (L4oct,2).PadLeft(3,'0');
-		
-		string xbits = "" + L1bits[0] + L2bits[0] + L3bits[0] + L4bits[0];
-		string ybits = "" + L1bits[1] + L2bits[1] + L3bits[1] + L4bits[1];
-		string zbits = "" + L1bits[2] + L2bits[2] + L3bits[2] + L4bits[2];
-		
-		int x = Convert.ToInt32 (xbits,2);
-		int y = Convert.ToInt32 (ybits,2);
-		int z = Convert.ToInt32 (zbits,2);
-		
-		int xmin = x * 512; 
-		int ymin = y * 512;
-		int zmin = z * 512;
-		
-		int xmax = xmin + 512;
-		int ymax = ymin + 512;
-		int zmax = zmin + 512;
-		
-		Boundary bry = new Boundary(xmin, xmax, ymin, ymax, zmin, zmax);
-		return bry;
-		
-	}
+	
 	
 	static Upcall.ccn_upcall_res RequestAllCallback (IntPtr selfp, Upcall.ccn_upcall_kind kind, IntPtr info)
 	{
@@ -403,9 +367,7 @@ public class FindAsteroids : MonoBehaviour {
             	Egal.ccn_name_init(c);
 				Egal.ccn_name_init(comp);
 				
-			
-				int index = name.IndexOf("/octant/");
-				string matchedprefix = name.Substring(0, index + 15);
+				string matchedprefix = M.GetNameTillID(name);
 				string [] split = matchedprefix.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
 				foreach(string s in split)
 				{
