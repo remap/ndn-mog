@@ -134,6 +134,35 @@ public class M : MonoBehaviour {
 		
 	}
 	
+	public static List<string> GetNeighbors(Vector3 position)
+	{
+		List<string> neighborlist = new List<string>();
+		int[,] neighbors = {{1,0,0}, {-1,0,0}, // x
+							{0,1,0}, {0,-1,0}, // y
+							{0,0,1}, {0,0,-1}, // z
+							{1,1,0}, {1,-1,0}, {-1,1,0}, {-1,-1,0}, // x,y
+							{1,0,1}, {1,0,-1}, {-1,0,1}, {-1,0,-1}, // x,z
+							{0,1,1}, {0,1,-1}, {0,-1,1}, {0,-1,-1}, // y,z
+							{1,1,1}, {-1,1,1}, {1,-1,1}, {1,1,-1}, {1,-1,-1}, {-1,1,-1}, {-1,-1,1},{-1,-1,-1} // x,y,z
+		};
+		
+		Vector3 offset = new Vector3();
+		string temp = null;
+		for(int i = 0; i<26; i++)
+		{
+			offset.x = neighbors[i,0] * 512;
+			offset.y = neighbors[i,1] * 512;
+			offset.z = neighbors[i,2] * 512;
+			
+			temp = M.GetLabel(position+offset);
+			if(temp!=null)
+			{
+				neighborlist.Add(temp);
+			}
+		}
+		print(string.Join(",", neighborlist.ToArray())); // debug
+		return neighborlist;
+	}
 	
 	static bool InWorld(Vector3 position)
 	{
