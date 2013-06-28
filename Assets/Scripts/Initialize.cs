@@ -38,7 +38,8 @@ public class Initialize : MonoBehaviour {
 		
 		Vector3 dollpos = pos + new Vector3(0, 50, 0);
 		transform.position = dollpos;
-		GameObject.Find("MainCamera").transform.position = dollpos;
+		//transform.Rotate( new Vector3(0, UnityEngine.Random.Range(0, 360), 0) );
+		//GameObject.Find("MainCamera").transform.position = dollpos;
 		
 	}
 	

@@ -18,7 +18,7 @@ using System.Collections;
 public class MouseLook : MonoBehaviour {
 
 	public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 }
-	public RotationAxes axes = RotationAxes.MouseXAndY;
+	public RotationAxes axes = RotationAxes.MouseX;
 	public float sensitivityX = 15F;
 	public float sensitivityY = 15F;
 

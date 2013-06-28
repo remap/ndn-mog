@@ -46,6 +46,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\AssetSync.cs" />
      <Compile Include="Assets\Scripts\Asteroids.cs" />
+     <Compile Include="Assets\Scripts\Boat.cs" />
      <Compile Include="Assets\Scripts\CCNScript.cs" />
      <Compile Include="Assets\Scripts\Data.cs" />
      <Compile Include="Assets\Scripts\FindAsteroids.cs" />
