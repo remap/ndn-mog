@@ -16,39 +16,44 @@ public class TPool : MonoBehaviour {
 		StartCoroutine(AllHandles.Run());
 	}
 	
+	void OnApplicationQuit()
+	{
+		AllHandles.Clear();
+	}
+	
 	public class HandlePool
 	{
-		// dictionary <handle, time when the closure was last called back>
-		private Dictionary<IntPtr, float> handles = new Dictionary<IntPtr, float>(); 
+		// dictionary <handle, labels>
+		private Dictionary<IntPtr, string> handles = new Dictionary<IntPtr, string>(); 
 		
 		
 		public void Delete(IntPtr ccn)
 		{
 			
-			print("Delete: " + ccn);
+			
 			if(handles.ContainsKey(ccn) == true)
 			{
 				rwl.EnterWriteLock();
+				print("Delete: " + ccn + ", " + handles[ccn]);
 				handles.Remove(ccn);
 				rwl.ExitWriteLock();
 			}
          	 
 		}
 		
-		public void Add(IntPtr ccn)
+		public void Add(IntPtr ccn, string labels)
 		{	
 			
-			print("Add: " + ccn);
+			print("Add: " + ccn + ", " + labels);
 			if(handles.ContainsKey(ccn) == false)
 			{
 				rwl.EnterWriteLock();
-				handles.Add (ccn, DateTime.Now.Second);
+				handles.Add (ccn, labels);
 				rwl.ExitWriteLock();
 			}
       		
 		}	
 		
-
 		public IEnumerator Run()
 		{
 			while(Application.isPlaying)
@@ -61,7 +66,7 @@ public class TPool : MonoBehaviour {
 				rwl.EnterReadLock();
 				foreach(IntPtr h in handles.Keys)
 				{
-					//print("Run: " + h);
+					print("Run: " + h + ", " + handles[h]);
 
 					HandleState state = new HandleState(h, 20);
 					ThreadPool.QueueUserWorkItem(Egal.run,state);
@@ -70,9 +75,16 @@ public class TPool : MonoBehaviour {
 								
 				yield return null;
 			}
+			
+			yield break;
 		}
 		
-		
+		public void Clear()
+		{
+			rwl.EnterWriteLock();
+			handles.Clear();
+			rwl.ExitWriteLock();
+		}
 	}
 }
 

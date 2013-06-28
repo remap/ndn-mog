@@ -171,16 +171,22 @@ public class FindAsteroids : MonoBehaviour {
 		}
 		
 		aura.Add ( temp );
+		bry = M.GetBoundaries ( aura[0] );
+		
 		nimbus.AddRange ( aura ); // nimbus contains aura
 		nimbus.AddRange ( M.GetNeighbors(transform.position) );
 		
 		AddAsteroidBySpace ( nimbus );
 		
-		bry = M.GetBoundaries ( aura[0] );
-		
-		//InvokeRepeating("CheckPos", 0, 0.1F); // actually this does not have to run so often :)
+		InvokeRepeating("CheckPos", 0, 0.1F); // actually this does not have to run so often :)
 		InvokeRepeating("Render", 0, 0.1F);
-		//RequestAll("/ndn/ucla.edu/apps/matryoshka/asteroid/octant/0/0/0/0");
+		
+//		string strnimbus = "0/4/3/3/1/3/2,0/0/7/7/5/7/2,0/0/7/7/7/5/4,0/0/7/7/5/7/4,0/0/7/7/5/7/7,0/0/7/7/5/6/7,0/4/3/3/3/1/0,0/4/3/3/1/3/0,0/0/7/7/7/5/0,0/0/7/7/5/7/0,0/4/3/3/1/3/3,0/4/3/3/1/2/3,0/0/7/7/5/7/3,0/0/7/7/5/6/3,0/0/7/7/7/5/5,0/0/7/7/7/4/5,0/0/7/7/5/7/5,0/0/7/7/5/6/5,0/4/3/3/3/1/1,0/0/7/7/7/5/1,0/4/3/3/1/3/1,0/4/3/3/3/0/1,0/4/3/3/1/2/1,0/0/7/7/7/4/1,0/0/7/7/5/7/1,0/0/7/7/5/6/1";
+//		string [] split = strnimbus.Split(new char [] {','},StringSplitOptions.RemoveEmptyEntries);
+//		foreach(string s in split)
+//		{
+//			RequestAll("/ndn/ucla.edu/apps/matryoshka/asteroid/octant/" + s);
+//		}
 	}
 	
 	void Render()
@@ -222,11 +228,12 @@ public class FindAsteroids : MonoBehaviour {
 		
 		if( InBound(transform.position) == false )
 		{
+			//print("Out of Bound!");
 			aura.Clear();
 			temp = M.GetLabel(transform.position);
 			if(temp == null)
 			{
-				print("FindAsteroids.CheckPos(): Aura is null!");
+				//print("FindAsteroids.CheckPos(): Aura is null!");
 				return;
 			}
 			
@@ -235,7 +242,7 @@ public class FindAsteroids : MonoBehaviour {
 			
 			List<string> newnimbus = new List<string>();
 			newnimbus.AddRange( aura );
-			//newnimbus.AddRange ( M.GetNeighbors(transform.position) );
+			newnimbus.AddRange ( M.GetNeighbors(transform.position) );
 			
 			List<string> newoct = newnimbus.Except(OctAstDic.Keys).ToList();
 			List<string> datedoct = OctAstDic.Keys.Except(newnimbus).ToList();
@@ -257,7 +264,7 @@ public class FindAsteroids : MonoBehaviour {
 		{
 			if(OctAstDic.ContainsKey(n)==true && n!=Initialize.FirstAsteroidLabel)
 			{
-				// print("AddAsteroidBySpace(): this octant is not new! --" + n);
+				//print("AddAsteroidBySpace(): this octant is not new! --" + n);
 				continue;
 			}
 			RequestAll( prefix + "/asteroid/octant/" + n);
@@ -404,7 +411,8 @@ public class FindAsteroids : MonoBehaviour {
 		IntPtr ccn = Egal.GetHandle(); // connect to ccnd
 		Egal.ExpressInterest(ccn, name, RequestAllCallback, pData, IntPtr.Zero); // express interest
 		
-		TPool.AllHandles.Add(ccn);
+		string labels = M.GetLabelFromName(name);
+		TPool.AllHandles.Add(ccn, labels);
 	}
 	
 	public static Vector3 MakeAnAsteroid(string info)
