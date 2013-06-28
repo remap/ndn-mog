@@ -425,6 +425,7 @@ public class FindAsteroids : MonoBehaviour {
 		GameObject newAsteroid = UnityEngine.Object.Instantiate(asteroid1, position, Quaternion.identity) as GameObject;
 		newAsteroid.name = "asteroid-"+id;
 		newAsteroid.transform.localScale = new Vector3(1000f,1000f,1000f);
+		newAsteroid.tag = "Asteroid";
 	}
 	
 
