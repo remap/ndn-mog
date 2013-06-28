@@ -26,7 +26,6 @@ public class TPool : MonoBehaviour {
 		// dictionary <handle, labels>
 		private Dictionary<IntPtr, string> handles = new Dictionary<IntPtr, string>(); 
 		
-		
 		public void Delete(IntPtr ccn)
 		{
 			

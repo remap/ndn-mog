@@ -176,17 +176,11 @@ public class FindAsteroids : MonoBehaviour {
 		nimbus.AddRange ( aura ); // nimbus contains aura
 		nimbus.AddRange ( M.GetNeighbors(transform.position) );
 		
-		AddAsteroidBySpace ( nimbus );
+		//AddAsteroidBySpace ( nimbus );
 		
-		InvokeRepeating("CheckPos", 0, 0.1F); // actually this does not have to run so often :)
-		InvokeRepeating("Render", 0, 0.1F);
+		//InvokeRepeating("CheckPos", 0, 0.1F); // actually this does not have to run so often :)
+		//InvokeRepeating("Render", 0, 0.1F);
 		
-//		string strnimbus = "0/4/3/3/1/3/2,0/0/7/7/5/7/2,0/0/7/7/7/5/4,0/0/7/7/5/7/4,0/0/7/7/5/7/7,0/0/7/7/5/6/7,0/4/3/3/3/1/0,0/4/3/3/1/3/0,0/0/7/7/7/5/0,0/0/7/7/5/7/0,0/4/3/3/1/3/3,0/4/3/3/1/2/3,0/0/7/7/5/7/3,0/0/7/7/5/6/3,0/0/7/7/7/5/5,0/0/7/7/7/4/5,0/0/7/7/5/7/5,0/0/7/7/5/6/5,0/4/3/3/3/1/1,0/0/7/7/7/5/1,0/4/3/3/1/3/1,0/4/3/3/3/0/1,0/4/3/3/1/2/1,0/0/7/7/7/4/1,0/0/7/7/5/7/1,0/0/7/7/5/6/1";
-//		string [] split = strnimbus.Split(new char [] {','},StringSplitOptions.RemoveEmptyEntries);
-//		foreach(string s in split)
-//		{
-//			RequestAll("/ndn/ucla.edu/apps/matryoshka/asteroid/octant/" + s);
-//		}
 	}
 	
 	void Render()
