@@ -56,6 +56,7 @@
      <Compile Include="Assets\Scripts\M.cs" />
      <Compile Include="Assets\Scripts\Motion.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
+     <Compile Include="Assets\Scripts\fishrotate.cs" />
      <Compile Include="Assets\Scripts\move.cs" />
      <Compile Include="Assets\Scripts\switchView.cs" />
      <None Include="Assets\Shader Support\HardSurface Shaders\HardSurfacePro Hidden Front Cut Out Specular.shader" />

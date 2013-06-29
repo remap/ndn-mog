@@ -6,7 +6,7 @@ public class move : MonoBehaviour {
 	public static float speed = 4.0F;
     public static float jumpSpeed = 6.0F;
     public static float gravity = 10F;
-	public static float autoflyspeed = 6F;
+	public static float autoflyspeed = 12F;
 	
 	
 	public enum Mode {walk, fly};

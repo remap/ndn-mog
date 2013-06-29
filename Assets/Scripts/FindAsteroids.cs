@@ -176,10 +176,10 @@ public class FindAsteroids : MonoBehaviour {
 		nimbus.AddRange ( aura ); // nimbus contains aura
 		nimbus.AddRange ( M.GetNeighbors(transform.position) );
 		
-		AddAsteroidBySpace ( nimbus );
+		//AddAsteroidBySpace ( nimbus );
 		
-		InvokeRepeating("CheckPos", 0, 0.3F); // actually this does not have to run so often :)
-		InvokeRepeating("Render", 0, 0.1F);
+		//InvokeRepeating("CheckPos", 0, 0.3F); // actually this does not have to run so often :)
+		//InvokeRepeating("Render", 0, 0.1F);
 		
 	}
 	
