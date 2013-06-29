@@ -79,60 +79,24 @@ public class FindAsteroids : MonoBehaviour {
 	{
 		private Dictionary<string, string> buf = new Dictionary<string, string> ();
 		private bool readerFlag = false;
+		private static ReaderWriterLockSlim rwl = new ReaderWriterLockSlim();
 		
 		public Dictionary<string, string> Read()
 		{
 			Dictionary<string, string> copy;
-			lock(this)
-      		{
-         		if (!readerFlag)
-         		{            
-            		try
-            		{
-               			Monitor.Wait(this);
-            		}
-            		catch (SynchronizationLockException e)
-            		{
-               			Console.WriteLine(e);
-            		}
-            		catch (ThreadInterruptedException e)
-            		{
-               			Console.WriteLine(e);
-            		}
-         		}
-         		// read here
-				copy = new Dictionary<string, string>(buf);
-				buf.Clear();
-         		readerFlag = false;    
-         		Monitor.Pulse(this);   
-      		}   
+			rwl.EnterWriteLock();
+			copy = new Dictionary<string, string>(buf);
+			buf.Clear();
+			rwl.ExitWriteLock();
+         		
       		return copy;
 		}
 		
 		public void Write(string name, string content)
 		{
-			lock(this)  
-      		{
-         		if (readerFlag)
-         		{      
-            		try
-            		{
-               			Monitor.Wait(this);   
-            		}
-            		catch (SynchronizationLockException e)
-            		{
-               			Console.WriteLine(e);
-            		}
-            		catch (ThreadInterruptedException e)
-            		{
-               			Console.WriteLine(e);
-            		}
-         		}
-         		// write here
-				buf.Add (name, content);
-         		readerFlag = true;   
-         		Monitor.Pulse(this);  
-      		}   
+			rwl.EnterWriteLock();
+			buf.Add (name, content);
+      		rwl.ExitWriteLock();
 		}
 		
 		public bool IsEmpty()
@@ -176,10 +140,10 @@ public class FindAsteroids : MonoBehaviour {
 		nimbus.AddRange ( aura ); // nimbus contains aura
 		nimbus.AddRange ( M.GetNeighbors(transform.position) );
 		
-		AddAsteroidBySpace ( nimbus );
-		
-		InvokeRepeating("CheckPos", 0, 0.3F); // actually this does not have to run so often :)
-		InvokeRepeating("Render", 0, 0.1F);
+//		AddAsteroidBySpace ( nimbus );
+//		
+//		InvokeRepeating("CheckPos", 0, 0.3F); // actually this does not have to run so often :)
+//		InvokeRepeating("Render", 0, 0.1F);
 		
 	}
 	

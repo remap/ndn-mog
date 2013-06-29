@@ -8,7 +8,7 @@ using System.Threading;
 public class TPool : MonoBehaviour {
 
 	public static HandlePool AllHandles = new HandlePool();
-	private static Mutex mut = new Mutex();
+	
 	private static ReaderWriterLockSlim rwl = new ReaderWriterLockSlim();
 	
 	void Start () {
