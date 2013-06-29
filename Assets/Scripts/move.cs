@@ -6,7 +6,8 @@ public class move : MonoBehaviour {
 	public static float speed = 4.0F;
     public static float jumpSpeed = 6.0F;
     public static float gravity = 10F;
-	public static float autoflyspeed = 12F;
+	public static float autoflyspeed = 0.5F;
+	public static float flyspeedstep = 0.05F;
 	
 	
 	public enum Mode {walk, fly};
@@ -20,7 +21,7 @@ public class move : MonoBehaviour {
 		if(currentmode == (int)Mode.walk)
 		{
 			if (controller.isGrounded) {
-            moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            moveDirection = new Vector3(Input.GetAxis("LeftRight"), 0, Input.GetAxis("WalkForBack"));
             moveDirection = transform.TransformDirection(moveDirection);
             moveDirection *= speed;
             if (Input.GetButton("Jump"))
@@ -32,9 +33,15 @@ public class move : MonoBehaviour {
 		}
 		else if(currentmode == (int)Mode.fly)
 		{
-			moveDirection = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 1);
+			print(Input.GetAxis("FlySpeed"));
+			float newspeed = autoflyspeed + flyspeedstep*Input.GetAxis("FlySpeed");
+			if(newspeed>=0 && newspeed<=3)
+			{
+				autoflyspeed = newspeed;
+			}
+			moveDirection = new Vector3(Input.GetAxis("LeftRight"), Input.GetAxis("FlyUpDown"), autoflyspeed);
             moveDirection = transform.TransformDirection(moveDirection);
-            moveDirection *= autoflyspeed;
+            moveDirection *= 12F;
             
         	controller.Move(moveDirection * Time.deltaTime);
 		}
