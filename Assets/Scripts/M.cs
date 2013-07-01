@@ -6,8 +6,9 @@ using System;
 
 public class M : MonoBehaviour {
 	
-	
-	// commonly used functions shared by all scripts
+	// M for Matryoshka
+	// Here are some commonly used functions shared by all scripts
+	// It's mostly about octree partitioning of the game world
 	
 	public static string GetLabel(Vector3 position)
 	{

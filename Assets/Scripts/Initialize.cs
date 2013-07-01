@@ -14,7 +14,7 @@ public class Initialize : MonoBehaviour {
 	public static string FirstAsteroidLabel;
 	
 	public IEnumerator Start () {
-	
+		print("Time: " + DateTime.Now.ToString("HH:mm:ss tt"));
 		string name = "/ndn/ucla.edu/apps/matryoshka/asteroid/octant";
 		IntPtr ccn = Egal.GetHandle(); // connect to ccnd
 		Egal.ExpressInterest(ccn, name, RequestCallback, IntPtr.Zero, IntPtr.Zero); // express interest

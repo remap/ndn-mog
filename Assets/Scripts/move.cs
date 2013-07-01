@@ -33,7 +33,7 @@ public class move : MonoBehaviour {
 		}
 		else if(currentmode == (int)Mode.fly)
 		{
-			print(Input.GetAxis("FlySpeed"));
+			
 			float newspeed = autoflyspeed + flyspeedstep*Input.GetAxis("FlySpeed");
 			if(newspeed>=0 && newspeed<=3)
 			{

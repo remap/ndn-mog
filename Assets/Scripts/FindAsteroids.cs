@@ -140,10 +140,10 @@ public class FindAsteroids : MonoBehaviour {
 		nimbus.AddRange ( aura ); // nimbus contains aura
 		nimbus.AddRange ( M.GetNeighbors(transform.position) );
 		
-//		AddAsteroidBySpace ( nimbus );
-//		
-//		InvokeRepeating("CheckPos", 0, 0.3F); // actually this does not have to run so often :)
-//		InvokeRepeating("Render", 0, 0.1F);
+		AddAsteroidBySpace ( nimbus );
+		
+		InvokeRepeating("CheckPos", 0, 0.5F); 
+		InvokeRepeating("Render", 0, 0.1F);
 		
 	}
 	
@@ -296,6 +296,7 @@ public class FindAsteroids : MonoBehaviour {
 				 
 				if(nimbus.Contains(labels)==false) // we don't care about this octant any more
 				{
+					print("don't care: " + h + ", " + labels);
 					TPool.AllHandles.Delete(h);
 				}
 			
@@ -311,11 +312,6 @@ public class FindAsteroids : MonoBehaviour {
 				{
 					Egal.ccn_name_append_str(c, s);
 				}
-			
-//				string tail = name.Substring(index + 16);
-//				split = tail.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
-//				string oldcomponent = split[0]; 
-				
 			
 				Egal.ccn_charbuf_append_tt(templ, (int)Dtag.ccn_dtag.CCN_DTAG_Interest, (int)TT.ccn_tt.CCN_DTAG);
 				Egal.ccn_charbuf_append_tt(templ, (int)Dtag.ccn_dtag.CCN_DTAG_Name, (int)TT.ccn_tt.CCN_DTAG);
@@ -350,12 +346,13 @@ public class FindAsteroids : MonoBehaviour {
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:
 				print("CCN_UPCALL_FINAL: " + h);
 				TPool.AllHandles.Delete(h);
-
 				break;
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_INTEREST_TIMED_OUT:
 				print("CCN_UPCALL_INTEREST_TIMED_OUT: " + h);
 				break;
-			default: break;
+			default: 
+				print("othercallback: " + kind);
+				break;
 		}
 		return Upcall.ccn_upcall_res.CCN_UPCALL_RESULT_OK;
 	}
