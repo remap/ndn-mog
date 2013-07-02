@@ -76,13 +76,17 @@ public class TPool : MonoBehaviour {
 				int index = 0;
 				foreach(IntPtr h in copy.Keys)
 				{
-					print("Run: " + h + ", " + copy[h]);
+					//print("Run: " + h + ", " + copy[h]);
 					doneEvents[index] = new ManualResetEvent(false);
 					HandleState state = new HandleState(h, 20, doneEvents[index]);
 					ThreadPool.QueueUserWorkItem(ThreadRun,state);
 					index++;
 				}
 				print("doneEvents array size: " + doneEvents.Length);
+				if(doneEvents.Length>27)
+				{
+					print("Abnormal doneEvents array size!");
+				}
 				WaitHandle.WaitAll(doneEvents);
 				doneEvents = null;
 				

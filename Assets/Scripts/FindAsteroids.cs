@@ -202,11 +202,11 @@ public class FindAsteroids : MonoBehaviour {
 			newnimbus.AddRange( aura );
 			newnimbus.AddRange ( M.GetNeighbors(transform.position) );
 			
-			List<string> newoct = newnimbus.Except(OctAstDic.Keys).ToList();
-			List<string> datedoct = OctAstDic.Keys.Except(newnimbus).ToList();
+			List<string> newoct = newnimbus.Except(nimbus).ToList();
+			List<string> datedoct = nimbus.Except(newnimbus).ToList();
 			
-			AddAsteroidBySpace(newoct);
 			DeleteAsteroidBySpace(datedoct);
+			AddAsteroidBySpace(newoct);
 			
 			nimbus.Clear();
 			nimbus.AddRange(newnimbus);
