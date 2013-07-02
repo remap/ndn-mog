@@ -33,8 +33,8 @@ public class FindAsteroids : MonoBehaviour {
 	static Boundary bry;
 	
 	// List <octant labels>
-	public static List<string> aura; 
-	public static List<string> nimbus;
+	public static List<string> aura = null; 
+	public static List<string> nimbus = null;
 	
 	// Dictionary < octant label, List <asteroid ids> >
 	public static Dictionary<string,List<string>> OctAstDic = new Dictionary<string, List<string>>(); 
@@ -248,7 +248,7 @@ public class FindAsteroids : MonoBehaviour {
 			asteroidids = OctAstDic[o];
 			foreach(string id in asteroidids)
 			{
-				GameObject t = GameObject.Find("asteroid-"+id);
+				GameObject t = GameObject.Find("/Asteroid/"+id);
 				if(!t)
 				{
 					print("Can't destroy asteroid with given id.");
@@ -389,10 +389,15 @@ public class FindAsteroids : MonoBehaviour {
 	{
 		// instantiate an asteroid
 		GameObject asteroid1 = GameObject.Find("tree2");
+		Transform parent = GameObject.Find("Asteroid").transform;
+		
 		GameObject newAsteroid = UnityEngine.Object.Instantiate(asteroid1, position, Quaternion.identity) as GameObject;
-		newAsteroid.name = "asteroid-"+id;
+		newAsteroid.name = id;
 		newAsteroid.transform.localScale = new Vector3(1000f,1000f,1000f);
 		newAsteroid.tag = "Asteroid";
+		newAsteroid.transform.parent = parent;
+		newAsteroid.transform.Find("label").GetComponent<GUIText>().text = "/ndn/ucla.edu/apps/matryoshka/asteroid/" + id;
+		ControlLabels.ApplyName(newAsteroid.transform);
 	}
 	
 
