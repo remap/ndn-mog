@@ -39,35 +39,34 @@ public class FindAsteroids : MonoBehaviour {
 	
 	// Dictionary < octant label, List <asteroid ids> >
 	public static Dictionary<string,List<string>> OctAstDic = new Dictionary<string, List<string>>(); 
+	
 	public static void AddToDic(string oct, string id)
 	{
 		if(oct==null || oct=="")
 			return;
-		if(id == null || id == "")
+
+		if( (id == null || id == "") && OctAstDic.ContainsKey(oct)==false)
 		{
 			OctAstDic.Add (oct,new List<string>());
 			return;
 		}
-		if(OctAstDic.ContainsKey(oct)==false)
+		
+		if( id != null && id != "" && OctAstDic.ContainsKey(oct)==false)
 		{
 			OctAstDic.Add (oct,new List<string>());
+			OctAstDic[oct].Add(id);
 		}
-		OctAstDic[oct].Add(id);
+		
 	}
+	
 	public static void AddToDic(string name)
 	{
 		string oct = M.GetLabelFromName(name);
 		string id = M.GetIDFromName(name);
 		
-		if(oct == null || oct == "" || id == null || id == "")
-			return;
-		
-		if(OctAstDic.ContainsKey(oct)==false)
-		{
-			OctAstDic.Add (oct,new List<string>());
-		}
-		OctAstDic[oct].Add(id);
+		AddToDic(oct, id);
 	}
+	
 	public static bool DicContains(string oct, string id)
 	{
 		if(OctAstDic.ContainsKey(oct)==true)
@@ -254,7 +253,7 @@ public class FindAsteroids : MonoBehaviour {
 			asteroidids = OctAstDic[o];
 			foreach(string id in asteroidids)
 			{
-				if(id=="")
+				if(id=="" && id==null)
 					continue;
 				
 				GameObject t = GameObject.Find("/Asteroid/"+id);

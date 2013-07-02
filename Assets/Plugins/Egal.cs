@@ -73,11 +73,7 @@ public class Egal: MonoBehaviour {
 		}
 	}
 	
-	public static void run(System.Object state)
-	{
-		HandleState hs = (HandleState)state;
-		ccn_run (hs.ccn, hs.timeout);
-	}
+	
 	
 	
 	

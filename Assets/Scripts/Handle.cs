@@ -6,10 +6,9 @@ using System.Threading;
 public class Handle : MonoBehaviour {
 
 	public static IntPtr ccn; // handle
-	private static ManualResetEvent _shutdownEvent = new ManualResetEvent(false);
     private static ManualResetEvent _pauseEvent = new ManualResetEvent(true);
     private static Thread _thread;
-	private static bool IsPlaying = true;
+	//private static bool IsPlaying = true;
 	
 	void Start () {
 		ccn = Egal.GetHandle(); 
@@ -20,21 +19,16 @@ public class Handle : MonoBehaviour {
 	
 	void OnApplicationQuit()
 	{
-		//_shutdownEvent.Set();
-        //_pauseEvent.Set();
-		IsPlaying = false;
-		//Egal.ccn_set_run_timeout(ccn, 0);
+		Resume();
 		_thread.Abort();
 		_thread.Join();
 	}
 	
 	public void Run () 
 	{
-		while(IsPlaying)
+		while(_thread.IsAlive == true)
 		{
 			_pauseEvent.WaitOne(Timeout.Infinite);
-			if (_shutdownEvent.WaitOne(0))
-                break;
             Egal.ccn_run(ccn, 20);
 		}
 		
