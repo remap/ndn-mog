@@ -35,11 +35,19 @@ public class FindAsteroids : MonoBehaviour {
 	// List <octant labels>
 	public static List<string> aura = null; 
 	public static List<string> nimbus = null;
+	public static List<string> oldnimbus = null;
 	
 	// Dictionary < octant label, List <asteroid ids> >
 	public static Dictionary<string,List<string>> OctAstDic = new Dictionary<string, List<string>>(); 
 	public static void AddToDic(string oct, string id)
 	{
+		if(oct==null || oct=="")
+			return;
+		if(id == null || id == "")
+		{
+			OctAstDic.Add (oct,new List<string>());
+			return;
+		}
 		if(OctAstDic.ContainsKey(oct)==false)
 		{
 			OctAstDic.Add (oct,new List<string>());
@@ -51,7 +59,7 @@ public class FindAsteroids : MonoBehaviour {
 		string oct = M.GetLabelFromName(name);
 		string id = M.GetIDFromName(name);
 		
-		if(oct == null || id == null)
+		if(oct == null || oct == "" || id == null || id == "")
 			return;
 		
 		if(OctAstDic.ContainsKey(oct)==false)
@@ -78,7 +86,6 @@ public class FindAsteroids : MonoBehaviour {
 	public class NameContBuf
 	{
 		private Dictionary<string, string> buf = new Dictionary<string, string> ();
-		private bool readerFlag = false;
 		private static ReaderWriterLockSlim rwl = new ReaderWriterLockSlim();
 		
 		public Dictionary<string, string> Read()
@@ -134,27 +141,7 @@ public class FindAsteroids : MonoBehaviour {
 			yield return new WaitForSeconds(0.05f);
 		}
 		
-//		string temp = M.GetLabel(transform.position);
-//		if(temp==null)
-//		{
-//			print("FindAsteroids.Start(): Aura is null!");
-//			return false;
-//		}
-//		
-//		aura.Add ( temp );
-//		bry = M.GetBoundaries ( aura[0] );
-//		
-//		nimbus.AddRange ( aura ); // nimbus contains aura
-//		//nimbus.AddRange ( M.GetNeighbors(transform.position) );
-//		
-//		AddAsteroidBySpace ( nimbus );
-//		
-//		transform.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/doll/zening\n" 
-//			+ M.PREFIX + "/doll/octant/" + aura[0] + "/zening";
-//		ControlLabels.ApplyOptions();
-//		
-		InvokeRepeating("CheckPos", 0, 0.5F); 
-		
+		InvokeRepeating("CheckPos", 0, 0.5F); // is this blocking?
 		
 	}
 	
@@ -198,34 +185,15 @@ public class FindAsteroids : MonoBehaviour {
 		
 	void CheckPos() {
 		
-		string temp = null;
-		
 		if( InBound(transform.position) == false )
 		{
-			//print("Out of Bound!");
-			aura.Clear();
-			temp = M.GetLabel(transform.position);
-			if(temp == null)
-			{
-				print("FindAsteroids.CheckPos(): Aura is null!");
-				return;
-			}
+			UpdateAuraNimbusBoundary();
 			
-			aura.Add ( temp );
-			bry = M.GetBoundaries(aura[0]); // update the boundaries
+			List<string> toadd = nimbus.Except(oldnimbus).ToList();
+			List<string> todelete = oldnimbus.Except(nimbus).ToList();
 			
-			List<string> newnimbus = new List<string>();
-			newnimbus.AddRange( aura );
-			//newnimbus.AddRange ( M.GetNeighbors(transform.position) );
-			
-			List<string> newoct = newnimbus.Except(nimbus).ToList();
-			List<string> datedoct = nimbus.Except(newnimbus).ToList();
-			
-			DeleteAsteroidBySpace(datedoct);
-			AddAsteroidBySpace(newoct);
-			
-			nimbus.Clear();
-			nimbus.AddRange(newnimbus);
+			DeleteAsteroidBySpace(todelete);
+			AddAsteroidBySpace(toadd);
 			
 			transform.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/doll/zening\n" 
 			+ M.PREFIX + "/doll/octant/" + aura[0] + "/zening";
@@ -234,13 +202,30 @@ public class FindAsteroids : MonoBehaviour {
 		
     }
 	
-	void AddAsteroidBySpace(List<string> nimbus)
+	void UpdateAuraNimbusBoundary()
 	{
-		if(nimbus.Count == 0)
+		aura.Clear();
+		string temp = M.GetLabel(transform.position);
+		if(temp == null)
+		{
+			print("FindAsteroids.CheckPos(): Aura is null!");
+			return;
+		}
+		aura.Add ( temp );
+		bry = M.GetBoundaries(aura[0]); 
+		
+		oldnimbus = new List<string>(nimbus);
+		nimbus.Clear();
+		nimbus.AddRange( aura );
+		nimbus.AddRange ( M.GetNeighbors(transform.position) );
+	}
+	
+	void AddAsteroidBySpace(List<string> toadd)
+	{
+		if(toadd.Count == 0)
 			return;
 		
-		List<string> asteroidnames = null;
-		foreach(string n in nimbus)
+		foreach(string n in toadd)
 		{
 			if(OctAstDic.ContainsKey(n)==true && n!=Initialize.FirstAsteroidLabel)
 			{
@@ -248,6 +233,7 @@ public class FindAsteroids : MonoBehaviour {
 				continue;
 			}
 			RequestAll( M.PREFIX + "/asteroid/octant/" + n);
+			AddToDic(n, null);
 		}
 	}
 	
@@ -268,6 +254,9 @@ public class FindAsteroids : MonoBehaviour {
 			asteroidids = OctAstDic[o];
 			foreach(string id in asteroidids)
 			{
+				if(id=="")
+					continue;
+				
 				GameObject t = GameObject.Find("/Asteroid/"+id);
 				if(!t)
 				{
@@ -300,7 +289,7 @@ public class FindAsteroids : MonoBehaviour {
 	
 	static Upcall.ccn_upcall_res RequestAllCallback (IntPtr selfp, Upcall.ccn_upcall_kind kind, IntPtr info)
 	{
-		//print("RequestAllCallback: " + kind + " long... long... long... long... long... long... long... long...");
+		//print("RequestAllCallback: " + kind);
 		Egal.ccn_upcall_info Info = Egal.GetInfo(info);
 		IntPtr h=Info.h;
 		
@@ -323,7 +312,8 @@ public class FindAsteroids : MonoBehaviour {
 				if(nimbus.Contains(labels)==false) // we don't care about this octant any more
 				{
 					print("don't care: " + h + ", " + labels);
-					TPool.AllHandles.Delete(h);
+					//TPool.AllHandles.Delete(h);
+					break;
 				}
 			
 				IntPtr c = Egal.ccn_charbuf_create();
@@ -365,13 +355,14 @@ public class FindAsteroids : MonoBehaviour {
 				Egal.ccn_charbuf_append_closer(templ); // </Interest>
 		
 				// express interest again
+				Handle.Pause();
 				Egal.ccn_express_interest(h,c,selfp,templ);
-			
+				Handle.Resume();
 				break;
 			
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:
 				print("CCN_UPCALL_FINAL: " + h);
-				TPool.AllHandles.Delete(h);
+				//TPool.AllHandles.Delete(h);
 				break;
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_INTEREST_TIMED_OUT:
 				print("CCN_UPCALL_INTEREST_TIMED_OUT: " + h);
@@ -389,11 +380,13 @@ public class FindAsteroids : MonoBehaviour {
 		IntPtr pData = Marshal.AllocHGlobal(Marshal.SizeOf(Data));
 		Marshal.StructureToPtr(Data, pData, true);
 		
-		IntPtr ccn = Egal.GetHandle(); // connect to ccnd
-		Egal.ExpressInterest(ccn, name, RequestAllCallback, pData, IntPtr.Zero); // express interest
+		//IntPtr ccn = Egal.GetHandle(); // connect to ccnd
+		Handle.Pause();
+		Egal.ExpressInterest(Handle.ccn, name, RequestAllCallback, pData, IntPtr.Zero); // express interest
+		Handle.Resume();
 		
-		string labels = M.GetLabelFromName(name);
-		TPool.AllHandles.Add(ccn, labels);
+		//string labels = M.GetLabelFromName(name);
+		//TPool.AllHandles.Add(ccn, labels);
 	}
 	
 	public static Vector3 MakeAnAsteroid(string info)

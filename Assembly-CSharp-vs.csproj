@@ -47,6 +47,7 @@
      <Compile Include="Assets\Scripts\CheckMode.cs" />
      <Compile Include="Assets\Scripts\ControlLabels.cs" />
      <Compile Include="Assets\Scripts\FindAsteroids.cs" />
+     <Compile Include="Assets\Scripts\Handle.cs" />
      <Compile Include="Assets\Scripts\Initialize.cs" />
      <Compile Include="Assets\Scripts\M.cs" />
      <Compile Include="Assets\Scripts\ObjectLabel.cs" />
