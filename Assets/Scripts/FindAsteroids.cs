@@ -143,8 +143,13 @@ public class FindAsteroids : MonoBehaviour {
 		AddAsteroidBySpace ( nimbus );
 		
 		InvokeRepeating("CheckPos", 0, 0.5F); 
-		InvokeRepeating("Render", 0, 0.1F);
+		//InvokeRepeating("Render", 0, 0.1F);
 		
+	}
+	
+	void Update()
+	{
+		Render ();
 	}
 	
 	void Render()
@@ -252,6 +257,7 @@ public class FindAsteroids : MonoBehaviour {
 			}
 			OctAstDic.Remove(o);
 		}
+		Resources.UnloadUnusedAssets();
 	}
 	
 	
