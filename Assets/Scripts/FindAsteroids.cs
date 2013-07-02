@@ -123,6 +123,7 @@ public class FindAsteroids : MonoBehaviour {
 		
 		aura = new List<string>();
 		nimbus = new List<string>();
+		bry = new Boundary(-1f, -1f, -1f, -1f, -1f, -1f);
 		
 		Tree2 = GameObject.Find("/tree2");
 		AsteroidParent = GameObject.Find("/Asteroid").transform;
@@ -133,25 +134,25 @@ public class FindAsteroids : MonoBehaviour {
 			yield return new WaitForSeconds(0.05f);
 		}
 		
-		string temp = M.GetLabel(transform.position);
-		if(temp==null)
-		{
-			print("FindAsteroids.Start(): Aura is null!");
-			return false;
-		}
-		
-		aura.Add ( temp );
-		bry = M.GetBoundaries ( aura[0] );
-		
-		nimbus.AddRange ( aura ); // nimbus contains aura
-		//nimbus.AddRange ( M.GetNeighbors(transform.position) );
-		
-		AddAsteroidBySpace ( nimbus );
-		
-		transform.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/doll/zening\n" 
-			+ M.PREFIX + "/doll/octant/" + aura[0] + "/zening";
-		ControlLabels.ApplyOptions();
-		
+//		string temp = M.GetLabel(transform.position);
+//		if(temp==null)
+//		{
+//			print("FindAsteroids.Start(): Aura is null!");
+//			return false;
+//		}
+//		
+//		aura.Add ( temp );
+//		bry = M.GetBoundaries ( aura[0] );
+//		
+//		nimbus.AddRange ( aura ); // nimbus contains aura
+//		//nimbus.AddRange ( M.GetNeighbors(transform.position) );
+//		
+//		AddAsteroidBySpace ( nimbus );
+//		
+//		transform.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/doll/zening\n" 
+//			+ M.PREFIX + "/doll/octant/" + aura[0] + "/zening";
+//		ControlLabels.ApplyOptions();
+//		
 		InvokeRepeating("CheckPos", 0, 0.5F); 
 		
 		
@@ -206,7 +207,7 @@ public class FindAsteroids : MonoBehaviour {
 			temp = M.GetLabel(transform.position);
 			if(temp == null)
 			{
-				//print("FindAsteroids.CheckPos(): Aura is null!");
+				print("FindAsteroids.CheckPos(): Aura is null!");
 				return;
 			}
 			
@@ -215,7 +216,7 @@ public class FindAsteroids : MonoBehaviour {
 			
 			List<string> newnimbus = new List<string>();
 			newnimbus.AddRange( aura );
-			newnimbus.AddRange ( M.GetNeighbors(transform.position) );
+			//newnimbus.AddRange ( M.GetNeighbors(transform.position) );
 			
 			List<string> newoct = newnimbus.Except(nimbus).ToList();
 			List<string> datedoct = nimbus.Except(newnimbus).ToList();
@@ -235,6 +236,9 @@ public class FindAsteroids : MonoBehaviour {
 	
 	void AddAsteroidBySpace(List<string> nimbus)
 	{
+		if(nimbus.Count == 0)
+			return;
+		
 		List<string> asteroidnames = null;
 		foreach(string n in nimbus)
 		{
@@ -249,6 +253,9 @@ public class FindAsteroids : MonoBehaviour {
 	
 	void DeleteAsteroidBySpace(List<string> octs)
 	{
+		if(octs.Count == 0)
+			return;
+		
 		List<string> asteroidids;
 		foreach(string o in octs)
 		{
