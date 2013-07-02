@@ -15,7 +15,8 @@ public class Initialize : MonoBehaviour {
 	
 	public IEnumerator Start () {
 		print("Time: " + DateTime.Now.ToString("HH:mm:ss tt"));
-		string name = "/ndn/ucla.edu/apps/matryoshka/asteroid/octant";
+		
+		string name = M.PREFIX + "/asteroid/octant";
 		IntPtr ccn = Egal.GetHandle(); // connect to ccnd
 		Egal.ExpressInterest(ccn, name, RequestCallback, IntPtr.Zero, IntPtr.Zero); // express interest
 		Egal.ccnRun(ccn, -1); // ccnRun starts a new thread
@@ -38,8 +39,6 @@ public class Initialize : MonoBehaviour {
 		
 		Vector3 dollpos = pos + new Vector3(0, 50, 0);
 		transform.position = dollpos;
-		//transform.Rotate( new Vector3(0, UnityEngine.Random.Range(0, 360), 0) );
-		//GameObject.Find("MainCamera").transform.position = dollpos;
 		
 	}
 	

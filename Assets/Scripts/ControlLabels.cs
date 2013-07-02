@@ -25,20 +25,11 @@ public class ControlLabels : MonoBehaviour {
 		if(Input.GetKeyUp(KeyCode.N))
 		{
 			Show = GetNextOption();
-			switch(Show)
-			{
-			case (int)Option.none:
-				ApplyNone(); break;
-			case (int)Option.self:
-				ApplySelf(); break;
-			case (int)Option.aura:
-				ApplyAura(); break;
-			case (int)Option.nimbus:
-				ApplyNimbus(); break;
-			}
+			ApplyOptions();
 		}
 		
 	}
+	
 	
 	int GetNextOption()
 	{
@@ -54,8 +45,22 @@ public class ControlLabels : MonoBehaviour {
 		return nextoption;
 	}
 	
+	public static void ApplyOptions()
+	{
+		switch(Show)
+			{
+			case (int)Option.none:
+				ApplyNone(); break;
+			case (int)Option.self:
+				ApplySelf(); break;
+			case (int)Option.aura:
+				ApplyAura(); break;
+			case (int)Option.nimbus:
+				ApplyNimbus(); break;
+			}
+	}
 	
-	void ApplyNone()
+	static void ApplyNone()
 	{
 		print("Show label for none.");
 		// player
@@ -69,7 +74,7 @@ public class ControlLabels : MonoBehaviour {
 		
 	}
 	
-	void ApplySelf()
+	static void ApplySelf()
 	{
 		print("Show label for self.");
 		// player
@@ -82,7 +87,7 @@ public class ControlLabels : MonoBehaviour {
 		}
 	}
 	
-	void ApplyAura()
+	static void ApplyAura()
 	{
 		print("Show labels for aura.");
 		// player
@@ -106,10 +111,13 @@ public class ControlLabels : MonoBehaviour {
 	{
 		if(FindAsteroids.aura == null || FindAsteroids.OctAstDic.Count == 0)
 			return false;
-		return FindAsteroids.OctAstDic[FindAsteroids.aura[0]].Contains(id);
+		string aura = FindAsteroids.aura[0];
+		if(FindAsteroids.OctAstDic.ContainsKey(aura) == false)
+			return false;
+		return FindAsteroids.OctAstDic[aura].Contains(id);
 	}
 	
-	void ApplyNimbus()
+	static void ApplyNimbus()
 	{
 		print("Show labels for nimbus");
 		// player
@@ -122,7 +130,7 @@ public class ControlLabels : MonoBehaviour {
 		}
 	}
 	
-	public static void ApplyName(Transform obj) // set label for asteroid
+	public static void ApplyAsteroidName(Transform obj) // set label for asteroid
 	{
 		switch(Show)
 			{

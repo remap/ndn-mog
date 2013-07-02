@@ -9,7 +9,7 @@ using System.Linq;
 
 public class FindAsteroids : MonoBehaviour {
 	
-	public string prefix = "/ndn/ucla.edu/apps/matryoshka";
+	
 	
 	// boundary: 512*512*512
 	public struct Boundary{
@@ -116,11 +116,17 @@ public class FindAsteroids : MonoBehaviour {
 	}
 	
 	
-	
+	public static GameObject Tree2; // prefab for asteroids
+	public static Transform AsteroidParent; // parent of asteroids
+		
 	IEnumerator Start () {
 		
 		aura = new List<string>();
 		nimbus = new List<string>();
+		
+		Tree2 = GameObject.Find("/tree2");
+		AsteroidParent = GameObject.Find("/Asteroid").transform;
+		
 		
 		while(Initialize.finished != true)
 		{
@@ -138,12 +144,16 @@ public class FindAsteroids : MonoBehaviour {
 		bry = M.GetBoundaries ( aura[0] );
 		
 		nimbus.AddRange ( aura ); // nimbus contains aura
-		nimbus.AddRange ( M.GetNeighbors(transform.position) );
+		//nimbus.AddRange ( M.GetNeighbors(transform.position) );
 		
 		AddAsteroidBySpace ( nimbus );
 		
+		transform.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/doll/zening\n" 
+			+ M.PREFIX + "/doll/octant/" + aura[0] + "/zening";
+		ControlLabels.ApplyOptions();
+		
 		InvokeRepeating("CheckPos", 0, 0.5F); 
-		//InvokeRepeating("Render", 0, 0.1F);
+		
 		
 	}
 	
@@ -216,6 +226,9 @@ public class FindAsteroids : MonoBehaviour {
 			nimbus.Clear();
 			nimbus.AddRange(newnimbus);
 			
+			transform.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/doll/zening\n" 
+			+ M.PREFIX + "/doll/octant/" + aura[0] + "/zening";
+			ControlLabels.ApplyOptions();
 		}
 		
     }
@@ -230,7 +243,7 @@ public class FindAsteroids : MonoBehaviour {
 				//print("AddAsteroidBySpace(): this octant is not new! --" + n);
 				continue;
 			}
-			RequestAll( prefix + "/asteroid/octant/" + n);
+			RequestAll( M.PREFIX + "/asteroid/octant/" + n);
 		}
 	}
 	
@@ -379,26 +392,22 @@ public class FindAsteroids : MonoBehaviour {
 	public static Vector3 MakeAnAsteroid(string info)
 	{
 		Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(info);
-		Vector3 pos = M.GetGameCoordinates(values["latitude"], values["longitude"]);
-		RenderAnAsteroid(pos, values["fs"]);
-		string label = M.GetLabel(pos);
-		return pos;
-	}
-	
-	public static void RenderAnAsteroid(Vector3 position, string id)
-	{
-		// instantiate an asteroid
-		GameObject asteroid1 = GameObject.Find("tree2");
-		Transform parent = GameObject.Find("Asteroid").transform;
+		string id = values["fs"];
+		Vector3 position = M.GetGameCoordinates(values["latitude"], values["longitude"]);
+		string label = M.GetLabel(position);
 		
-		GameObject newAsteroid = UnityEngine.Object.Instantiate(asteroid1, position, Quaternion.identity) as GameObject;
+		GameObject newAsteroid = UnityEngine.Object.Instantiate(Tree2, position, Quaternion.identity) as GameObject;
 		newAsteroid.name = id;
 		newAsteroid.transform.localScale = new Vector3(1000f,1000f,1000f);
 		newAsteroid.tag = "Asteroid";
-		newAsteroid.transform.parent = parent;
-		newAsteroid.transform.Find("label").GetComponent<GUIText>().text = "/ndn/ucla.edu/apps/matryoshka/asteroid/" + id;
-		ControlLabels.ApplyName(newAsteroid.transform);
+		newAsteroid.transform.parent = AsteroidParent;
+		newAsteroid.transform.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/asteroid/" + id + "\n" 
+			+ M.PREFIX + "/asteroid/octant/" + label + "/" + id;
+		ControlLabels.ApplyAsteroidName(newAsteroid.transform);
+		
+		return position;
 	}
+	
 	
 
 }
