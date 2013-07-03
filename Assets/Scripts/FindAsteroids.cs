@@ -84,24 +84,24 @@ public class FindAsteroids : MonoBehaviour {
 		
 	public class NameContBuf
 	{
-		private Dictionary<string, string> buf = new Dictionary<string, string> ();
+		private Queue buf = new Queue ();
 		private static ReaderWriterLockSlim rwl = new ReaderWriterLockSlim();
 		
-		public Dictionary<string, string> Read()
+		public string Read()
 		{
-			Dictionary<string, string> copy;
+			string item;
+			
 			rwl.EnterWriteLock();
-			copy = new Dictionary<string, string>(buf);
-			buf.Clear();
+			item = (string)buf.Dequeue();
 			rwl.ExitWriteLock();
          		
-      		return copy;
+      		return item;
 		}
 		
 		public void Write(string name, string content)
 		{
 			rwl.EnterWriteLock();
-			buf.Add (name, content);
+			buf.Enqueue ("" + name + "|" + content);
       		rwl.ExitWriteLock();
 		}
 		
@@ -122,7 +122,7 @@ public class FindAsteroids : MonoBehaviour {
 	}
 	
 	
-	public static GameObject Tree2; // prefab for asteroids
+	public static Transform Tree2; // prefab for asteroids
 	public static Transform AsteroidParent; // parent of asteroids
 		
 	IEnumerator Start () {
@@ -131,7 +131,7 @@ public class FindAsteroids : MonoBehaviour {
 		nimbus = new List<string>();
 		bry = new Boundary(-1f, -1f, -1f, -1f, -1f, -1f);
 		
-		Tree2 = GameObject.Find("/tree2");
+		Tree2 = GameObject.Find("/tree2").transform;
 		AsteroidParent = GameObject.Find("/Asteroid").transform;
 		
 		
@@ -153,28 +153,30 @@ public class FindAsteroids : MonoBehaviour {
 	{
 		if(AstNameContBuf.IsEmpty() == false)
 		{ 
-			Dictionary<string, string> buf = AstNameContBuf.Read();
 			
-			foreach(string name in buf.Keys)
+			string namecontent = AstNameContBuf.Read();
+			print("Render: " + namecontent);
+			string [] split = namecontent.Split(new char [] {'|'},StringSplitOptions.RemoveEmptyEntries);
+			string name = split[0];
+			string info = split[1];
+			
 			{
+				
 				if(name == Initialize.FirstAsteroidName)
 				{
-					continue;
+					return;
 				}
-				
-				string info = buf[name];
 				
 				string n = M.GetLabelFromName(name);
 				string id = M.GetIDFromName(name);
 				
 				if(n == null || id == null)
-					continue;
+					return;
 				if(DicContains(n, id)==true)
-					continue;
+					return;
+				AddToDic(n,id);
 				
 				MakeAnAsteroid(info);
-					
-				AddToDic(n,id);
 				
 			}
 			
@@ -388,22 +390,27 @@ public class FindAsteroids : MonoBehaviour {
 		//TPool.AllHandles.Add(ccn, labels);
 	}
 	
-	public static Vector3 MakeAnAsteroid(string info)
+	public static Vector3 MakeAnAsteroid(string info, bool activate = false)
 	{
 		Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(info);
 		string id = values["fs"];
 		Vector3 position = M.GetGameCoordinates(values["latitude"], values["longitude"]);
 		string label = M.GetLabel(position);
 		
-		GameObject newAsteroid = UnityEngine.Object.Instantiate(Tree2, position, Quaternion.identity) as GameObject;
-		newAsteroid.name = id;
-		newAsteroid.transform.localScale = new Vector3(1000f,1000f,1000f);
-		newAsteroid.tag = "Asteroid";
-		newAsteroid.transform.parent = AsteroidParent;
-		newAsteroid.transform.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/asteroid/" + id + "\n" 
-			+ M.PREFIX + "/asteroid/octant/" + label + "/" + id;
-		ControlLabels.ApplyAsteroidName(newAsteroid.transform);
+		Transform newAsteroid = Instantiate(Tree2, position, Quaternion.identity) as Transform;
 		
+		newAsteroid.name = id;
+		//newAsteroid.transform.localScale = new Vector3(1000f,1000f,1000f);
+		newAsteroid.tag = "Asteroid";
+		newAsteroid.parent = AsteroidParent;
+		newAsteroid.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/asteroid/" + id + "\n" 
+			+ M.PREFIX + "/asteroid/octant/" + label + "/" + id;
+		ControlLabels.ApplyAsteroidName(newAsteroid);
+		
+		if(activate == true)
+		{
+			newAsteroid.GetComponent<TreeScript>().Activate();
+		}
 		return position;
 	}
 	

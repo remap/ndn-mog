@@ -36,13 +36,13 @@ public class Handle : MonoBehaviour {
 	
 	public static void Pause()
     {
-		print("Pause()");
+		//print("Pause()");
         _pauseEvent.Reset();
     }
 
     public static void Resume()
     {
-		print("Resume()");
+		//print("Resume()");
         _pauseEvent.Set();
     }
 

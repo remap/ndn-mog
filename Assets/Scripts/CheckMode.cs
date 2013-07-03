@@ -4,49 +4,56 @@ using System.Collections;
 public class CheckMode : MonoBehaviour {
 
 	public string OnAsteroid = null;
-	public static bool start = false;
-	private static GameObject asteroidparent;
+	
+	private static Transform asteroidparent;
+	private static GameObject Boat;
+	
 	
 	IEnumerator Start()
 	{
 		CharacterController controller = GetComponent<CharacterController>();
+		Boat =  transform.Find("graphics/boat").gameObject;
+		asteroidparent = GameObject.Find("/Asteroid").transform;
+		
 		while(controller.isGrounded == false)
 			yield return new WaitForSeconds(0.1f);
-		asteroidparent = GameObject.Find("Asteroid");
 		OnAsteroid = FindNearestAsteroid();
 		
-		start = true;
+		InvokeRepeating("Check", 0, 0.1F); 
 	}
 	
-	void Update () {
+	void Check () {
 		
-		if(start== false)
-			return;
+		string newhomeasteroid = FindNearestAsteroid();
 		
-		string homeasteroid = FindNearestAsteroid();
-		
-		if(homeasteroid != OnAsteroid)
+		if(newhomeasteroid != OnAsteroid)
 		{
 			print("Change of Mode!");
-			OnAsteroid = homeasteroid;
-			ChangeMode(OnAsteroid);
+			ChangeMode(newhomeasteroid, OnAsteroid);
+			OnAsteroid = newhomeasteroid;
 		}
 		
 		
 	}
 	
-	public void ChangeMode(string homeast)
+	public void ChangeMode(string newhomeast, string oldhomeast)
 	{
-		GameObject boat = transform.Find("graphics/boat").gameObject;
-		if(homeast == null) // change to fly mode
+		
+		if(newhomeast == null && oldhomeast != null) // change to fly mode
 		{
-			boat.SetActiveRecursively(true);
+			Boat.SetActiveRecursively(true);
 			move.currentmode = (int)move.Mode.fly;
+			asteroidparent.Find(oldhomeast).GetComponent<TreeScript>().DeActivate();
 		}
-		else // change to walk mode
+		else if(newhomeast != null && oldhomeast == null) // change to walk mode
 		{
-			boat.SetActiveRecursively(false);
+			Boat.SetActiveRecursively(false);
 			move.currentmode = (int)move.Mode.walk;
+			asteroidparent.Find(newhomeast).GetComponent<TreeScript>().Activate();
+		}
+		else
+		{
+			print("ChangeMode Error.");
 		}
 	}
 	
@@ -55,7 +62,7 @@ public class CheckMode : MonoBehaviour {
 		
 		string homeasteroid = null;
 		float mindistance = 14;
-		foreach(Transform a in asteroidparent.transform)
+		foreach(Transform a in asteroidparent)
 		{
 			Transform cap = a.Find("cap");
 			float distance = Vector3.Distance(transform.position, cap.position);

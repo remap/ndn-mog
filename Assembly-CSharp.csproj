@@ -51,6 +51,7 @@
      <Compile Include="Assets\Scripts\Initialize.cs" />
      <Compile Include="Assets\Scripts\M.cs" />
      <Compile Include="Assets\Scripts\ObjectLabel.cs" />
+     <Compile Include="Assets\Scripts\TreeScript.cs" />
      <Compile Include="Assets\Scripts\fishrotate.cs" />
      <Compile Include="Assets\Scripts\move.cs" />
      <Compile Include="Assets\Scripts\switchView.cs" />
