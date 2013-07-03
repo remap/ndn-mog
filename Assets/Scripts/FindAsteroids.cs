@@ -55,6 +55,13 @@ public class FindAsteroids : MonoBehaviour {
 		{
 			OctAstDic.Add (oct,new List<string>());
 			OctAstDic[oct].Add(id);
+			return;
+		}
+		
+		if( id != null && id != "" && OctAstDic.ContainsKey(oct)==true)
+		{
+			OctAstDic[oct].Add(id);
+			return;
 		}
 		
 	}
@@ -140,7 +147,7 @@ public class FindAsteroids : MonoBehaviour {
 			yield return new WaitForSeconds(0.05f);
 		}
 		
-		InvokeRepeating("CheckPos", 0, 0.5F); // is this blocking?
+		InvokeRepeating("CheckPos", 0, 0.5F); 
 		
 	}
 	
@@ -155,13 +162,13 @@ public class FindAsteroids : MonoBehaviour {
 		{ 
 			
 			string namecontent = AstNameContBuf.Read();
-			print("Render: " + namecontent);
+			
 			string [] split = namecontent.Split(new char [] {'|'},StringSplitOptions.RemoveEmptyEntries);
 			string name = split[0];
 			string info = split[1];
 			
+			
 			{
-				
 				if(name == Initialize.FirstAsteroidName)
 				{
 					return;
@@ -174,10 +181,10 @@ public class FindAsteroids : MonoBehaviour {
 					return;
 				if(DicContains(n, id)==true)
 					return;
+				print("Render label: " + n + "    id: " + id);
 				AddToDic(n,id);
 				
 				MakeAnAsteroid(info);
-				
 			}
 			
 		}

@@ -8,6 +8,7 @@ public class CheckMode : MonoBehaviour {
 	private static Transform asteroidparent;
 	private static GameObject Boat;
 	
+	private static bool start = false;
 	
 	IEnumerator Start()
 	{
@@ -19,7 +20,15 @@ public class CheckMode : MonoBehaviour {
 			yield return new WaitForSeconds(0.1f);
 		OnAsteroid = FindNearestAsteroid();
 		
-		InvokeRepeating("Check", 0, 0.1F); 
+		start = true;
+	}
+	
+	void Update()
+	{
+		if(start == false)
+			return;
+		
+		Check();
 	}
 	
 	void Check () {
@@ -32,7 +41,6 @@ public class CheckMode : MonoBehaviour {
 			ChangeMode(newhomeasteroid, OnAsteroid);
 			OnAsteroid = newhomeasteroid;
 		}
-		
 		
 	}
 	
@@ -61,12 +69,12 @@ public class CheckMode : MonoBehaviour {
 	{
 		
 		string homeasteroid = null;
-		float mindistance = 14;
+		float mindistance = 17;
 		foreach(Transform a in asteroidparent)
 		{
 			Transform cap = a.Find("cap");
 			float distance = Vector3.Distance(transform.position, cap.position);
-			if(distance<=mindistance && transform.position.y > cap.position.y)
+			if(distance<=mindistance && transform.position.y > cap.position.y-7)
 			{
 				mindistance = distance;
 				homeasteroid = a.name;

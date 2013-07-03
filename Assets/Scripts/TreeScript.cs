@@ -15,13 +15,15 @@ public class TreeScript : MonoBehaviour {
 	
 	public void Activate()
 	{
-		print("Activate " + transform.name);
+		//print("Activate " + transform.name);
 		transform.Find("cap").collider.enabled = true;
+		transform.Find("npc8/body").collider.enabled = true;
 	}
 	
 	public void DeActivate()
 	{
-		print("DeActivate " + transform.name);
+		//print("DeActivate " + transform.name);
 		transform.Find("cap").collider.enabled = false;
+		transform.Find("npc8/body").collider.enabled = false;
 	}
 }
