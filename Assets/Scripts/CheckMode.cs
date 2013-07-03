@@ -20,16 +20,17 @@ public class CheckMode : MonoBehaviour {
 			yield return new WaitForSeconds(0.1f);
 		OnAsteroid = FindNearestAsteroid();
 		
-		start = true;
+		//start = true;
+		InvokeRepeating("Check", 0, 0.05F); 
 	}
 	
-	void Update()
-	{
-		if(start == false)
-			return;
-		
-		Check();
-	}
+//	void Update()
+//	{
+//		if(start == false)
+//			return;
+//		
+//		Check();
+//	}
 	
 	void Check () {
 		

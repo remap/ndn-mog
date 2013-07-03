@@ -181,7 +181,7 @@ public class FindAsteroids : MonoBehaviour {
 					return;
 				if(DicContains(n, id)==true)
 					return;
-				print("Render label: " + n + "    id: " + id);
+				//print("Render label: " + n + "    id: " + id);
 				AddToDic(n,id);
 				
 				MakeAnAsteroid(info);
