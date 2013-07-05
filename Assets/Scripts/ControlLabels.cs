@@ -94,17 +94,14 @@ public class ControlLabels : MonoBehaviour {
 		player.Find("label").gameObject.SetActiveRecursively(true);
 		
 		// asteroids
-		print("Aura is: " + FindAsteroids.aura[0]);
 		foreach(Transform t in asteroidparent)
 		{
 			if( IsAsteroidInAura(t.name) == true)
 			{
-				print(t.name + " is in Aura!");
 				t.Find("label").gameObject.SetActiveRecursively(true);
 			}
 			else
 			{
-				print(t.name + " is not in Aura!");
 				t.Find("label").gameObject.SetActiveRecursively(false);
 			}
 		}

@@ -13,8 +13,8 @@ public Transform cameraToUse ;   // Only use this if useMainCamera is false
 	
     void Update()
     {
-		
-		transform.position = cameraToUse.camera.WorldToViewportPoint(target.position + offset);
+		if(target.renderer.isVisible)
+			transform.position = cameraToUse.camera.WorldToViewportPoint(target.position + offset);
 		
     }
 	
