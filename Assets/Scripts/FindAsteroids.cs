@@ -123,6 +123,9 @@ public class FindAsteroids : MonoBehaviour {
 		
 	}
 	
+	// Queue< asteroid id >  asteroid to be deleted
+	public static Queue AstDustbin = new Queue(); 
+		
 	public struct Exclude
 	{
 		public string filter; // components, seperated by ','
@@ -153,10 +156,26 @@ public class FindAsteroids : MonoBehaviour {
 	
 	void Update()
 	{
-		Render ();
+		AstDestroy(); // destroy 0~1 asteroid per frame
+		AstInstantiate(); // instantiate 0~1 asteroid per frame
 	}
 	
-	void Render()
+	void AstDestroy()
+	{
+		if(AstDustbin.Count != 0)
+		{
+			string id = (string) AstDustbin.Dequeue();
+			GameObject t = GameObject.Find("/Asteroid/"+id);
+			if(!t)
+			{
+				print("Can't destroy asteroid with given id.");
+			}
+			Destroy( t );
+		}
+			
+	}
+	
+	void AstInstantiate()
 	{
 		if(AstNameContBuf.IsEmpty() == false)
 		{ 
@@ -266,12 +285,8 @@ public class FindAsteroids : MonoBehaviour {
 				if(id=="" && id==null)
 					continue;
 				
-				GameObject t = GameObject.Find("/Asteroid/"+id);
-				if(!t)
-				{
-					print("Can't destroy asteroid with given id.");
-				}
-				Destroy( t );
+				AstDustbin.Enqueue(id);
+				
 			}
 			OctAstDic.Remove(o);
 		}
