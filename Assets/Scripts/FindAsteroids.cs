@@ -245,6 +245,7 @@ public class FindAsteroids : MonoBehaviour {
 		}
 	}
 	
+	
 	void DeleteAsteroidBySpace(List<string> octs)
 	{
 		if(octs.Count == 0)
@@ -274,7 +275,7 @@ public class FindAsteroids : MonoBehaviour {
 			}
 			OctAstDic.Remove(o);
 		}
-		Resources.UnloadUnusedAssets();
+
 	}
 	
 	
