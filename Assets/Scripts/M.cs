@@ -201,7 +201,7 @@ public class M : MonoBehaviour {
 	
 	public static string GetIDFromName(string name)
 	{
-		if(name.Contains("/octant/"))
+		if(name.Contains("/asteroid/octant/"))
 		{
 			int index = name.IndexOf("/octant/");
 			if(name.Length<(index+22))
@@ -213,6 +213,20 @@ public class M : MonoBehaviour {
 			
 			return id;
 		}
+		
+		if(name.Contains("/fish/octant/"))
+		{
+			int index = name.IndexOf("/octant/");
+			if(name.Length<(index+51))
+				return null;
+			
+			string tail = name.Substring(index + 51);
+			string[] split = tail.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
+			string id = split[0]; 
+			
+			return id;
+		}
+			
 		return null;
 	}
 	

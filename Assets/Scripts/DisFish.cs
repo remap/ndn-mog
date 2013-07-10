@@ -63,6 +63,9 @@ public class DisFish : MonoBehaviour {
 	}
 	
 	
+	public static Queue FishDustbin = new Queue(); 
+	
+	
 	public struct Exclude
 	{
 		public string filter; // components, seperated by ','
@@ -112,20 +115,79 @@ public class DisFish : MonoBehaviour {
 	}
 	
 	
-	void Update () {
-		
-	}
 	
 	public static void FishDestroy()
 	{
+		if(FishDustbin.Count != 0)
+		{
+			string id = (string) FishDustbin.Dequeue();
+			GameObject t = GameObject.Find("/Fish/"+id);
+			if(!t)
+			{
+				print("Can't destroy fish with given id.");
+			}
+			Destroy( t );
+		}
 	}
 	
 	public static void FishInstantiate()
 	{
+		if(FishNameContBuf.IsEmpty() == false)
+		{ 
+			
+			string namecontent = FishNameContBuf.Read();
+			
+			string [] split = namecontent.Split(new char [] {'|'},StringSplitOptions.RemoveEmptyEntries);
+			
+			if(split.Length<2)
+				return;
+			
+			string name = split[0];
+			string info = split[1];
+			
+			
+			{
+				
+				string n = M.GetLabelFromName(name);
+				string id = M.GetIDFromName(name);
+				
+				if(n == null || id == null)
+					return;
+				if(DicContains(n, id)==true)
+					return;
+				//print("Render label: " + n + "    id: " + id);
+				AddToDic(n,id);
+				
+				MakeFish(info);
+			}
+			
+		}
 	}
 	
 	public static void DeleteFishBySpace(List<string> octs)
 	{
+		if(octs.Count == 0)
+			return;
+		
+		List<string> fishids;
+		foreach(string o in octs)
+		{
+			if(OctFishDic.ContainsKey(o) == false)
+			{
+				continue;
+			}
+			
+			fishids = OctFishDic[o];
+			foreach(string id in fishids)
+			{
+				if(id=="" && id==null)
+					continue;
+				
+				FishDustbin.Enqueue(id);
+				
+			}
+			OctFishDic.Remove(o);
+		}
 	}
 	
 	public static void AddFishBySpace(List<string> toadd)
@@ -145,7 +207,7 @@ public class DisFish : MonoBehaviour {
 			//DateTime ct = new DateTime(2013, 7, 9, 20, 46, 0);
 			string currenttime = ct.ToString("ddd-MMM-dd-HH.mm") + ".00-PDT-" + ct.ToString("yyyy");
 			string name = M.PREFIX + "/fish/octant/" + n + "/" + currenttime;
-			print("discover fish name: " + name);
+			//print("discover fish name: " + name);
 			RequestAll(name);
 			AddToDic(n, null);
 		}
@@ -254,4 +316,27 @@ public class DisFish : MonoBehaviour {
 //		print("fish callback");
 //		return Upcall.ccn_upcall_res.CCN_UPCALL_RESULT_OK;
 //	}
+	
+	public static Vector3 MakeFish(string info, bool activate = false)
+	{
+		Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(info);
+		string id = values["callsign"];
+		Vector3 position = M.GetGameCoordinates(values["lat"], values["lon"]);
+		string label = M.GetLabel(position);
+		
+		Transform newFish = Instantiate(Fish, position, Quaternion.identity) as Transform;
+		
+		newFish.name = id;
+		newFish.tag = "Fish";
+		newFish.parent = FishParent;
+//		newFish.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/asteroid/" + id + "\n" 
+//			+ M.PREFIX + "/asteroid/octant/" + label + "/" + id;
+//		ControlLabels.ApplyAsteroidName(newAsteroid);
+		
+		if(activate == true)
+		{
+			//
+		}
+		return position;
+	}
 }
