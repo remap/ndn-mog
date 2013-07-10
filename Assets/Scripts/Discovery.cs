@@ -48,13 +48,16 @@ public class Discovery : MonoBehaviour {
 		}
 		
 		InvokeRepeating("CheckPos", 0, 0.5F); 
-		
+		InvokeRepeating("CheckFish", 0, 60F);
 	}
 	
 	void Update()
 	{
 		DisAst.AstDestroy(); // destroy 0~1 asteroid per frame
 		DisAst.AstInstantiate(); // instantiate 0~1 asteroid per frame
+		
+		DisFish.FishDestroy();
+		DisFish.FishInstantiate();
 	}
 	
 	void CheckPos() {
@@ -68,6 +71,9 @@ public class Discovery : MonoBehaviour {
 			
 			DisAst.DeleteAsteroidBySpace(todelete);
 			DisAst.AddAsteroidBySpace(toadd);
+			
+			DisFish.DeleteFishBySpace(todelete);
+			DisFish.AddFishBySpace(toadd);
 			
 			transform.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/doll/zening\n" 
 			+ M.PREFIX + "/doll/octant/" + aura[0] + "/zening";
@@ -105,5 +111,10 @@ public class Discovery : MonoBehaviour {
 		nimbus.Clear();
 		nimbus.AddRange( aura );
 		nimbus.AddRange ( M.GetNeighbors(transform.position) );
+	}
+	
+	void CheckFish()
+	{
+		// update fish position
 	}
 }

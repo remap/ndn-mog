@@ -218,7 +218,7 @@ public class M : MonoBehaviour {
 	
 	public static string GetNameTillID(string name)
 	{
-		if(name.Contains("/octant/"))
+		if(name.Contains("/asteroid/octant/"))
 		{
 			int index = name.IndexOf("/octant/");
 			if(name.Length<(index+22))
@@ -227,6 +227,17 @@ public class M : MonoBehaviour {
 			string namebeforeid = name.Substring(0, index + 21);
 			return namebeforeid;
 		}
+		
+		if(name.Contains("/fish/octant/"))
+		{
+			int index = name.IndexOf("/octant/");
+			if(name.Length<(index+51))
+				return null;
+			
+			string namebeforeid = name.Substring(0, index + 50);
+			return namebeforeid;
+		}
+		
 		return null;
 	}
 	

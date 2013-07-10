@@ -7,33 +7,36 @@ using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 using System.Linq;
 
-public class DisAst : MonoBehaviour {
-	// DiscoverAsteroids
+public class DisFish : MonoBehaviour {
+
+	public static Transform Fish;
+	public static Transform FishParent;
 	
-	// Dictionary < octant label, List <asteroid ids> >
-	public static Dictionary<string,List<string>> OctAstDic = new Dictionary<string, List<string>>(); 
+	
+	// Dictionary < octant label, List <fish ids> >
+	public static Dictionary<string,List<string>> OctFishDic = new Dictionary<string, List<string>>(); 
 	
 	public static void AddToDic(string oct, string id)
 	{
 		if(oct==null || oct=="")
 			return;
 
-		if( (id == null || id == "") && OctAstDic.ContainsKey(oct)==false)
+		if( (id == null || id == "") && OctFishDic.ContainsKey(oct)==false)
 		{
-			OctAstDic.Add (oct,new List<string>());
+			OctFishDic.Add (oct,new List<string>());
 			return;
 		}
 		
-		if( id != null && id != "" && OctAstDic.ContainsKey(oct)==false)
+		if( id != null && id != "" && OctFishDic.ContainsKey(oct)==false)
 		{
-			OctAstDic.Add (oct,new List<string>());
-			OctAstDic[oct].Add(id);
+			OctFishDic.Add (oct,new List<string>());
+			OctFishDic[oct].Add(id);
 			return;
 		}
 		
-		if( id != null && id != "" && OctAstDic.ContainsKey(oct)==true)
+		if( id != null && id != "" && OctFishDic.ContainsKey(oct)==true)
 		{
-			OctAstDic[oct].Add(id);
+			OctFishDic[oct].Add(id);
 			return;
 		}
 		
@@ -49,9 +52,9 @@ public class DisAst : MonoBehaviour {
 	
 	public static bool DicContains(string oct, string id)
 	{
-		if(OctAstDic.ContainsKey(oct)==true)
+		if(OctFishDic.ContainsKey(oct)==true)
 		{
-			if(OctAstDic[oct].Contains(id))
+			if(OctFishDic[oct].Contains(id))
 			{
 				return true;
 			}
@@ -59,8 +62,14 @@ public class DisAst : MonoBehaviour {
 		return false;
 	}
 	
+	
+	public struct Exclude
+	{
+		public string filter; // components, seperated by ','
+	}
+	
 	// Dictionary < asteroid name, asteroid content >
-	public static NameContBuf AstNameContBuf = new NameContBuf();
+	public static NameContBuf FishNameContBuf = new NameContBuf();
 		
 	public class NameContBuf
 	{
@@ -95,130 +104,56 @@ public class DisAst : MonoBehaviour {
 		
 		
 	}
-	
-	// Queue< asteroid id >  asteroid to be deleted
-	public static Queue AstDustbin = new Queue(); 
-		
-	public struct Exclude
-	{
-		public string filter; // components, seperated by ','
-	}
-	
-	
-	public static Transform Tree2; // prefab for asteroids
-	public static Transform AsteroidParent; // parent of asteroids
-		
 	void Start () {
-			
-		Tree2 = GameObject.Find("/tree2").transform;
-		AsteroidParent = GameObject.Find("/Asteroid").transform;
+		
+	 	Fish = GameObject.Find("/fish1").transform;
+		FishParent = GameObject.Find("/Fish").transform;
 		
 	}
 	
 	
-	public static void AstDestroy()
-	{
-		if(AstDustbin.Count != 0)
-		{
-			string id = (string) AstDustbin.Dequeue();
-			GameObject t = GameObject.Find("/Asteroid/"+id);
-			if(!t)
-			{
-				print("Can't destroy asteroid with given id.");
-			}
-			Destroy( t );
-		}
-			
-	}
-	
-	public static void AstInstantiate()
-	{
-		if(AstNameContBuf.IsEmpty() == false)
-		{ 
-			
-			string namecontent = AstNameContBuf.Read();
-			
-			string [] split = namecontent.Split(new char [] {'|'},StringSplitOptions.RemoveEmptyEntries);
-			
-			if(split.Length<2)
-				return;
-			
-			string name = split[0];
-			string info = split[1];
-			
-			
-			{
-				if(name == Initialize.FirstAsteroidName)
-				{
-					return;
-				}
-				
-				string n = M.GetLabelFromName(name);
-				string id = M.GetIDFromName(name);
-				
-				if(n == null || id == null)
-					return;
-				if(DicContains(n, id)==true)
-					return;
-				//print("Render label: " + n + "    id: " + id);
-				AddToDic(n,id);
-				
-				MakeAnAsteroid(info);
-			}
-			
-		}
+	void Update () {
 		
 	}
-
-	public static void AddAsteroidBySpace(List<string> toadd)
+	
+	public static void FishDestroy()
+	{
+	}
+	
+	public static void FishInstantiate()
+	{
+	}
+	
+	public static void DeleteFishBySpace(List<string> octs)
+	{
+	}
+	
+	public static void AddFishBySpace(List<string> toadd)
 	{
 		if(toadd.Count == 0)
 			return;
 		
 		foreach(string n in toadd)
 		{
-			if(OctAstDic.ContainsKey(n)==true && n!=Initialize.FirstAsteroidLabel)
+			if(OctFishDic.ContainsKey(n)==true && n!=Initialize.FirstAsteroidLabel)
 			{
-				//print("AddAsteroidBySpace(): this octant is not new! --" + n);
+				//print("AddFishBySpace(): this octant is not new! --" + n);
 				continue;
 			}
-			RequestAll( M.PREFIX + "/asteroid/octant/" + n);
+			
+			DateTime ct = DateTime.Now.AddMinutes(-15);
+			//DateTime ct = new DateTime(2013, 7, 9, 20, 46, 0);
+			string currenttime = ct.ToString("ddd-MMM-dd-HH.mm") + ".00-PDT-" + ct.ToString("yyyy");
+			string name = M.PREFIX + "/fish/octant/" + n + "/" + currenttime;
+			print("discover fish name: " + name);
+			RequestAll(name);
 			AddToDic(n, null);
 		}
 	}
 	
-	
-	public static void DeleteAsteroidBySpace(List<string> octs)
+	static Upcall.ccn_upcall_res DiscoverFishCallback (IntPtr selfp, Upcall.ccn_upcall_kind kind, IntPtr info)
 	{
-		if(octs.Count == 0)
-			return;
-		
-		List<string> asteroidids;
-		foreach(string o in octs)
-		{
-			if(OctAstDic.ContainsKey(o) == false)
-			{
-				continue;
-			}
-			
-			asteroidids = OctAstDic[o];
-			foreach(string id in asteroidids)
-			{
-				if(id=="" && id==null)
-					continue;
-				
-				AstDustbin.Enqueue(id);
-				
-			}
-			OctAstDic.Remove(o);
-		}
-
-	}
-	
-	
-	static Upcall.ccn_upcall_res RequestAllCallback (IntPtr selfp, Upcall.ccn_upcall_kind kind, IntPtr info)
-	{
-		//print("RequestAllCallback: " + kind);
+		//print("Fish Callback: " + kind);
 		Egal.ccn_upcall_info Info = Egal.GetInfo(info);
 		IntPtr h=Info.h;
 		
@@ -228,7 +163,7 @@ public class DisAst : MonoBehaviour {
 			
 				string name = Egal.GetContentName(Info.content_ccnb);
 				string content = Egal.GetContentValue(Info.content_ccnb, Info.pco); 
-				AstNameContBuf.Write (name, content);
+				FishNameContBuf.Write (name, content);
 			
 				string labels = M.GetLabelFromName(name);
 				string oldcomponent = M.GetIDFromName(name);
@@ -241,7 +176,6 @@ public class DisAst : MonoBehaviour {
 				if(Discovery.nimbus.Contains(labels)==false) // we don't care about this octant any more
 				{
 					print("don't care: " + h + ", " + labels);
-					//TPool.AllHandles.Delete(h);
 					break;
 				}
 			
@@ -290,11 +224,11 @@ public class DisAst : MonoBehaviour {
 				break;
 			
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_FINAL:
-				//print("CCN_UPCALL_FINAL: " + h);
+				print("CCN_UPCALL_FINAL: " + h);
 				
 				break;
 			case Upcall.ccn_upcall_kind.CCN_UPCALL_INTEREST_TIMED_OUT:
-				//print("CCN_UPCALL_INTEREST_TIMED_OUT: " + h);
+				print("CCN_UPCALL_INTEREST_TIMED_OUT: " + h);
 				break;
 			default: 
 				print("othercallback: " + kind);
@@ -311,34 +245,13 @@ public class DisAst : MonoBehaviour {
 		
 		//IntPtr ccn = Egal.GetHandle(); // connect to ccnd
 		Handle.Pause();
-		Egal.ExpressInterest(Handle.ccn, name, RequestAllCallback, pData, IntPtr.Zero); // express interest
+		Egal.ExpressInterest(Handle.ccn, name, DiscoverFishCallback, pData, IntPtr.Zero); // express interest
 		Handle.Resume();
 	}
 	
-	public static Vector3 MakeAnAsteroid(string info, bool activate = false)
-	{
-		Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(info);
-		string id = values["fs"];
-		Vector3 position = M.GetGameCoordinates(values["latitude"], values["longitude"]);
-		string label = M.GetLabel(position);
-		
-		Transform newAsteroid = Instantiate(Tree2, position, Quaternion.identity) as Transform;
-		
-		newAsteroid.name = id;
-		//newAsteroid.transform.localScale = new Vector3(1000f,1000f,1000f);
-		newAsteroid.tag = "Asteroid";
-		newAsteroid.parent = AsteroidParent;
-		newAsteroid.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/asteroid/" + id + "\n" 
-			+ M.PREFIX + "/asteroid/octant/" + label + "/" + id;
-		ControlLabels.ApplyAsteroidName(newAsteroid);
-		
-		if(activate == true)
-		{
-			newAsteroid.GetComponent<TreeScript>().Activate();
-		}
-		return position;
-	}
-	
-	
-
+//	static Upcall.ccn_upcall_res DiscoverFishCallback (IntPtr selfp, Upcall.ccn_upcall_kind kind, IntPtr info)
+//	{
+//		print("fish callback");
+//		return Upcall.ccn_upcall_res.CCN_UPCALL_RESULT_OK;
+//	}
 }

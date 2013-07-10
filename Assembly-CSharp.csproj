@@ -47,6 +47,7 @@
      <Compile Include="Assets\Scripts\CheckMode.cs" />
      <Compile Include="Assets\Scripts\ControlLabels.cs" />
      <Compile Include="Assets\Scripts\DisAst.cs" />
+     <Compile Include="Assets\Scripts\DisFish.cs" />
      <Compile Include="Assets\Scripts\Discovery.cs" />
      <Compile Include="Assets\Scripts\Handle.cs" />
      <Compile Include="Assets\Scripts\Initialize.cs" />
