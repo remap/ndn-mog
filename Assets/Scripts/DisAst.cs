@@ -7,35 +7,35 @@ using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 using System.Linq;
 
-public class FindAsteroids : MonoBehaviour {
+public class DisAst : MonoBehaviour {
 	
 	
 	
-	// boundary: 512*512*512
-	public struct Boundary{
-		public float xmin;
-		public float xmax;
-		public float ymin;
-		public float ymax;
-		public float zmin;
-		public float zmax;
-		public Boundary(float a, float b, float c, 
-			float d, float e, float f)
-		{
-			xmin = a;
-			xmax = b;
-			ymin = c;
-			ymax = d;
-			zmin = e;
-			zmax = f;
-		}
-	};
-	static Boundary bry;
+//	// boundary: 512*512*512
+//	public struct Boundary{
+//		public float xmin;
+//		public float xmax;
+//		public float ymin;
+//		public float ymax;
+//		public float zmin;
+//		public float zmax;
+//		public Boundary(float a, float b, float c, 
+//			float d, float e, float f)
+//		{
+//			xmin = a;
+//			xmax = b;
+//			ymin = c;
+//			ymax = d;
+//			zmin = e;
+//			zmax = f;
+//		}
+//	};
+//	static Boundary bry;
 	
-	// List <octant labels>
-	public static List<string> aura = null; 
-	public static List<string> nimbus = null;
-	public static List<string> oldnimbus = null;
+//	// List <octant labels>
+//	public static List<string> aura = null; 
+//	public static List<string> nimbus = null;
+//	public static List<string> oldnimbus = null;
 	
 	// Dictionary < octant label, List <asteroid ids> >
 	public static Dictionary<string,List<string>> OctAstDic = new Dictionary<string, List<string>>(); 
@@ -135,32 +135,32 @@ public class FindAsteroids : MonoBehaviour {
 	public static Transform Tree2; // prefab for asteroids
 	public static Transform AsteroidParent; // parent of asteroids
 		
-	IEnumerator Start () {
+	void Start () {
 		
-		aura = new List<string>();
-		nimbus = new List<string>();
-		bry = new Boundary(-1f, -1f, -1f, -1f, -1f, -1f);
+//		aura = new List<string>();
+//		nimbus = new List<string>();
+//		bry = new Boundary(-1f, -1f, -1f, -1f, -1f, -1f);
 		
 		Tree2 = GameObject.Find("/tree2").transform;
 		AsteroidParent = GameObject.Find("/Asteroid").transform;
 		
 		
-		while(Initialize.finished != true)
-		{
-			yield return new WaitForSeconds(0.05f);
-		}
-		
-		InvokeRepeating("CheckPos", 0, 0.5F); 
+//		while(Initialize.finished != true)
+//		{
+//			yield return new WaitForSeconds(0.05f);
+//		}
+//		
+//		InvokeRepeating("CheckPos", 0, 0.5F); 
 		
 	}
 	
 	void Update()
 	{
-		AstDestroy(); // destroy 0~1 asteroid per frame
-		AstInstantiate(); // instantiate 0~1 asteroid per frame
+//		AstDestroy(); // destroy 0~1 asteroid per frame
+//		AstInstantiate(); // instantiate 0~1 asteroid per frame
 	}
 	
-	void AstDestroy()
+	public static void AstDestroy()
 	{
 		if(AstDustbin.Count != 0)
 		{
@@ -175,7 +175,7 @@ public class FindAsteroids : MonoBehaviour {
 			
 	}
 	
-	void AstInstantiate()
+	public static void AstInstantiate()
 	{
 		if(AstNameContBuf.IsEmpty() == false)
 		{ 
@@ -210,44 +210,44 @@ public class FindAsteroids : MonoBehaviour {
 		
 	}
 		
-	void CheckPos() {
-		
-		if( InBound(transform.position) == false )
-		{
-			UpdateAuraNimbusBoundary();
-			
-			List<string> toadd = nimbus.Except(oldnimbus).ToList();
-			List<string> todelete = oldnimbus.Except(nimbus).ToList();
-			
-			DeleteAsteroidBySpace(todelete);
-			AddAsteroidBySpace(toadd);
-			
-			transform.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/doll/zening\n" 
-			+ M.PREFIX + "/doll/octant/" + aura[0] + "/zening";
-			ControlLabels.ApplyOptions();
-		}
-		
-    }
+//	void CheckPos() {
+//		
+//		if( InBound(transform.position) == false )
+//		{
+//			UpdateAuraNimbusBoundary();
+//			
+//			List<string> toadd = nimbus.Except(oldnimbus).ToList();
+//			List<string> todelete = oldnimbus.Except(nimbus).ToList();
+//			
+//			DeleteAsteroidBySpace(todelete);
+//			AddAsteroidBySpace(toadd);
+//			
+//			transform.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/doll/zening\n" 
+//			+ M.PREFIX + "/doll/octant/" + aura[0] + "/zening";
+//			ControlLabels.ApplyOptions();
+//		}
+//		
+//    }
 	
-	void UpdateAuraNimbusBoundary()
-	{
-		aura.Clear();
-		string temp = M.GetLabel(transform.position);
-		if(temp == null)
-		{
-			print("FindAsteroids.CheckPos(): Aura is null!");
-			return;
-		}
-		aura.Add ( temp );
-		bry = M.GetBoundaries(aura[0]); 
-		
-		oldnimbus = new List<string>(nimbus);
-		nimbus.Clear();
-		nimbus.AddRange( aura );
-		nimbus.AddRange ( M.GetNeighbors(transform.position) );
-	}
+//	void UpdateAuraNimbusBoundary()
+//	{
+//		aura.Clear();
+//		string temp = M.GetLabel(transform.position);
+//		if(temp == null)
+//		{
+//			print("FindAsteroids.CheckPos(): Aura is null!");
+//			return;
+//		}
+//		aura.Add ( temp );
+//		bry = M.GetBoundaries(aura[0]); 
+//		
+//		oldnimbus = new List<string>(nimbus);
+//		nimbus.Clear();
+//		nimbus.AddRange( aura );
+//		nimbus.AddRange ( M.GetNeighbors(transform.position) );
+//	}
 	
-	void AddAsteroidBySpace(List<string> toadd)
+	public static void AddAsteroidBySpace(List<string> toadd)
 	{
 		if(toadd.Count == 0)
 			return;
@@ -265,7 +265,7 @@ public class FindAsteroids : MonoBehaviour {
 	}
 	
 	
-	void DeleteAsteroidBySpace(List<string> octs)
+	public static void DeleteAsteroidBySpace(List<string> octs)
 	{
 		if(octs.Count == 0)
 			return;
@@ -275,7 +275,6 @@ public class FindAsteroids : MonoBehaviour {
 		{
 			if(OctAstDic.ContainsKey(o) == false)
 			{
-				// print("DeleteAsteroidBySpace(): this octant is not old! --" + o);
 				continue;
 			}
 			
@@ -294,18 +293,18 @@ public class FindAsteroids : MonoBehaviour {
 	}
 	
 	
-	static bool InBound(Vector3 position)
-	{
-		if(position.x<bry.xmin || position.y<bry.ymin || position.z<bry.zmin)
-		{
-			return false;
-		}
-		if(position.x>bry.xmax || position.y>bry.ymax || position.z>bry.zmax)
-		{
-			return false;
-		}
-		return true;
-	}
+//	static bool InBound(Vector3 position)
+//	{
+//		if(position.x<bry.xmin || position.y<bry.ymin || position.z<bry.zmin)
+//		{
+//			return false;
+//		}
+//		if(position.x>bry.xmax || position.y>bry.ymax || position.z>bry.zmax)
+//		{
+//			return false;
+//		}
+//		return true;
+//	}
 		
 	
 	
@@ -333,7 +332,7 @@ public class FindAsteroids : MonoBehaviour {
 					break;
 				}
 				 
-				if(nimbus.Contains(labels)==false) // we don't care about this octant any more
+				if(Discovery.nimbus.Contains(labels)==false) // we don't care about this octant any more
 				{
 					print("don't care: " + h + ", " + labels);
 					//TPool.AllHandles.Delete(h);
@@ -398,7 +397,7 @@ public class FindAsteroids : MonoBehaviour {
 		return Upcall.ccn_upcall_res.CCN_UPCALL_RESULT_OK;
 	}
 	
-	public void RequestAll(string name)
+	public static void RequestAll(string name)
 	{	
 		Exclude Data = new Exclude();
 		IntPtr pData = Marshal.AllocHGlobal(Marshal.SizeOf(Data));

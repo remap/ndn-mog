@@ -34,8 +34,8 @@ public class Initialize : MonoBehaviour {
 	void LandOnFirstAsteroid()
 	{
 		
-		Vector3 pos = FindAsteroids.MakeAnAsteroid(FirstAsteroid, true);
-		FindAsteroids.AddToDic(FirstAsteroidName);
+		Vector3 pos = DisAst.MakeAnAsteroid(FirstAsteroid, true);
+		DisAst.AddToDic(FirstAsteroidName);
 		
 		Vector3 dollpos = pos + new Vector3(0, 50, 0);
 		transform.position = dollpos;

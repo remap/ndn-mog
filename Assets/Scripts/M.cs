@@ -95,7 +95,7 @@ public class M : MonoBehaviour {
 	}
 	
 	
-	public static FindAsteroids.Boundary GetBoundaries(string labels)
+	public static Discovery.Boundary GetBoundaries(string labels)
 	{
 		string [] split = labels.Split(new char [] {'/'},StringSplitOptions.RemoveEmptyEntries);
 		
@@ -132,7 +132,7 @@ public class M : MonoBehaviour {
 		int zmax = zmin + 512;
 		
 		
-		FindAsteroids.Boundary bry = new FindAsteroids.Boundary(xmin, xmax, ymin, ymax, zmin, zmax);
+		Discovery.Boundary bry = new Discovery.Boundary(xmin, xmax, ymin, ymax, zmin, zmax);
 		return bry;
 		
 	}
