@@ -262,6 +262,6 @@ public class DisFish : MonoBehaviour {
 		print("move fish! " + DateTime.Now.ToString("HH:mm:ss tt"));
 		Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(info);
 		Vector3 position = M.GetGameCoordinates(values["lat"], values["lon"]);
-		fish.position = position;
+		fish.GetComponent<FishSwim>().target = position;
 	}
 }
