@@ -115,6 +115,6 @@ public class Discovery : MonoBehaviour {
 	
 	void CheckEnv()
 	{
-		//DisFish.AddFishBySpace(nimbus); // update fish position
+		DisFish.UpdateFishBySpace(nimbus); // update fish position
 	}
 }

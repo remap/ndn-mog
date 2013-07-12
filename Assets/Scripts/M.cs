@@ -327,6 +327,7 @@ public class M : MonoBehaviour {
 				dic[oct].Add(id);
 				return;
 			}
+			
 		
 		}
 		
@@ -368,6 +369,11 @@ public class M : MonoBehaviour {
 		public int Count()
 		{
 			return dic.Count;
+		}
+		
+		public void Clear()
+		{
+			dic.Clear();
 		}
 	}
 	

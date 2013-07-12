@@ -58,21 +58,27 @@ public class DisFish : MonoBehaviour {
 			string name = split[0];
 			string info = split[1];
 			
+			string n = M.GetLabelFromName(name);
+			string id = M.GetIDFromName(name);
 			
+			if(n == null || id == null)
+				return;
+			if(OctFishDic.Contains(n, id)==true)
+				return;
+			//print("Render label: " + n + "    id: " + id);
+			OctFishDic.Add(n,id);
+			
+			Transform oldfish = FishParent.Find(id);
+			if(oldfish == null)
 			{
-				
-				string n = M.GetLabelFromName(name);
-				string id = M.GetIDFromName(name);
-				
-				if(n == null || id == null)
-					return;
-				if(OctFishDic.Contains(n, id)==true)
-					return;
-				//print("Render label: " + n + "    id: " + id);
-				OctFishDic.Add(n,id);
-				
 				MakeFish(info);
 			}
+			else
+			{
+				MoveFish(oldfish, info);
+			}
+			
+			
 			
 		}
 	}
@@ -119,6 +125,15 @@ public class DisFish : MonoBehaviour {
 			RequestAll(name);
 			OctFishDic.Add(n, null);
 		}
+	}
+	
+	public static void UpdateFishBySpace(List<string> nimbus)
+	{
+		if(nimbus.Count == 0)
+			return;
+		
+		OctFishDic.Clear();
+		AddFishBySpace(nimbus);
 	}
 	
 	static Upcall.ccn_upcall_res DiscoverFishCallback (IntPtr selfp, Upcall.ccn_upcall_kind kind, IntPtr info)
@@ -242,5 +257,11 @@ public class DisFish : MonoBehaviour {
 		return position;
 	}
 	
-	
+	public static void MoveFish(Transform fish, string info)
+	{
+		print("move fish! " + DateTime.Now.ToString("HH:mm:ss tt"));
+		Dictionary<string, string> values = JsonConvert.DeserializeObject<Dictionary<string, string>>(info);
+		Vector3 position = M.GetGameCoordinates(values["lat"], values["lon"]);
+		fish.position = position;
+	}
 }
