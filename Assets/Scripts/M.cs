@@ -256,7 +256,7 @@ public class M : MonoBehaviour {
 		return null;
 	}
 	
-	public static string GetTimeComponent(int addhour = -2, int addmin = -15)
+	public static string GetTimeComponent(int addhour = -3, int addmin = -15)
 	{
 		DateTime ct = DateTime.Now.AddMinutes(addmin);
 		ct = ct.AddHours(addhour);
