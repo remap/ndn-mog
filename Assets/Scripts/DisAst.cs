@@ -11,98 +11,13 @@ public class DisAst : MonoBehaviour {
 	// DiscoverAsteroids
 	
 	// Dictionary < octant label, List <asteroid ids> >
-	public static Dictionary<string,List<string>> OctAstDic = new Dictionary<string, List<string>>(); 
-	
-	public static void AddToDic(string oct, string id)
-	{
-		if(oct==null || oct=="")
-			return;
-
-		if( (id == null || id == "") && OctAstDic.ContainsKey(oct)==false)
-		{
-			OctAstDic.Add (oct,new List<string>());
-			return;
-		}
-		
-		if( id != null && id != "" && OctAstDic.ContainsKey(oct)==false)
-		{
-			OctAstDic.Add (oct,new List<string>());
-			OctAstDic[oct].Add(id);
-			return;
-		}
-		
-		if( id != null && id != "" && OctAstDic.ContainsKey(oct)==true)
-		{
-			OctAstDic[oct].Add(id);
-			return;
-		}
-		
-	}
-	
-	public static void AddToDic(string name)
-	{
-		string oct = M.GetLabelFromName(name);
-		string id = M.GetIDFromName(name);
-		
-		AddToDic(oct, id);
-	}
-	
-	public static bool DicContains(string oct, string id)
-	{
-		if(OctAstDic.ContainsKey(oct)==true)
-		{
-			if(OctAstDic[oct].Contains(id))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+	public static M.OctIDDic OctAstDic = new M.OctIDDic(); 
 	
 	// Dictionary < asteroid name, asteroid content >
-	public static NameContBuf AstNameContBuf = new NameContBuf();
-		
-	public class NameContBuf
-	{
-		private Queue buf = new Queue ();
-		private static ReaderWriterLockSlim rwl = new ReaderWriterLockSlim();
-		
-		public string Read()
-		{
-			string item;
-			
-			rwl.EnterWriteLock();
-			item = (string)buf.Dequeue();
-			rwl.ExitWriteLock();
-         		
-      		return item;
-		}
-		
-		public void Write(string name, string content)
-		{
-			rwl.EnterWriteLock();
-			buf.Enqueue ("" + name + "|" + content);
-      		rwl.ExitWriteLock();
-		}
-		
-		public bool IsEmpty()
-		{
-			if(buf.Count == 0)
-				return true;
-			else
-				return false;
-		}
-		
-		
-	}
+	public static M.NameContBuf AstNameContBuf = new M.NameContBuf();
 	
 	// Queue< asteroid id >  asteroid to be deleted
 	public static Queue AstDustbin = new Queue(); 
-		
-	public struct Exclude
-	{
-		public string filter; // components, seperated by ','
-	}
 	
 	
 	public static Transform Tree2; // prefab for asteroids
@@ -158,10 +73,10 @@ public class DisAst : MonoBehaviour {
 				
 				if(n == null || id == null)
 					return;
-				if(DicContains(n, id)==true)
+				if(OctAstDic.Contains(n, id)==true)
 					return;
 				//print("Render label: " + n + "    id: " + id);
-				AddToDic(n,id);
+				OctAstDic.Add(n,id);
 				
 				MakeAnAsteroid(info);
 			}
@@ -183,7 +98,7 @@ public class DisAst : MonoBehaviour {
 				continue;
 			}
 			RequestAll( M.PREFIX + "/asteroid/octant/" + n);
-			AddToDic(n, null);
+			OctAstDic.Add(n, null);
 		}
 	}
 	
@@ -201,7 +116,7 @@ public class DisAst : MonoBehaviour {
 				continue;
 			}
 			
-			asteroidids = OctAstDic[o];
+			asteroidids = OctAstDic.Get(o);
 			foreach(string id in asteroidids)
 			{
 				if(id=="" && id==null)
@@ -265,7 +180,7 @@ public class DisAst : MonoBehaviour {
 				Egal.ccn_charbuf_append_tt(templ, (int)Dtag.ccn_dtag.CCN_DTAG_Exclude, (int)TT.ccn_tt.CCN_DTAG);
 			
 				Egal.ccn_closure Selfp = (Egal.ccn_closure)Marshal.PtrToStructure(selfp, typeof(Egal.ccn_closure));
-				Exclude Data = (Exclude) Marshal.PtrToStructure(Selfp.data, typeof(Exclude));	
+				M.Exclude Data = (M.Exclude) Marshal.PtrToStructure(Selfp.data, typeof(M.Exclude));	
 				Data.filter = Data.filter + "," + oldcomponent;
 				Marshal.StructureToPtr(Data, Selfp.data, true);
 				Marshal.StructureToPtr(Selfp, selfp, true);
@@ -305,7 +220,7 @@ public class DisAst : MonoBehaviour {
 	
 	public static void RequestAll(string name)
 	{	
-		Exclude Data = new Exclude();
+		M.Exclude Data = new M.Exclude();
 		IntPtr pData = Marshal.AllocHGlobal(Marshal.SizeOf(Data));
 		Marshal.StructureToPtr(Data, pData, true);
 		

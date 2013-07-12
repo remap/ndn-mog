@@ -47,8 +47,8 @@ public class Discovery : MonoBehaviour {
 			yield return new WaitForSeconds(0.05f);
 		}
 		
-		InvokeRepeating("CheckPos", 0, 0.5F); 
-		InvokeRepeating("CheckFish", 0, 60F);
+		InvokeRepeating("CheckPos", 0, 0.5F); // player position changed
+		InvokeRepeating("CheckEnv", 0, 60F); // environment changed
 	}
 	
 	void Update()
@@ -76,7 +76,7 @@ public class Discovery : MonoBehaviour {
 			DisFish.AddFishBySpace(toadd);
 			
 			transform.Find("label").GetComponent<GUIText>().text = M.PREFIX + "/doll/zening\n" 
-			+ M.PREFIX + "/doll/octant/" + aura[0] + "/zening";
+													+ M.PREFIX + "/doll/octant/" + aura[0] + "/zening";
 			ControlLabels.ApplyOptions();
 		}
 		
@@ -113,8 +113,8 @@ public class Discovery : MonoBehaviour {
 		nimbus.AddRange ( M.GetNeighbors(transform.position) );
 	}
 	
-	void CheckFish()
+	void CheckEnv()
 	{
-		// update fish position
+		//DisFish.AddFishBySpace(nimbus); // update fish position
 	}
 }

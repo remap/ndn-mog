@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Threading;
 
 
 public class M : MonoBehaviour {
@@ -253,6 +254,126 @@ public class M : MonoBehaviour {
 		}
 		
 		return null;
+	}
+	
+	public static string GetTimeComponent(int addhour = -1, int addmin = -15)
+	{
+		DateTime ct = DateTime.Now.AddMinutes(addmin);
+		ct = ct.AddHours(addhour);
+		//DateTime ct = DateTime.Now.AddMinutes(2);
+		string component = ct.ToString("ddd-MMM-dd-HH.mm") + ".00-PDT-" + ct.ToString("yyyy");
+		return component;
+	}
+	
+	public class NameContBuf
+	{
+		private Queue buf = new Queue ();
+		private static ReaderWriterLockSlim rwl = new ReaderWriterLockSlim();
+		
+		public string Read()
+		{
+			string item;
+			
+			rwl.EnterWriteLock();
+			item = (string)buf.Dequeue();
+			rwl.ExitWriteLock();
+         		
+      		return item;
+		}
+		
+		public void Write(string name, string content)
+		{
+			rwl.EnterWriteLock();
+			buf.Enqueue ("" + name + "|" + content);
+      		rwl.ExitWriteLock();
+		}
+		
+		public bool IsEmpty()
+		{
+			if(buf.Count == 0)
+				return true;
+			else
+				return false;
+		}
+		
+		
+	}
+	
+	public class OctIDDic
+	{
+		// dictionary < oct label, list<id> >
+		private static Dictionary<string,List<string>> dic = new Dictionary<string, List<string>>();
+		
+		public void Add(string oct, string id)
+		{
+			if(oct==null || oct=="")
+				return;
+	
+			if( (id == null || id == "") && dic.ContainsKey(oct)==false)
+			{
+				dic.Add (oct,new List<string>());
+				return;
+			}
+			
+			if( id != null && id != "" && dic.ContainsKey(oct)==false)
+			{
+				dic.Add (oct,new List<string>());
+				dic[oct].Add(id);
+				return;
+			}
+			
+			if( id != null && id != "" && dic.ContainsKey(oct)==true)
+			{
+				dic[oct].Add(id);
+				return;
+			}
+		
+		}
+		
+		public void Add(string name)
+		{
+			string oct = M.GetLabelFromName(name);
+			string id = M.GetIDFromName(name);
+			
+			Add(oct, id);
+		}
+		
+		public bool Contains(string oct, string id)
+		{
+			if(dic.ContainsKey(oct)==true)
+			{
+				if(dic[oct].Contains(id))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		public bool ContainsKey(string oct)
+		{
+			return dic.ContainsKey(oct);
+		}
+		
+		public List<string> Get(string oct)
+		{
+			return dic[oct];
+		}
+		
+		public void Remove(string oct)
+		{
+			dic.Remove(oct);
+		}
+		
+		public int Count()
+		{
+			return dic.Count;
+		}
+	}
+	
+	public struct Exclude
+	{
+		public string filter; // components, seperated by ','
 	}
 	
 }

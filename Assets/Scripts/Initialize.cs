@@ -16,7 +16,7 @@ public class Initialize : MonoBehaviour {
 	public IEnumerator Start () {
 		print("Time: " + DateTime.Now.ToString("HH:mm:ss tt"));
 		
-		string name = M.PREFIX + "/asteroid/octant/0/2/5/6/7/5";
+		string name = M.PREFIX + "/asteroid/octant/0/2/5/6/7/5/5";
 		IntPtr ccn = Egal.GetHandle(); // connect to ccnd
 		Egal.ExpressInterest(ccn, name, RequestCallback, IntPtr.Zero, IntPtr.Zero); // express interest
 		Egal.ccnRun(ccn, -1); // ccnRun starts a new thread
@@ -35,7 +35,7 @@ public class Initialize : MonoBehaviour {
 	{
 		
 		Vector3 pos = DisAst.MakeAnAsteroid(FirstAsteroid, true);
-		DisAst.AddToDic(FirstAsteroidName);
+		DisAst.OctAstDic.Add(FirstAsteroidName);
 		
 		Vector3 dollpos = pos + new Vector3(0, 50, 0);
 		transform.position = dollpos;

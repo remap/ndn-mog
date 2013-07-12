@@ -12,101 +12,14 @@ public class DisFish : MonoBehaviour {
 	public static Transform Fish;
 	public static Transform FishParent;
 	
-	
-	// Dictionary < octant label, List <fish ids> >
-	public static Dictionary<string,List<string>> OctFishDic = new Dictionary<string, List<string>>(); 
-	
-	public static void AddToDic(string oct, string id)
-	{
-		if(oct==null || oct=="")
-			return;
-
-		if( (id == null || id == "") && OctFishDic.ContainsKey(oct)==false)
-		{
-			OctFishDic.Add (oct,new List<string>());
-			return;
-		}
-		
-		if( id != null && id != "" && OctFishDic.ContainsKey(oct)==false)
-		{
-			OctFishDic.Add (oct,new List<string>());
-			OctFishDic[oct].Add(id);
-			return;
-		}
-		
-		if( id != null && id != "" && OctFishDic.ContainsKey(oct)==true)
-		{
-			OctFishDic[oct].Add(id);
-			return;
-		}
-		
-	}
-	
-	public static void AddToDic(string name)
-	{
-		string oct = M.GetLabelFromName(name);
-		string id = M.GetIDFromName(name);
-		
-		AddToDic(oct, id);
-	}
-	
-	public static bool DicContains(string oct, string id)
-	{
-		if(OctFishDic.ContainsKey(oct)==true)
-		{
-			if(OctFishDic[oct].Contains(id))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
+	// Dictionary < octant label, List<fish id> >
+	public static M.OctIDDic OctFishDic = new M.OctIDDic();
 	
 	public static Queue FishDustbin = new Queue(); 
 	
-	
-	public struct Exclude
-	{
-		public string filter; // components, seperated by ','
-	}
-	
-	// Dictionary < asteroid name, asteroid content >
-	public static NameContBuf FishNameContBuf = new NameContBuf();
+	// Dictionary < fish name, fish content >
+	public static M.NameContBuf FishNameContBuf = new M.NameContBuf();
 		
-	public class NameContBuf
-	{
-		private Queue buf = new Queue ();
-		private static ReaderWriterLockSlim rwl = new ReaderWriterLockSlim();
-		
-		public string Read()
-		{
-			string item;
-			
-			rwl.EnterWriteLock();
-			item = (string)buf.Dequeue();
-			rwl.ExitWriteLock();
-         		
-      		return item;
-		}
-		
-		public void Write(string name, string content)
-		{
-			rwl.EnterWriteLock();
-			buf.Enqueue ("" + name + "|" + content);
-      		rwl.ExitWriteLock();
-		}
-		
-		public bool IsEmpty()
-		{
-			if(buf.Count == 0)
-				return true;
-			else
-				return false;
-		}
-		
-		
-	}
 	void Start () {
 		
 	 	Fish = GameObject.Find("/fish1").transform;
@@ -153,10 +66,10 @@ public class DisFish : MonoBehaviour {
 				
 				if(n == null || id == null)
 					return;
-				if(DicContains(n, id)==true)
+				if(OctFishDic.Contains(n, id)==true)
 					return;
 				//print("Render label: " + n + "    id: " + id);
-				AddToDic(n,id);
+				OctFishDic.Add(n,id);
 				
 				MakeFish(info);
 			}
@@ -177,7 +90,7 @@ public class DisFish : MonoBehaviour {
 				continue;
 			}
 			
-			fishids = OctFishDic[o];
+			fishids = OctFishDic.Get(o);
 			foreach(string id in fishids)
 			{
 				if(id=="" && id==null)
@@ -199,17 +112,12 @@ public class DisFish : MonoBehaviour {
 		{
 			if(OctFishDic.ContainsKey(n)==true && n!=Initialize.FirstAsteroidLabel)
 			{
-				//print("AddFishBySpace(): this octant is not new! --" + n);
 				continue;
 			}
 			
-			DateTime ct = DateTime.Now.AddMinutes(-15);
-			//DateTime ct = new DateTime(2013, 7, 9, 20, 46, 0);
-			string currenttime = ct.ToString("ddd-MMM-dd-HH.mm") + ".00-PDT-" + ct.ToString("yyyy");
-			string name = M.PREFIX + "/fish/octant/" + n + "/" + currenttime;
-			//print("discover fish name: " + name);
+			string name = M.PREFIX + "/fish/octant/" + n + "/" + M.GetTimeComponent();
 			RequestAll(name);
-			AddToDic(n, null);
+			OctFishDic.Add(n, null);
 		}
 	}
 	
@@ -261,7 +169,7 @@ public class DisFish : MonoBehaviour {
 				Egal.ccn_charbuf_append_tt(templ, (int)Dtag.ccn_dtag.CCN_DTAG_Exclude, (int)TT.ccn_tt.CCN_DTAG);
 			
 				Egal.ccn_closure Selfp = (Egal.ccn_closure)Marshal.PtrToStructure(selfp, typeof(Egal.ccn_closure));
-				Exclude Data = (Exclude) Marshal.PtrToStructure(Selfp.data, typeof(Exclude));	
+				M.Exclude Data = (M.Exclude) Marshal.PtrToStructure(Selfp.data, typeof(M.Exclude));	
 				Data.filter = Data.filter + "," + oldcomponent;
 				Marshal.StructureToPtr(Data, Selfp.data, true);
 				Marshal.StructureToPtr(Selfp, selfp, true);
@@ -301,7 +209,7 @@ public class DisFish : MonoBehaviour {
 	
 	public static void RequestAll(string name)
 	{	
-		Exclude Data = new Exclude();
+		M.Exclude Data = new M.Exclude();
 		IntPtr pData = Marshal.AllocHGlobal(Marshal.SizeOf(Data));
 		Marshal.StructureToPtr(Data, pData, true);
 		
@@ -310,12 +218,6 @@ public class DisFish : MonoBehaviour {
 		Egal.ExpressInterest(Handle.ccn, name, DiscoverFishCallback, pData, IntPtr.Zero); // express interest
 		Handle.Resume();
 	}
-	
-//	static Upcall.ccn_upcall_res DiscoverFishCallback (IntPtr selfp, Upcall.ccn_upcall_kind kind, IntPtr info)
-//	{
-//		print("fish callback");
-//		return Upcall.ccn_upcall_res.CCN_UPCALL_RESULT_OK;
-//	}
 	
 	public static Vector3 MakeFish(string info, bool activate = false)
 	{
@@ -339,4 +241,6 @@ public class DisFish : MonoBehaviour {
 		}
 		return position;
 	}
+	
+	
 }

@@ -109,12 +109,10 @@ public class ControlLabels : MonoBehaviour {
 	
 	static bool IsAsteroidInAura(string id)
 	{
-		if(Discovery.aura == null || DisAst.OctAstDic.Count == 0)
+		if(Discovery.aura == null || DisAst.OctAstDic.Count() == 0)
 			return false;
 		string aura = Discovery.aura[0];
-		if(DisAst.OctAstDic.ContainsKey(aura) == false)
-			return false;
-		return DisAst.OctAstDic[aura].Contains(id);
+		return DisAst.OctAstDic.Contains(aura, id);
 	}
 	
 	static void ApplyNimbus()
