@@ -57,8 +57,11 @@ public class Initialize : MonoBehaviour {
 		selfLocation.z_ = selfTransform.localPosition.z;
 		
 		instance.getSelfGameEntity().setLocation(selfLocation, false);
+		List<string> toDelete = new List<string>();
 		
+		// Is generating a copy of hashtable a potentially better idea than this?
 		hashtableLock.WaitOne(Constants.MutexLockTimeoutMilliSeconds);
+		
 		foreach (DictionaryEntry pair in hashtable)
 		{
 			GameObject entity = GameObject.Find((string)pair.Key);
@@ -68,14 +71,31 @@ public class Initialize : MonoBehaviour {
 				
 			if (entity == null)
 			{
-				Transform newEntity = Instantiate(playerTransformPath, locationUnity, Quaternion.identity) as Transform;
-				newEntity.name = (string)pair.Key;
+				if (locationUnity.x != Constants.DefaultLocationDropEntity && locationUnity.x != Constants.DefaultLocationNewEntity)
+				{
+					Transform newEntity = Instantiate(playerTransformPath, locationUnity, Quaternion.identity) as Transform;
+					newEntity.name = (string)pair.Key;
+				}
 				//newEntity.tag = "";
 			}
 			else
 			{
-				entity.transform.localPosition = locationUnity;
+				if (locationUnity.x != Constants.DefaultLocationDropEntity && locationUnity.x != Constants.DefaultLocationNewEntity)
+				{
+					entity.transform.localPosition = locationUnity;
+				}
+				else
+				{
+					Destroy(entity);
+					
+					// hashtable deletion in foreach loop is considered illegal
+					toDelete.Add((string)pair.Key);
+				}
 			}
+		}
+		foreach (string str in toDelete)
+		{
+			hashtable.Remove(str);	
 		}
 		hashtableLock.ReleaseMutex();
 	}
@@ -90,10 +110,32 @@ public class Initialize : MonoBehaviour {
 		if (location.Equals(new remap.NDNMOG.DiscoveryModule.Vector3(Constants.DefaultLocationNewEntity, Constants.DefaultLocationNewEntity, Constants.DefaultLocationNewEntity)))
 		{
 			Debug.Log("New entity " + name + " discovered from returned names");
+			
+			hashtableLock.WaitOne(Constants.MutexLockTimeoutMilliSeconds);
+			if (hashtable.Contains(name))
+			{
+				hashtable[name] = location;
+			}
+			else
+			{
+				hashtable.Add(name, location);
+			}
+			hashtableLock.ReleaseMutex();
 		}
 		else if (location.Equals(new remap.NDNMOG.DiscoveryModule.Vector3(Constants.DefaultLocationDropEntity, Constants.DefaultLocationDropEntity, Constants.DefaultLocationDropEntity)))
 		{
 			Debug.Log("Entity " + name + " dropped.");
+			
+			hashtableLock.WaitOne(Constants.MutexLockTimeoutMilliSeconds);
+			if (hashtable.Contains(name))
+			{
+				hashtable[name] = location;
+			}
+			else
+			{
+				hashtable.Add(name, location);
+			}
+			hashtableLock.ReleaseMutex();
 		}
 		else
 		{
