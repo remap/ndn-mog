@@ -38,7 +38,7 @@ public class Initialize : MonoBehaviour {
 		
 		List<int> startingLoc = CommonUtility.getOctantIndicesFromVector3(dollPos);
 		
-		string name = "zening";
+		string name = "caboon";
 		Debug.Log(CommonUtility.getStringFromList(startingLoc));
 		
 		instance = new Instance(startingLoc, name, dollPos, setPosCallback); 
@@ -100,11 +100,6 @@ public class Initialize : MonoBehaviour {
 		hashtableLock.ReleaseMutex();
 	}
 	
-	public void Awake()
-	{
-		Application.targetFrameRate = 30;
-	}
-	
 	public bool setPosCallback(string name, remap.NDNMOG.DiscoveryModule.Vector3 location)
 	{
 		if (location.Equals(new remap.NDNMOG.DiscoveryModule.Vector3(Constants.DefaultLocationNewEntity, Constants.DefaultLocationNewEntity, Constants.DefaultLocationNewEntity)))
@@ -157,5 +152,10 @@ public class Initialize : MonoBehaviour {
 	{
 		// if somehow this method is not called, the discovery thread will not be stopped
 		instance.stopDiscovery();
+	}
+	
+	public void Awake()
+	{
+		Application.targetFrameRate = 30;
 	}
 }
