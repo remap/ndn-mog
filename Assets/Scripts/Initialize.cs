@@ -8,8 +8,14 @@ using remap.NDNMOG.DiscoveryModule;
 using System.Threading;
 using net.named_data.jndn.encoding;
 
+using System.IO;
+
 public class Initialize : MonoBehaviour {
+	public const string configFilePath = "config.txt";
+	
 	public Instance instance;
+	public string playerName;
+	public string gameInstanceName;
 	
 	public static Transform playerTransformPath;
 	
@@ -18,6 +24,45 @@ public class Initialize : MonoBehaviour {
 	public Mutex hashtableLock = new Mutex();
 	public remap.NDNMOG.DiscoveryModule.Vector3 selfLocation = new remap.NDNMOG.DiscoveryModule.Vector3(0, 0, 0);
 	public Transform selfTransform;
+	
+	public bool readConfFromFile(string fileName)
+	{
+		if (!File.Exists(fileName))
+		{
+			return false;	
+		}
+		else
+		{
+			using (StreamReader sr = File.OpenText(configFilePath))
+        	{
+            	string s = "";
+            	while ((s = sr.ReadLine()) != null)
+            	{
+                	if (s.Contains("name"))
+					{
+						string[] name = s.Split(':');
+						if (name.Length > 0)
+						{
+							playerName = name[1];
+						}
+						else
+						{
+							return false;	
+						}
+					}
+					if (s.Contains("instance"))
+					{
+						string[] name = s.Split(':');
+						if (name.Length > 0)
+						{
+							gameInstanceName = name[1];
+						}
+					}
+            	}
+        	}
+			return true;
+		}
+	}
 	
 	public void Start () {
 		//WireFormat.setDefaultWireFormat(BinaryXmlWireFormat.get());
@@ -38,10 +83,13 @@ public class Initialize : MonoBehaviour {
 		
 		List<int> startingLoc = CommonUtility.getOctantIndicesFromVector3(dollPos);
 		
-		string name = "caboon";
 		Debug.Log(CommonUtility.getStringFromList(startingLoc));
 		
-		instance = new Instance(startingLoc, name, dollPos, setPosCallback); 
+		if (!readConfFromFile(configFilePath))
+		{
+			playerName = "default";
+		}
+		instance = new Instance(startingLoc, playerName, dollPos, setPosCallback); 
 		
 		instance.discovery ();
 
