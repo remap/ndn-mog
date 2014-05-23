@@ -53,6 +53,7 @@
      <Compile Include="Assets\Scripts\Initialize.cs" />
      <Compile Include="Assets\Scripts\ObjectLabel.cs" />
      <Compile Include="Assets\Scripts\TreeScript.cs" />
+     <Compile Include="Assets\Scripts\UnityConstants.cs" />
      <Compile Include="Assets\Scripts\Utility.cs" />
  <Reference Include="Assets\Plugins\DiscoveryModule">
  <HintPath>Assets\Plugins\DiscoveryModule.dll</HintPath>

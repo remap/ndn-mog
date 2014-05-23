@@ -1,25 +1,25 @@
 using UnityEngine;
 using System.Collections;
 
-public class CheckMode : MonoBehaviour {
+public class CheckMode : MonoBehaviour
+{
 
 	public string OnAsteroid = null;
-	
 	private static Transform asteroidparent;
 	private static GameObject Boat;
 	
-	IEnumerator Start()
+	IEnumerator Start ()
 	{
-		CharacterController controller = GetComponent<CharacterController>();
-		Boat =  transform.Find("graphics/boat").gameObject;
-		asteroidparent = GameObject.Find("/Asteroid").transform;
+		CharacterController controller = GetComponent<CharacterController> ();
+		Boat = transform.Find ("graphics/boat").gameObject;
+		asteroidparent = GameObject.Find ("/Asteroid").transform;
 		
-		while(controller.isGrounded == false)
+		while (controller.isGrounded == false)
 			yield return new WaitForSeconds(0.1f);
-		OnAsteroid = FindNearestAsteroid();
+		OnAsteroid = FindNearestAsteroid ();
 		
 		//start = true;
-		InvokeRepeating("Check", 0, 0.05F); 
+		InvokeRepeating ("Check", 0, 0.05F); 
 	}
 	
 //	void Update()
@@ -30,51 +30,44 @@ public class CheckMode : MonoBehaviour {
 //		Check();
 //	}
 	
-	void Check () {
+	void Check ()
+	{
 		
-		string newhomeasteroid = FindNearestAsteroid();
+		string newhomeasteroid = FindNearestAsteroid ();
 		
-		if(newhomeasteroid != OnAsteroid)
-		{
-			print("Change of Mode!");
-			ChangeMode(newhomeasteroid, OnAsteroid);
+		if (newhomeasteroid != OnAsteroid) {
+			print ("Change of Mode!");
+			ChangeMode (newhomeasteroid, OnAsteroid);
 			OnAsteroid = newhomeasteroid;
 		}
 		
 	}
 	
-	public void ChangeMode(string newhomeast, string oldhomeast)
+	public void ChangeMode (string newhomeast, string oldhomeast)
 	{
 		
-		if(newhomeast == null && oldhomeast != null) // change to fly mode
-		{
-			Boat.SetActiveRecursively(true);
+		if (newhomeast == null && oldhomeast != null) { // change to fly mode
+			Boat.SetActiveRecursively (true);
 			Movement.currentmode = (int)Movement.Mode.fly;
-			asteroidparent.Find(oldhomeast).GetComponent<TreeScript>().DeActivate();
-		}
-		else if(newhomeast != null && oldhomeast == null) // change to walk mode
-		{
-			Boat.SetActiveRecursively(false);
+			asteroidparent.Find (oldhomeast).GetComponent<TreeScript> ().DeActivate ();
+		} else if (newhomeast != null && oldhomeast == null) { // change to walk mode
+			Boat.SetActiveRecursively (false);
 			Movement.currentmode = (int)Movement.Mode.walk;
-			asteroidparent.Find(newhomeast).GetComponent<TreeScript>().Activate();
-		}
-		else
-		{
-			print("ChangeMode Error.");
+			asteroidparent.Find (newhomeast).GetComponent<TreeScript> ().Activate ();
+		} else {
+			print ("ChangeMode Error.");
 		}
 	}
 	
-	public string FindNearestAsteroid()
+	public string FindNearestAsteroid ()
 	{
 		
 		string homeasteroid = null;
 		float mindistance = 17;
-		foreach(Transform a in asteroidparent)
-		{
-			Transform cap = a.Find("cap");
-			float distance = Vector3.Distance(transform.position, cap.position);
-			if(distance<=mindistance && transform.position.y > cap.position.y-7)
-			{
+		foreach (Transform a in asteroidparent) {
+			Transform cap = a.Find ("cap");
+			float distance = Vector3.Distance (transform.position, cap.position);
+			if (distance <= mindistance && transform.position.y > cap.position.y - 7) {
 				mindistance = distance;
 				homeasteroid = a.name;
 			}
