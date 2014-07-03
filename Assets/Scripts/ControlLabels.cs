@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
+//I'll just try to turn up the applicaiton configuration interface
+
 public class ControlLabels : MonoBehaviour
 {
 

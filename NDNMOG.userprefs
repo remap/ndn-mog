@@ -6,8 +6,13 @@
       <File FileName="Assets/Scripts/ObjectLabel.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/CharacterControl/MouseLook.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/AsteroidInstantiate.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Initialize.cs" Line="41" Column="24" />
+      <File FileName="Assets/Scripts/Initialize.cs" Line="29" Column="4" />
       <File FileName="Assets/Scripts/CharacterControl/CheckMode.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UnityConstants.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/CharacterControl/Movement.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ControlLabels.cs" Line="8" Column="2" />
+      <File FileName="Assets/Scripts/TreeScript.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Utility.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

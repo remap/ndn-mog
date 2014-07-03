@@ -12,6 +12,7 @@ using System.IO;
 
 public class Initialize : MonoBehaviour
 {
+	public int unUsed = 0;
 	
 	public Instance instance;
 	public string playerName;
