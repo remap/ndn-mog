@@ -27,14 +27,22 @@ public class Initialize : MonoBehaviour
 	{
 		if (UnityConstants.logFileEnabled)
 		{
-			System.IO.File.AppendAllText (UnityConstants.logFilePath, str);	
+			System.IO.File.AppendAllText (UnityConstants.gameLogName + playerName + ".txt", str);	
+		}
+		return UnityConstants.logFileEnabled;
+	}
+	
+	public bool libraryWriteCallback(string type, string info)
+	{
+		if (UnityConstants.logFileEnabled)
+		{
+			System.IO.File.AppendAllText (UnityConstants.libraryLogName + playerName + ".txt", type + " - " + info + "\n");	
 		}
 		return UnityConstants.logFileEnabled;
 	}
 	
 	public bool readConfFromFile (string fileName)
 	{
-		writeLog("Reading from configuration file.\n");
 		if (!File.Exists (fileName)) {
 			return false;	
 		} else {
@@ -89,7 +97,7 @@ public class Initialize : MonoBehaviour
 			playerName = "default";
 			writeLog("Didn't parse config file, using default as name.");
 		}
-		instance = new Instance (startingLoc, playerName, dollPos, setPosCallback); 
+		instance = new Instance (startingLoc, playerName, dollPos, setPosCallback, libraryWriteCallback); 
 		
 		instance.discovery ();
 
