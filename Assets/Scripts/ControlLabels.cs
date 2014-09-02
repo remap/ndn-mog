@@ -87,7 +87,7 @@ public class ControlLabels : MonoBehaviour
 		
 		// asteroids
 		foreach (Transform t in asteroidparent) {
-			t.Find ("label").gameObject.SetActiveRecursively (false);
+			//t.Find ("label").gameObject.SetActiveRecursively (false);
 		}
 	}
 	
