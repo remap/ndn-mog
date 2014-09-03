@@ -14,7 +14,7 @@ public class AsteroidInstantiate : MonoBehaviour
 		AsteroidParent = GameObject.Find ("/Asteroid").transform;
 	}
 	
-	public static UnityEngine.Vector3 MakeAnAsteroid (string id, UnityEngine.Vector3 position, bool activate = false)
+	public static Transform MakeAnAsteroid (string id, UnityEngine.Vector3 position, bool activate = false)
 	{
 		// Generate DiscoveryModule.Vector3 from UnityEngine.Vector3 
 		remap.NDNMOG.DiscoveryModule.Vector3 vector3 = new remap.NDNMOG.DiscoveryModule.Vector3 (position.x, position.y, position.z);
@@ -32,6 +32,6 @@ public class AsteroidInstantiate : MonoBehaviour
 		if (activate == true) {
 			newAsteroid.GetComponent<TreeScript> ().Activate ();
 		}
-		return position;
+		return newAsteroid;
 	}
 }

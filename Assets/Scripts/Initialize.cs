@@ -29,8 +29,8 @@ public class Initialize : MonoBehaviour
 	public static Transform cubeTransform;
 	
 	public Hashtable hashtable = new Hashtable ();
-	
 	public Hashtable trackedOctant = new Hashtable ();
+	public Transform[] asteroids;
 	
 	public Mutex hashtableLock = new Mutex ();
 	public remap.NDNMOG.DiscoveryModule.Vector3 selfLocation = new remap.NDNMOG.DiscoveryModule.Vector3 (0, 0, 0);
@@ -38,6 +38,9 @@ public class Initialize : MonoBehaviour
 	
 	public string loggingLevel = "none";
 	public bool instantiated = false;
+	
+	// Populate the world to ten trees in different octants.
+	public const int treeNum = 10;
 	
 	public bool writeLog(string str)
 	{
@@ -100,7 +103,7 @@ public class Initialize : MonoBehaviour
 		return false;
 	}
 	
-	public void instantiateOctant(string name, int xmin, int ymin, int zmin)
+	public void instantiateOctant(string name, int x, int y, int z)
 	{
 		GameObject entity = GameObject.Find (name);
 		
@@ -120,13 +123,22 @@ public class Initialize : MonoBehaviour
 			*/
 			
 			// Create octant using existing path to a GameObject
-			UnityEngine.Vector3 locationUnity = new UnityEngine.Vector3 (xmin, ymin, zmin);
+			UnityEngine.Vector3 locationUnity = new UnityEngine.Vector3 (x, y, z);
 			Transform octant = Instantiate (cubeTransform, locationUnity, Quaternion.identity) as Transform;
 			
 			octant.name = name;
 			octant.renderer.material.SetColor("_Color", new Color(0.5f, 0.5f, 0.5f, 0.5f));
 			octant.renderer.material.shader = Shader.Find( "Transparent/Diffuse" );
 			
+			// Whenever there's an octant being instantiated, enable the asteroid that's in there
+			List<int> octList = CommonUtility.getOctantIndicesFromVector3(new remap.NDNMOG.DiscoveryModule.Vector3(x, y, z));
+			for (int i = 0; i < treeNum; i++)
+			{
+				if (inOct((int)asteroids[i].position.x, (int)asteroids[i].position.y, (int)asteroids[i].position.z, octList))
+				{
+					toggleVisibility(asteroids[i], true);
+				}
+			}
 		}
 		else
 		{
@@ -134,7 +146,7 @@ public class Initialize : MonoBehaviour
 		}
 	}
 	
-	public void destroyOctant(string name)
+	public void destroyOctant(string name, int x = 0, int y = 0, int z = 0)
 	{
 		// deinstantiateOctant does not automatically add minimap prefix
 		GameObject entity = GameObject.Find(name);
@@ -145,7 +157,52 @@ public class Initialize : MonoBehaviour
 		else
 		{
 			Destroy(entity);
+			
+			// Whenever there's an octant being destroyed, disable the asteroid that's in there
+			List<int> octList = CommonUtility.getOctantIndicesFromVector3(new remap.NDNMOG.DiscoveryModule.Vector3(x + 256, y + 256, z + 256));
+			for (int i = 0; i < treeNum; i++)
+			{
+				if (inOct((int)asteroids[i].position.x, (int)asteroids[i].position.y, (int)asteroids[i].position.z, octList))
+				{
+					toggleVisibility(asteroids[i], false);
+				}
+			}
 		}
+	}
+	
+	public bool inOct(int x, int y, int z, List<int> octList)
+	{
+		int xmin = 0;
+		int ymin = 0;
+		int zmin = 0;
+		
+		CommonUtility.GetBoundaries(CommonUtility.getStringFromList(octList), ref xmin, ref ymin, ref zmin);
+		if (x > xmin && x < (xmin + 512) && y > ymin && y < (ymin + 512) && z > zmin && z < (zmin + 512))
+		{
+			return true;
+		}
+		else
+		{
+			return false;	
+		}
+	}
+	
+	// recursively toggle the visibility of a transform
+	void toggleVisibility(Transform obj, bool state)
+	{
+	    for (int i = 0; i < obj.GetChildCount(); i++)
+	    {
+	        if (obj.GetChild(i).renderer != null)
+	            obj.GetChild(i).renderer.enabled = state;
+			
+	 		if (obj.GetChild(i).GetComponent("Halo") as Behaviour != null)
+	            (obj.GetChild(i).GetComponent("Halo") as Behaviour).enabled = state;
+	 
+	        if (obj.GetChild(i).GetChildCount() > 0)
+	        {
+	            toggleVisibility(obj.GetChild(i), state);
+	        }
+	    }
 	}
 	
 	public void Start ()
@@ -156,18 +213,40 @@ public class Initialize : MonoBehaviour
 		playerTransform = GameObject.Find (playerTransformPath).transform;
 		cubeTransform = GameObject.Find(cubeTransformPath).transform;
 		
-		UnityEngine.Vector3 initLoc = new UnityEngine.Vector3 (6750, 3500, 4800);
+		UnityEngine.Vector3 []asteroidLoc = new UnityEngine.Vector3[treeNum];
+		asteroids = new Transform[treeNum];
 		
-		string initId = "10";
+		// for the demo, the trick is that asteroids are statically located in fixed positions.
+		asteroidLoc[0] = new UnityEngine.Vector3(6750, 4000, 4800);
+		asteroidLoc[1] = new UnityEngine.Vector3(6250, 4000, 4800);
+		asteroidLoc[2] = new UnityEngine.Vector3(5750, 4000, 4800);
 		
-		UnityEngine.Vector3 pos = AsteroidInstantiate.MakeAnAsteroid (initId, initLoc, true);
+		asteroidLoc[3] = new UnityEngine.Vector3(6750, 4000, 5300);
+		asteroidLoc[4] = new UnityEngine.Vector3(6250, 4000, 5300);
+		asteroidLoc[5] = new UnityEngine.Vector3(5750, 4000, 5300);
 		
-		UnityEngine.Vector3 dollPosUnity = pos + new UnityEngine.Vector3 (0, 50, 0);
+		asteroidLoc[6] = new UnityEngine.Vector3(6250, 4000, 4300);
+		asteroidLoc[7] = new UnityEngine.Vector3(6750, 4000, 4300);
+		asteroidLoc[8] = new UnityEngine.Vector3(5750, 4000, 4300);
+		
+		asteroidLoc[9] = new UnityEngine.Vector3(6750, 4500, 4800);
+		
+		UnityEngine.Vector3 dollPosUnity = asteroidLoc[0] + new UnityEngine.Vector3 (0, 50, 0);
 		transform.position = dollPosUnity;
 		
 		remap.NDNMOG.DiscoveryModule.Vector3 dollPos = new remap.NDNMOG.DiscoveryModule.Vector3 (dollPosUnity.x, dollPosUnity.y, dollPosUnity.z);
 		
 		List<int> startingOct = CommonUtility.getOctantIndicesFromVector3 (dollPos);
+		
+		for (int i = 0; i < treeNum; i++)
+		{
+			asteroids[i] = AsteroidInstantiate.MakeAnAsteroid ("asteroid" + i.ToString(), asteroidLoc[i], true);
+			if (!inOct((int)asteroids[i].position.x, (int)asteroids[i].position.y, (int)asteroids[i].position.z, startingOct))
+			{
+				toggleVisibility(asteroids[i], false);
+			}
+		}
+		
 		Debug.Log (CommonUtility.getStringFromList (startingOct));
 		
 		if (!readConfFromFile (UnityConstants.configFilePath)) {
@@ -259,7 +338,15 @@ public class Initialize : MonoBehaviour
 			instance.untrackOctant(oct);	
 		}
 		string octantName = CommonUtility.getStringFromList(octList);
-		destroyOctant(minimapPrefix + octantName);
+		
+		// Added for the purpose of hinding everything in that octant
+		int xmin = 0;
+		int ymin = 0;
+		int zmin = 0;
+		
+		CommonUtility.GetBoundaries(octantName, ref xmin, ref ymin, ref zmin);
+		
+		destroyOctant(minimapPrefix + octantName, xmin, ymin, zmin);
 		return 1;
 	}
 	
