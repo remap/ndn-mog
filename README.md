@@ -12,7 +12,7 @@ Updated by Zhehao Wang (wangzhehao410305@gmail.com)
 
 Sept 09, 2014
 Updated by Zhehao Wang (wanzhehao410305@gmail.com)
-In preparation for ICN 2014 demo
+In preparation for ICN 2014 demo. Remote branch set to remap ndn-mog/master by default, refer to that repository for further updates.
 
 ## How To Run
 1. nfd-start. For information about nfd, refer to nfd github or redmine site.
