@@ -10,9 +10,13 @@ Updated by Zhehao Wang (wangzhehao410305@gmail.com)
 May 21, 2014
 Updated by Zhehao Wang (wangzhehao410305@gmail.com)
 
+Sept 09, 2014
+Updated by Zhehao Wang (wanzhehao410305@gmail.com)
+In preparation for ICN 2014 demo
+
 ## How To Run
-1. ndnd-tlv-start. For information about ndnd-tlv, take a look at https://github.com/named-data/ndnd-tlv and http://redmine.named-data.net/projects/ndnd-tlv/wiki
-2. ndndc add /ndn/edu/ucla/remap tcp aleph.ndn.ucla.edu
+1. nfd-start. For information about nfd, refer to nfd github or redmine site.
+2. nfdc the hub you want to connect to; for now the app uses /ndn/broadcast namespace(ideally the strategy for that face should be broadcast); and /ndn/edu/ucla/remap namespace; will be allowing user to configure the latter namespace shortly
 3. double click the app
 
 ## What To See
@@ -34,6 +38,7 @@ Updated by Zhehao Wang (wangzhehao410305@gmail.com)
 ## Known Issue
 1. some NDN names keep floating on the screen before being deleted
 2. doll sometimes crashes through asteroids when flying too fast
+3. sometimes the same player gets discovered twice
 
 ## Todos
 1. See todos and references in DiscoveryModule(https://github.com/zhehaowang/DiscoveryModule)
