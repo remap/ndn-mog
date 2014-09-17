@@ -6,4 +6,6 @@ public class UnityConstants
 	public const string gameLogName = "game-";
 	public const string libraryLogName = "library-";
 	public const bool logFileEnabled = true;
+	
+	public const string LoggingLevelNone = "none";
 }
