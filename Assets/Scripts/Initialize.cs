@@ -28,10 +28,13 @@ public class Initialize : MonoBehaviour
 	public Instance instance;
 	public string playerName;
 	public string gameInstanceName;
+	
 	public const string playerTransformPath = "/player/graphics";
 	public const string cubeTransformPath = "/octant";
 	public const string selfTransformPath = "/player";
 	public const string dollPath = "/doll";
+	public const string haloPath = "/halo";
+	
 	public const string minimapPrefix = "minimap";
 	public const int distanceThreshold = 600;
 	public static Transform playerTransform;
@@ -116,13 +119,12 @@ public class Initialize : MonoBehaviour
 			renderer.material.color = new Color(1, 0, 0, 0.5f);
 			*/
 			
-			// Create octant using existing path to a GameObject
 			UnityEngine.Vector3 locationUnity = new UnityEngine.Vector3 (x, y, z);
-			Transform octant = Instantiate (cubeTransform, locationUnity, Quaternion.identity) as Transform;
+			Transform cube = Instantiate (cubeTransform, locationUnity, Quaternion.identity) as Transform;
 			
-			octant.name = name;
-			octant.renderer.material.SetColor ("_Color", new Color (0.5f, 0.5f, 0.5f, 0.5f));
-			octant.renderer.material.shader = Shader.Find ("Transparent/Diffuse");
+			cube.name = name;
+			cube.renderer.material.SetColor ("_Color", new Color (0.5f, 0.5f, 0.5f, 0.5f));
+			cube.renderer.material.shader = Shader.Find ("Transparent/Diffuse");
 			
 			// Whenever there's an octant being instantiated, enable the asteroid that's in there
 			List<int> octList = CommonUtility.getOctantIndicesFromVector3 (new remap.NDNMOG.DiscoveryModule.Vector3 (x, y, z));
@@ -248,10 +250,8 @@ public class Initialize : MonoBehaviour
 		if (entity != null) {
 			string path = "Materials/" + renderString;
 			Material unityMaterial = Resources.Load (path, typeof(Material)) as Material;
-			Debug.Log (path);
 				
 			if (unityMaterial != null) {
-				Debug.Log (path);
 				entity.GetComponent<MeshRenderer> ().material = unityMaterial;
 			}
 		}
@@ -404,21 +404,22 @@ public class Initialize : MonoBehaviour
 	
 		hashtableLock.ReleaseMutex ();
 		renderListLock.WaitOne ();
-		foreach (EntityInfo ei in renderList.ToArray()) {
-			GameObject renderEntity = GameObject.Find (ei.name_ + dollPath);
-			if (renderEntity != null) {
-				string path = "Materials/" + ei.renderString_;
-				Material unityMaterial = Resources.Load (path, typeof(Material)) as Material;
-						
-				if (unityMaterial != null) {
-					renderEntity.GetComponent<MeshRenderer> ().material = unityMaterial;
+		if (renderList.Count != 0) {
+			// Rendering based on the list...which still tells me collection is modified, even if I have the lock to protect it...finding out why.
+			foreach (EntityInfo ei in renderList) {
+				Debug.Log("rendering one.");
+				GameObject renderEntity = GameObject.Find (ei.name_ + dollPath);
+				if (renderEntity != null) {
+					string path = "Materials/" + ei.renderString_;
+					Material unityMaterial = Resources.Load (path, typeof(Material)) as Material;
+					
+					if (unityMaterial != null) {
+						renderEntity.GetComponent<MeshRenderer> ().material = unityMaterial;
+					}
 				}
 			}
-			renderList.Remove (ei);
-		}
 			
-		foreach (EntityInfo ei in renderList) {
-			renderList.Remove (ei);
+			renderList.Clear();
 		}
 		renderListLock.ReleaseMutex ();
 	}
