@@ -10,6 +10,7 @@ using net.named_data.jndn.encoding;
 
 using System.IO;
 
+// EntityInfo class correponds with the GameEntityInfo class in plugin
 public class EntityInfo
 {
 	public string name_;
@@ -24,37 +25,41 @@ public class EntityInfo
 
 public class Initialize : MonoBehaviour
 {
-	public int unUsed = 0;
 	public Instance instance;
 	public string playerName;
 	public string gameInstanceName;
 	
-	public const string playerTransformPath = "/player/graphics";
-	public const string cubeTransformPath = "/octant";
-	public const string selfTransformPath = "/player";
-	public const string dollPath = "/doll";
-	public const string haloPath = "/halo";
-	
-	public const string minimapPrefix = "minimap";
-	public const int distanceThreshold = 600;
 	public static Transform playerTransform;
 	public static Transform cubeTransform;
-	public Hashtable hashtable = new Hashtable ();
-	public Mutex hashtableLock = new Mutex ();
-	public Mutex renderListLock = new Mutex ();
-	public Hashtable trackedOctant = new Hashtable ();
+	
+	// gameEntityHashtable is keyed by name of a game entity; with the vector3 location of the game entity as value.
+	public Hashtable gameEntityHashtable = new Hashtable ();
+	// renderList is the queue of entities that should be re-colored (re-rendered) in Unity
 	public List<EntityInfo> renderList = new List<EntityInfo> ();
+	
+	// hashtableLock locks gameEntityHashtable
+	public Mutex hashtableLock = new Mutex ();
+	// renderListLock locks the queue of entities to be rendered
+	public Mutex renderListLock = new Mutex ();
+	
+	// trackedOctant hashtable is keyed by string name of an octant; with the vector3 location of the octant as value.
+	// trackedOctant should be sync'ed up with the interestExpressionOctants in discovery module.
+	public Hashtable trackedOctant = new Hashtable ();
+	
+	// The static array of asteroids, used as a substitute for retrieving airport data from lioncub
 	public Transform[] asteroids;
+	// Populate the world to ten trees in different octants.
+	public const int treeNum = 10;
+	
 	public remap.NDNMOG.DiscoveryModule.Vector3 selfLocation = new remap.NDNMOG.DiscoveryModule.Vector3 (0, 0, 0);
 	public Transform selfTransform;
+	
 	public bool instantiated = false;
 	public string loggingLevel = UnityConstants.LoggingLevelNone;
+	
 	public Logging log;
 	// the render string for local instance
 	public string renderString = Constants.DefaultRenderString;
-	
-	// Populate the world to ten trees in different octants.
-	public const int treeNum = 10;
 	
 	public bool readConfFromFile (string fileName)
 	{
@@ -171,7 +176,7 @@ public class Initialize : MonoBehaviour
 		}
 	}
 	
-	// recursively toggle the visibility of a transform
+	// recursively toggle the visibility of a transform and its children, including Halos as they are used for minimap camera display.
 	void toggleVisibility (Transform obj, bool state)
 	{
 		for (int i = 0; i < obj.GetChildCount(); i++) {
@@ -192,8 +197,8 @@ public class Initialize : MonoBehaviour
 		renderString = Constants.DefaultRenderString;
 		
 		AsteroidInstantiate.init ();
-		playerTransform = GameObject.Find (playerTransformPath).transform;
-		cubeTransform = GameObject.Find (cubeTransformPath).transform;
+		playerTransform = GameObject.Find (UnityConstants.playerTransformPath).transform;
+		cubeTransform = GameObject.Find (UnityConstants.cubeTransformPath).transform;
 		
 		UnityEngine.Vector3 [] asteroidLoc = new UnityEngine.Vector3[treeNum];
 		asteroids = new Transform[treeNum];
@@ -246,7 +251,10 @@ public class Initialize : MonoBehaviour
 		// instance is interested in its starting location
 		trackOctant (startingOct);
 		
-		GameObject entity = GameObject.Find (playerTransformPath + dollPath);
+		// set playerName for label: this is the full name of the local player.
+		GameObject.Find (UnityConstants.playerTransformPath + UnityConstants.labelTransformPath).guiText.text = Constants.AlephPrefix + "/" + Constants.PlayersPrefix + "/" + playerName;
+		
+		GameObject entity = GameObject.Find (UnityConstants.playerTransformPath + UnityConstants.dollPath);
 		if (entity != null) {
 			string path = "Materials/" + renderString;
 			Material unityMaterial = Resources.Load (path, typeof(Material)) as Material;
@@ -272,7 +280,7 @@ public class Initialize : MonoBehaviour
 		// naive strategy for untracking octants: for each octants that's not in range, we remove the octants from tracking list
 		foreach (DictionaryEntry pair in trackedOctant) {
 			UnityEngine.Vector3 position = (UnityEngine.Vector3)pair.Value;
-			if (UnityEngine.Vector3.Distance (position, new UnityEngine.Vector3 (x, y, z)) > distanceThreshold) {
+			if (UnityEngine.Vector3.Distance (position, new UnityEngine.Vector3 (x, y, z)) > UnityConstants.distanceThreshold) {
 				List<int> newOctList = CommonUtility.getOctantIndicesFromVector3 (new remap.NDNMOG.DiscoveryModule.Vector3 (position.x, position.y, position.z));
 				untrackOctant (newOctList);
 				toDelete.Add ((string)pair.Key);
@@ -328,7 +336,7 @@ public class Initialize : MonoBehaviour
 		
 		CommonUtility.GetBoundaries (octantName, ref xmin, ref ymin, ref zmin);
 		
-		destroyOctant (minimapPrefix + octantName, xmin, ymin, zmin);
+		destroyOctant (UnityConstants.minimapPrefix + octantName, xmin, ymin, zmin);
 		return 1;
 	}
 	
@@ -351,7 +359,7 @@ public class Initialize : MonoBehaviour
 			string octantName = CommonUtility.getStringFromList (octList);
 			CommonUtility.GetBoundaries (octantName, ref xmin, ref ymin, ref zmin);
 			
-			instantiateOctant (minimapPrefix + octantName, xmin + 256, ymin + 256, zmin + 256);
+			instantiateOctant (UnityConstants.minimapPrefix + octantName, xmin + 256, ymin + 256, zmin + 256);
 			trackedOctant.Add (CommonUtility.getStringFromList (octList), new UnityEngine.Vector3 (xmin + 256, ymin + 256, zmin + 256));
 		} else {
 			
@@ -361,7 +369,7 @@ public class Initialize : MonoBehaviour
 	
 	public void Update ()
 	{
-		selfTransform = GameObject.Find (selfTransformPath).transform;
+		selfTransform = GameObject.Find (UnityConstants.selfTransformPath).transform;
 		selfLocation.x_ = selfTransform.localPosition.x;
 		selfLocation.y_ = selfTransform.localPosition.y;
 		selfLocation.z_ = selfTransform.localPosition.z;
@@ -372,8 +380,8 @@ public class Initialize : MonoBehaviour
 		
 		// Is generating a copy of hashtable a potentially better idea than this?
 		hashtableLock.WaitOne (Constants.MutexLockTimeoutMilliSeconds);
-		foreach (DictionaryEntry pair in hashtable) {
-			GameObject entity = GameObject.Find ((string)pair.Key);
+		foreach (DictionaryEntry pair in gameEntityHashtable) {
+			GameObject entity = GameObject.Find (UnityConstants.playerParentPath + "/" + (string)pair.Key);
 			remap.NDNMOG.DiscoveryModule.Vector3 location = new remap.NDNMOG.DiscoveryModule.Vector3 ((remap.NDNMOG.DiscoveryModule.Vector3)pair.Value);
 			//Debug.Log(location.x_);
 			UnityEngine.Vector3 locationUnity = new UnityEngine.Vector3 (location.x_, location.y_, location.z_);
@@ -382,6 +390,9 @@ public class Initialize : MonoBehaviour
 				if (locationUnity.x != Constants.DefaultLocationDropEntity && locationUnity.x != Constants.DefaultLocationNewEntity) {
 					Transform newEntity = Instantiate (playerTransform, locationUnity, Quaternion.identity) as Transform;
 					newEntity.name = (string)pair.Key;
+					newEntity.parent = GameObject.Find(UnityConstants.playerParentPath).transform;
+					
+					GameObject.Find(UnityConstants.playerParentPath + "/" + newEntity.name + UnityConstants.labelTransformPath).guiText.text = Constants.AlephPrefix + "/" + Constants.PlayersPrefix + "/" + newEntity.name;
 				}
 				//newEntity.tag = "";
 			} else {
@@ -396,7 +407,7 @@ public class Initialize : MonoBehaviour
 			}
 		}
 		foreach (string str in toDelete) {
-			hashtable.Remove (str);	
+			gameEntityHashtable.Remove (str);	
 		}
 		if (instantiated) {
 			updateOctantList ((int)selfLocation.x_, (int)selfLocation.y_, (int)selfLocation.z_);
@@ -407,8 +418,7 @@ public class Initialize : MonoBehaviour
 		if (renderList.Count != 0) {
 			// Rendering based on the list...which still tells me collection is modified, even if I have the lock to protect it...finding out why.
 			foreach (EntityInfo ei in renderList) {
-				Debug.Log("rendering one.");
-				GameObject renderEntity = GameObject.Find (ei.name_ + dollPath);
+				GameObject renderEntity = GameObject.Find (UnityConstants.playerParentPath + "/" + ei.name_ + UnityConstants.dollPath);
 				if (renderEntity != null) {
 					string path = "Materials/" + ei.renderString_;
 					Material unityMaterial = Resources.Load (path, typeof(Material)) as Material;
@@ -440,27 +450,27 @@ public class Initialize : MonoBehaviour
 		if (location.Equals (new remap.NDNMOG.DiscoveryModule.Vector3 (Constants.DefaultLocationNewEntity, Constants.DefaultLocationNewEntity, Constants.DefaultLocationNewEntity))) {
 			log.writeLog ("New entity " + name + " discovered from returned names");
 			
-			if (hashtable.Contains (name)) {
-				hashtable [name] = location;
+			if (gameEntityHashtable.Contains (name)) {
+				gameEntityHashtable [name] = location;
 			} else {
-				hashtable.Add (name, location);
+				gameEntityHashtable.Add (name, location);
 			}
 		} else if (location.Equals (new remap.NDNMOG.DiscoveryModule.Vector3 (Constants.DefaultLocationDropEntity, Constants.DefaultLocationDropEntity, Constants.DefaultLocationDropEntity))) {
 			log.writeLog ("Entity " + name + " dropped.");
 			
-			if (hashtable.Contains (name)) {
-				hashtable [name] = location;
+			if (gameEntityHashtable.Contains (name)) {
+				gameEntityHashtable [name] = location;
 			} else {
-				hashtable.Add (name, location);
+				gameEntityHashtable.Add (name, location);
 			}
 			
 		} else {
 			
 			
-			if (hashtable.Contains (name)) {
-				hashtable [name] = location;
+			if (gameEntityHashtable.Contains (name)) {
+				gameEntityHashtable [name] = location;
 			} else {
-				hashtable.Add (name, location);
+				gameEntityHashtable.Add (name, location);
 			}
 		}
 		hashtableLock.ReleaseMutex ();

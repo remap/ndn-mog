@@ -8,7 +8,7 @@ public class TreeScript : MonoBehaviour
 	*  	When player lands on an asteroid,
 	*	that asteroid should call Activate(),
 	*	which enables everything on the asteroid:
-	*	colliders, scripts, animations ect.
+	*	colliders, scripts, animations etc.
 	*	When player leaves an asteroid,
 	*	everything except renderer is DeActivate().
 	*	This largely saves game frame rate.

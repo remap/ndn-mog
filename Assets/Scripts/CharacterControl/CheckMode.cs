@@ -12,7 +12,7 @@ public class CheckMode : MonoBehaviour
 	{
 		CharacterController controller = GetComponent<CharacterController> ();
 		Boat = transform.Find ("graphics/boat").gameObject;
-		asteroidparent = GameObject.Find ("/Asteroid").transform;
+		asteroidparent = GameObject.Find (UnityConstants.asteroidParentPath).transform;
 		
 		while (controller.isGrounded == false)
 			yield return new WaitForSeconds(0.1f);
