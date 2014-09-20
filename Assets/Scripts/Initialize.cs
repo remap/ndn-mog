@@ -53,6 +53,7 @@ public class Initialize : MonoBehaviour
 	
 	public remap.NDNMOG.DiscoveryModule.Vector3 selfLocation = new remap.NDNMOG.DiscoveryModule.Vector3 (0, 0, 0);
 	public Transform selfTransform;
+	public Transform playersParentTransform;
 	
 	public bool instantiated = false;
 	public string loggingLevel = UnityConstants.LoggingLevelNone;
@@ -60,6 +61,7 @@ public class Initialize : MonoBehaviour
 	public Logging log;
 	// the render string for local instance
 	public string renderString = Constants.DefaultRenderString;
+	public string hubPrefix = "";
 	
 	public bool readConfFromFile (string fileName)
 	{
@@ -93,6 +95,12 @@ public class Initialize : MonoBehaviour
 						string[] name = s.Split (':');	
 						if (name.Length > 0) {
 							renderString = name [1];	
+						}
+					}
+					if (s.Contains("hub-prefix")) {
+						string[] name = s.Split(':');
+						if (name.Length > 0) {
+							hubPrefix = name [1];
 						}
 					}
 				}
@@ -194,6 +202,9 @@ public class Initialize : MonoBehaviour
 	
 	public void Start ()
 	{
+		selfTransform = GameObject.Find (UnityConstants.selfTransformPath).transform;
+		playersParentTransform = GameObject.Find(UnityConstants.playerParentPath).transform;
+
 		renderString = Constants.DefaultRenderString;
 		
 		AsteroidInstantiate.init ();
@@ -244,7 +255,7 @@ public class Initialize : MonoBehaviour
 			log.level_ = LoggingLevel.None;
 		}
 		
-		instance = new Instance (startingOct, playerName, dollPos, setPosCallback, log.libraryWriteCallback, infoCallback, null, null, null, renderString); 
+		instance = new Instance (startingOct, playerName, dollPos, setPosCallback, log.libraryWriteCallback, infoCallback, null, null, null, renderString, hubPrefix); 
 		instance.discovery ();
 		
 		instantiated = true;
@@ -252,7 +263,7 @@ public class Initialize : MonoBehaviour
 		trackOctant (startingOct);
 		
 		// set playerName for label: this is the full name of the local player.
-		GameObject.Find (UnityConstants.playerTransformPath + UnityConstants.labelTransformPath).guiText.text = Constants.AlephPrefix + "/" + Constants.PlayersPrefix + "/" + playerName;
+		GameObject.Find (UnityConstants.playerTransformPath + UnityConstants.labelTransformPath).guiText.text = instance.getSelfGameEntity().getHubPrefix() + "/" + Constants.PlayersPrefix + "/" + playerName;
 		
 		GameObject entity = GameObject.Find (UnityConstants.playerTransformPath + UnityConstants.dollPath);
 		if (entity != null) {
@@ -369,7 +380,6 @@ public class Initialize : MonoBehaviour
 	
 	public void Update ()
 	{
-		selfTransform = GameObject.Find (UnityConstants.selfTransformPath).transform;
 		selfLocation.x_ = selfTransform.localPosition.x;
 		selfLocation.y_ = selfTransform.localPosition.y;
 		selfLocation.z_ = selfTransform.localPosition.z;
@@ -377,11 +387,13 @@ public class Initialize : MonoBehaviour
 		// setLocation talks with DiscoveryModule without calling callback.
 		instance.getSelfGameEntity ().setLocation (selfLocation, false);
 		List<string> toDelete = new List<string> ();
-		
+		// For iteration
+		Transform entity;
 		// Is generating a copy of hashtable a potentially better idea than this?
-		hashtableLock.WaitOne (Constants.MutexLockTimeoutMilliSeconds);
+		hashtableLock.WaitOne ();
 		foreach (DictionaryEntry pair in gameEntityHashtable) {
-			GameObject entity = GameObject.Find (UnityConstants.playerParentPath + "/" + (string)pair.Key);
+			entity = playersParentTransform.Find(((string)pair.Key).Replace("/", "-"));
+			
 			remap.NDNMOG.DiscoveryModule.Vector3 location = new remap.NDNMOG.DiscoveryModule.Vector3 ((remap.NDNMOG.DiscoveryModule.Vector3)pair.Value);
 			//Debug.Log(location.x_);
 			UnityEngine.Vector3 locationUnity = new UnityEngine.Vector3 (location.x_, location.y_, location.z_);
@@ -389,17 +401,15 @@ public class Initialize : MonoBehaviour
 			if (entity == null) {
 				if (locationUnity.x != Constants.DefaultLocationDropEntity && locationUnity.x != Constants.DefaultLocationNewEntity) {
 					Transform newEntity = Instantiate (playerTransform, locationUnity, Quaternion.identity) as Transform;
-					newEntity.name = (string)pair.Key;
+					newEntity.name = ((string)pair.Key).Replace("/", "-");
 					newEntity.parent = GameObject.Find(UnityConstants.playerParentPath).transform;
-					
-					GameObject.Find(UnityConstants.playerParentPath + "/" + newEntity.name + UnityConstants.labelTransformPath).guiText.text = Constants.AlephPrefix + "/" + Constants.PlayersPrefix + "/" + newEntity.name;
+					newEntity.Find(UnityConstants.labelTransformPath.TrimStart('/')).guiText.text = (string)pair.Key;
 				}
-				//newEntity.tag = "";
 			} else {
 				if (locationUnity.x != Constants.DefaultLocationDropEntity && locationUnity.x != Constants.DefaultLocationNewEntity) {
 					entity.transform.localPosition = locationUnity;
 				} else {
-					Destroy (entity);
+					Destroy (entity.gameObject);
 						
 					// hashtable deletion in foreach loop is considered illegal
 					toDelete.Add ((string)pair.Key);
@@ -414,11 +424,12 @@ public class Initialize : MonoBehaviour
 		}
 	
 		hashtableLock.ReleaseMutex ();
+		
 		renderListLock.WaitOne ();
 		if (renderList.Count != 0) {
 			// Rendering based on the list...which still tells me collection is modified, even if I have the lock to protect it...finding out why.
 			foreach (EntityInfo ei in renderList) {
-				GameObject renderEntity = GameObject.Find (UnityConstants.playerParentPath + "/" + ei.name_ + UnityConstants.dollPath);
+				GameObject renderEntity = playersParentTransform.Find(ei.name_.Replace("/", "-") + UnityConstants.dollPath).gameObject;
 				if (renderEntity != null) {
 					string path = "Materials/" + ei.renderString_;
 					Material unityMaterial = Resources.Load (path, typeof(Material)) as Material;
@@ -434,9 +445,9 @@ public class Initialize : MonoBehaviour
 		renderListLock.ReleaseMutex ();
 	}
 	
-	public bool infoCallback (string name, string info)
+	public bool infoCallback (string prefix, string name, string info)
 	{
-		EntityInfo ei = new EntityInfo (name, info);
+		EntityInfo ei = new EntityInfo (prefix + "/" + Constants.PlayersPrefix + "/" + name, info);
 		renderListLock.WaitOne ();
 		renderList.Add (ei);
 		renderListLock.ReleaseMutex ();
@@ -444,33 +455,32 @@ public class Initialize : MonoBehaviour
 	}
 	
 	// though setPosCallback is called by gameEntity, it's still trying to access the entities in Unity by name
-	public bool setPosCallback (string name, remap.NDNMOG.DiscoveryModule.Vector3 location)
+	public bool setPosCallback (string prefix, string name, remap.NDNMOG.DiscoveryModule.Vector3 location)
 	{
+		string storedName = prefix + "/" + Constants.PlayersPrefix + "/" + name;
 		hashtableLock.WaitOne ();
 		if (location.Equals (new remap.NDNMOG.DiscoveryModule.Vector3 (Constants.DefaultLocationNewEntity, Constants.DefaultLocationNewEntity, Constants.DefaultLocationNewEntity))) {
-			log.writeLog ("New entity " + name + " discovered from returned names");
+			log.writeLog ("New entity " + storedName + " discovered from returned names");
 			
-			if (gameEntityHashtable.Contains (name)) {
-				gameEntityHashtable [name] = location;
+			if (gameEntityHashtable.Contains (storedName)) {
+				gameEntityHashtable [storedName] = location;
 			} else {
-				gameEntityHashtable.Add (name, location);
+				gameEntityHashtable.Add (storedName, location);
 			}
 		} else if (location.Equals (new remap.NDNMOG.DiscoveryModule.Vector3 (Constants.DefaultLocationDropEntity, Constants.DefaultLocationDropEntity, Constants.DefaultLocationDropEntity))) {
-			log.writeLog ("Entity " + name + " dropped.");
+			log.writeLog ("Entity " + storedName + " dropped.");
 			
-			if (gameEntityHashtable.Contains (name)) {
-				gameEntityHashtable [name] = location;
+			if (gameEntityHashtable.Contains (storedName)) {
+				gameEntityHashtable [storedName] = location;
 			} else {
-				gameEntityHashtable.Add (name, location);
+				gameEntityHashtable.Add (storedName, location);
 			}
 			
 		} else {
-			
-			
-			if (gameEntityHashtable.Contains (name)) {
-				gameEntityHashtable [name] = location;
+			if (gameEntityHashtable.Contains (storedName)) {
+				gameEntityHashtable [storedName] = location;
 			} else {
-				gameEntityHashtable.Add (name, location);
+				gameEntityHashtable.Add (storedName, location);
 			}
 		}
 		hashtableLock.ReleaseMutex ();
