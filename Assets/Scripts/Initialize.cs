@@ -54,6 +54,7 @@ public class Initialize : MonoBehaviour
 	public remap.NDNMOG.DiscoveryModule.Vector3 selfLocation = new remap.NDNMOG.DiscoveryModule.Vector3 (0, 0, 0);
 	public Transform selfTransform;
 	public Transform playersParentTransform;
+	public Transform minimapCamera;
 	
 	public bool instantiated = false;
 	public string loggingLevel = UnityConstants.LoggingLevelNone;
@@ -119,22 +120,10 @@ public class Initialize : MonoBehaviour
 		GameObject entity = GameObject.Find (name);
 		
 		if (entity == null) {
-			// Create octant by code
-			/*
-			GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-			cube.transform.localScale = new UnityEngine.Vector3(512, 512, 512);
-			cube.transform.localPosition = new UnityEngine.Vector3(xmin + 256, ymin + 256, zmin + 256);
-			
-			// Generic function and as keyword...
-			MeshRenderer renderer = cube.AddComponent<MeshRenderer>();
-			
-			renderer.material = new Material(Shader.Find("Transparent/Diffuse"));
-			renderer.material.color = new Color(1, 0, 0, 0.5f);
-			*/
-			
 			UnityEngine.Vector3 locationUnity = new UnityEngine.Vector3 (x, y, z);
 			Transform cube = Instantiate (cubeTransform, locationUnity, Quaternion.identity) as Transform;
 			
+			cube.Find(UnityConstants.labelTransformPath.TrimStart('/')).guiText.text = name;
 			cube.name = name;
 			cube.renderer.material.SetColor ("_Color", new Color (0.5f, 0.5f, 0.5f, 0.5f));
 			cube.renderer.material.shader = Shader.Find ("Transparent/Diffuse");
@@ -204,7 +193,9 @@ public class Initialize : MonoBehaviour
 	{
 		selfTransform = GameObject.Find (UnityConstants.selfTransformPath).transform;
 		playersParentTransform = GameObject.Find(UnityConstants.playerParentPath).transform;
-
+		
+		minimapCamera = GameObject.Find(UnityConstants.selfTransformPath + UnityConstants.minimapCameraPath).transform;
+		
 		renderString = Constants.DefaultRenderString;
 		
 		AsteroidInstantiate.init ();
@@ -215,19 +206,19 @@ public class Initialize : MonoBehaviour
 		asteroids = new Transform[treeNum];
 		
 		// for the demo, the trick is that asteroids are statically located in fixed positions.
-		asteroidLoc [0] = new UnityEngine.Vector3 (6750, 4000, 4800);
-		asteroidLoc [1] = new UnityEngine.Vector3 (6250, 4000, 4800);
-		asteroidLoc [2] = new UnityEngine.Vector3 (5750, 4000, 4800);
+		asteroidLoc [0] = new UnityEngine.Vector3 (6750, 3900, 4800);
+		asteroidLoc [1] = new UnityEngine.Vector3 (6250, 3900, 4800);
+		asteroidLoc [2] = new UnityEngine.Vector3 (5750, 3900, 4800);
 		
-		asteroidLoc [3] = new UnityEngine.Vector3 (6750, 4000, 5300);
-		asteroidLoc [4] = new UnityEngine.Vector3 (6250, 4000, 5300);
-		asteroidLoc [5] = new UnityEngine.Vector3 (5750, 4000, 5300);
+		asteroidLoc [3] = new UnityEngine.Vector3 (6750, 3900, 5300);
+		asteroidLoc [4] = new UnityEngine.Vector3 (6250, 3900, 5300);
+		asteroidLoc [5] = new UnityEngine.Vector3 (5750, 3900, 5300);
 		
-		asteroidLoc [6] = new UnityEngine.Vector3 (6250, 4000, 4300);
-		asteroidLoc [7] = new UnityEngine.Vector3 (6750, 4000, 4300);
-		asteroidLoc [8] = new UnityEngine.Vector3 (5750, 4000, 4300);
+		asteroidLoc [6] = new UnityEngine.Vector3 (6250, 3900, 4300);
+		asteroidLoc [7] = new UnityEngine.Vector3 (6750, 3900, 4300);
+		asteroidLoc [8] = new UnityEngine.Vector3 (5750, 3900, 4300);
 		
-		asteroidLoc [9] = new UnityEngine.Vector3 (6750, 4500, 4800);
+		asteroidLoc [9] = new UnityEngine.Vector3 (6750, 4400, 4800);
 		
 		UnityEngine.Vector3 dollPosUnity = asteroidLoc [0] + new UnityEngine.Vector3 (0, 50, 0);
 		transform.position = dollPosUnity;

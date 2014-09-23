@@ -13,6 +13,8 @@ public class UnityConstants
 	public const string playerTransformPath = "/player/graphics";
 	public const string cubeTransformPath = "/octant";
 	public const string selfTransformPath = "/player";
+	public const string minimapCameraPath = "/minimapCamera";
+	
 	public const string dollPath = "/doll";
 	public const string haloPath = "/halo";
 	public const string labelTransformPath = "/label";
