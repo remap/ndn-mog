@@ -1,23 +1,6 @@
 # Readme - Matryoshka
 
-
-July 02, 2013
-by Zening Qu (quzening@remap.ucla.edu)
-
-Dec 30, 2013
-Updated by Zhehao Wang (wangzhehao410305@gmail.com)
-
-May 21, 2014
-Updated by Zhehao Wang (wangzhehao410305@gmail.com)
-
-Sept 09, 2014
-Updated by Zhehao Wang (wanzhehao410305@gmail.com)
-In preparation for ICN 2014 demo. Remote branch set to remap ndn-mog/master by default, refer to that repository for further updates.
-
-Sept 19, 2014
-Updated by Zhehao Wang (wanzhehao410305@gmail.com)
-Added object coloring, tagging, minimap, increased position update frequency, modified position update mechanism.
-Before ICN 2014 demo.
+Matryoshka is an NDN multiplayer online game. The game is tested with OS X >= 10.7 and nfd release-0.2.0.
 
 ## How to Run
 1. nfd-start. For information about nfd, refer to nfd github or redmine site. (The game currently uses nfd-release-0.2.0)
@@ -50,8 +33,8 @@ Before ICN 2014 demo.
 5. hub-prefix: The name prefix of this player, used when testing with hub
 6. update-interval: The milliseconds interval of position update. Default is 40ms. For now, all instances should have the same interval. (They don't necessarily need to be the same, but it will look really weird as info such as producing rate is not being communicated yet)
 
-## Trouble Shooting: Please email wangzhehao410305@gmail.com, and attach logs created in ~/Library/Logs/Unity/*.log if applicable.
-The game is tested with OS X >= 10.7 and nfd release-0.2.0.
+## Trouble Shooting: 
+Please email wangzhehao410305@gmail.com, and attach logs created in ~/Library/Logs/Unity/*.log if applicable.
 Unity build for Mac contains the mono and ndn-dot-net, on which the game depends (Unity's mono being compatible with DotNet 2.0 and no higher).
 1. If the game launches with an unrecognized color, and no labels anywhere, please check if nfd is running.
 2. If after some time, certain players stopped receiving updates, and other players rendered on those instances did not get destroyed (but those players on other instances get destroyed), please email, including network environment and current nfd-status for each localhost/hub if applicable.
@@ -65,3 +48,23 @@ Unity build for Mac contains the mono and ndn-dot-net, on which the game depends
 2. Better strategy for position update
 3. MemoryContentCache implementation for ndn-dot-net, which could improve the performance of position update a lot
 4. Add more action to the game for testing
+
+## Update Log
+
+July 02, 2013
+by Zening Qu (quzening@remap.ucla.edu)
+
+Dec 30, 2013
+Updated by Zhehao Wang (wangzhehao410305@gmail.com)
+
+May 21, 2014
+Updated by Zhehao Wang (wangzhehao410305@gmail.com)
+
+Sept 09, 2014
+Updated by Zhehao Wang (wanzhehao410305@gmail.com)
+In preparation for ICN 2014 demo. Remote branch set to remap ndn-mog/master by default, refer to that repository for further updates.
+
+Sept 19, 2014
+Updated by Zhehao Wang (wanzhehao410305@gmail.com)
+Added object coloring, tagging, minimap, increased position update frequency, modified position update mechanism.
+Before ICN 2014 demo.
