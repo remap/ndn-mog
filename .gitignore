@@ -1,6 +1,6 @@
-*
-!*/
+/*
+/*/
 !*.cs
 !.gitignore
 !README.md
-!Build/
+!/Build/
