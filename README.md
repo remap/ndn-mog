@@ -34,10 +34,11 @@ Matryoshka is an NDN multiplayer online game. The game is tested with OS X >= 10
 6. update-interval: The milliseconds interval of position update. Default is 40ms. For now, all instances should have the same interval. (They don't necessarily need to be the same, but it will look really weird as info such as producing rate is not being communicated yet)
 
 ## Trouble Shooting: 
-Please email wangzhehao410305@gmail.com, and attach logs created in ~/Library/Logs/Unity/*.log if applicable.
-Unity build for Mac contains the mono and ndn-dot-net, on which the game depends (Unity's mono being compatible with DotNet 2.0 and no higher).
 1. If the game launches with an unrecognized color, and no labels anywhere, please check if nfd is running.
 2. If after some time, certain players stopped receiving updates, and other players rendered on those instances did not get destroyed (but those players on other instances get destroyed), please email, including network environment and current nfd-status for each localhost/hub if applicable.
+
+## Problem Reporting:
+Please email wangzhehao410305@gmail.com, and attach logs created in ~/Library/Logs/Unity/*.log if applicable.
 
 ## Known Issue
 1. Player sometimes crashes through asteroids when flying too fast or trying to land on a lower height
