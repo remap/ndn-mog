@@ -9,7 +9,7 @@ public class Movement : MonoBehaviour
 	public static float gravity = 10F;
 	public static float autoflyspeed = 0.5F;
 	public static float flyspeedstep = 0.05F;
-	public static float flyspeedlimit = 5f;
+	public static float flyspeedlimit = 3f;
 	
 	
 	public enum Mode

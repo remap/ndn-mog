@@ -48,8 +48,6 @@ public class Initialize : MonoBehaviour
 	
 	// The static array of asteroids, used as a substitute for retrieving airport data from lioncub
 	public Transform[] asteroids;
-	// Populate the world to ten trees in different octants.
-	public const int treeNum = 10;
 	
 	public remap.NDNMOG.DiscoveryModule.Vector3 selfLocation = new remap.NDNMOG.DiscoveryModule.Vector3 (0, 0, 0);
 	public Transform selfTransform;
@@ -104,6 +102,13 @@ public class Initialize : MonoBehaviour
 							hubPrefix = name [1];
 						}
 					}
+					if (s.Contains("update-interval")) {
+						string[] name = s.Split(':');
+						int milliseconds = 0;
+						if (name.Length > 0 && int.TryParse(name[1], out milliseconds)) {
+							Constants.setPositionIntervalMilliseconds(milliseconds);
+						}
+					}
 				}
 			}
 			return true;
@@ -130,7 +135,7 @@ public class Initialize : MonoBehaviour
 			
 			// Whenever there's an octant being instantiated, enable the asteroid that's in there
 			List<int> octList = CommonUtility.getOctantIndicesFromVector3 (new remap.NDNMOG.DiscoveryModule.Vector3 (x, y, z));
-			for (int i = 0; i < treeNum; i++) {
+			for (int i = 0; i < UnityConstants.treeNum * UnityConstants.scenarioNum; i++) {
 				if (inOct ((int)asteroids [i].position.x, (int)asteroids [i].position.y, (int)asteroids [i].position.z, octList)) {
 					toggleVisibility (asteroids [i], true);
 				}
@@ -151,7 +156,7 @@ public class Initialize : MonoBehaviour
 			
 			// Whenever there's an octant being destroyed, disable the asteroid that's in there
 			List<int> octList = CommonUtility.getOctantIndicesFromVector3 (new remap.NDNMOG.DiscoveryModule.Vector3 (x + 256, y + 256, z + 256));
-			for (int i = 0; i < treeNum; i++) {
+			for (int i = 0; i < UnityConstants.treeNum * UnityConstants.scenarioNum; i++) {
 				if (inOct ((int)asteroids [i].position.x, (int)asteroids [i].position.y, (int)asteroids [i].position.z, octList)) {
 					toggleVisibility (asteroids [i], false);
 				}
@@ -189,8 +194,38 @@ public class Initialize : MonoBehaviour
 		}
 	}
 	
+	// Populates the world with asteroids of predefined locations; and decide if they should be enabled according to startingOct
+	public void populateAsteroids(List<int> startingOct)
+	{
+		UnityEngine.Vector3 [] asteroidLocOne = new UnityEngine.Vector3[UnityConstants.treeNum];
+		UnityEngine.Vector3 [] asteroidLocTwo = new UnityEngine.Vector3[UnityConstants.treeNum];
+		asteroids = new Transform[UnityConstants.treeNum * UnityConstants.scenarioNum];
+		
+		// for the demo, the trick is that asteroids are statically located in fixed positions.
+		for (int i = 0; i < UnityConstants.treeNum; i++) {
+			asteroidLocOne [i] = UnityConstants.startingLocOne + UnityConstants.asteroidOffset[i];
+			asteroidLocTwo [i] = UnityConstants.startingLocTwo + UnityConstants.asteroidOffset[i];
+		}
+		
+		for (int i = 0; i < UnityConstants.treeNum; i++) {
+			asteroids [i] = AsteroidInstantiate.MakeAnAsteroid ("asteroid" + i.ToString (), asteroidLocOne [i], true);
+			if (!inOct ((int)asteroids [i].position.x, (int)asteroids [i].position.y, (int)asteroids [i].position.z, startingOct)) {
+				toggleVisibility (asteroids [i], false);
+			}
+		}
+		for (int i = UnityConstants.treeNum; i < UnityConstants.treeNum * UnityConstants.scenarioNum; i++) {
+			asteroids [i] = AsteroidInstantiate.MakeAnAsteroid ("asteroid" + i.ToString (), asteroidLocTwo [i - UnityConstants.treeNum], true);
+			if (!inOct ((int)asteroids [i].position.x, (int)asteroids [i].position.y, (int)asteroids [i].position.z, startingOct)) {
+				toggleVisibility (asteroids [i], false);
+			}
+		}
+		
+	}
+	
 	public void Start ()
 	{
+		UnityConstants.init();
+		
 		selfTransform = GameObject.Find (UnityConstants.selfTransformPath).transform;
 		playersParentTransform = GameObject.Find(UnityConstants.playerParentPath).transform;
 		
@@ -202,37 +237,12 @@ public class Initialize : MonoBehaviour
 		playerTransform = GameObject.Find (UnityConstants.playerTransformPath).transform;
 		cubeTransform = GameObject.Find (UnityConstants.cubeTransformPath).transform;
 		
-		UnityEngine.Vector3 [] asteroidLoc = new UnityEngine.Vector3[treeNum];
-		asteroids = new Transform[treeNum];
-		
-		// for the demo, the trick is that asteroids are statically located in fixed positions.
-		asteroidLoc [0] = new UnityEngine.Vector3 (6750, 3900, 4800);
-		asteroidLoc [1] = new UnityEngine.Vector3 (6250, 3900, 4800);
-		asteroidLoc [2] = new UnityEngine.Vector3 (5750, 3900, 4800);
-		
-		asteroidLoc [3] = new UnityEngine.Vector3 (6750, 3900, 5300);
-		asteroidLoc [4] = new UnityEngine.Vector3 (6250, 3900, 5300);
-		asteroidLoc [5] = new UnityEngine.Vector3 (5750, 3900, 5300);
-		
-		asteroidLoc [6] = new UnityEngine.Vector3 (6250, 3900, 4300);
-		asteroidLoc [7] = new UnityEngine.Vector3 (6750, 3900, 4300);
-		asteroidLoc [8] = new UnityEngine.Vector3 (5750, 3900, 4300);
-		
-		asteroidLoc [9] = new UnityEngine.Vector3 (6750, 4400, 4800);
-		
-		UnityEngine.Vector3 dollPosUnity = asteroidLoc [0] + new UnityEngine.Vector3 (0, 50, 0);
+		UnityEngine.Vector3 dollPosUnity = UnityConstants.startingLocOne;
 		transform.position = dollPosUnity;
 		
 		remap.NDNMOG.DiscoveryModule.Vector3 dollPos = new remap.NDNMOG.DiscoveryModule.Vector3 (dollPosUnity.x, dollPosUnity.y, dollPosUnity.z);
-		
 		List<int> startingOct = CommonUtility.getOctantIndicesFromVector3 (dollPos);
-		
-		for (int i = 0; i < treeNum; i++) {
-			asteroids [i] = AsteroidInstantiate.MakeAnAsteroid ("asteroid" + i.ToString (), asteroidLoc [i], true);
-			if (!inOct ((int)asteroids [i].position.x, (int)asteroids [i].position.y, (int)asteroids [i].position.z, startingOct)) {
-				toggleVisibility (asteroids [i], false);
-			}
-		}
+		populateAsteroids(startingOct);
 		
 		log = new Logging (playerName, UnityConstants.gameLogName, UnityConstants.libraryLogName);
 		if (!readConfFromFile (UnityConstants.configFilePath)) {
@@ -371,6 +381,27 @@ public class Initialize : MonoBehaviour
 	
 	public void Update ()
 	{
+		if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
+			if (Input.GetKeyDown(KeyCode.Alpha1)) {
+				Movement.autoflyspeed = 0F;
+				selfTransform.localPosition = UnityConstants.startingLocOne;
+				trackOctant (CommonUtility.getOctantIndicesFromVector3
+					(new remap.NDNMOG.DiscoveryModule.Vector3(UnityConstants.startingLocOne.x, UnityConstants.startingLocOne.y, UnityConstants.startingLocOne.z)));
+			}
+			else if (Input.GetKeyDown(KeyCode.Alpha2)) {
+				Movement.autoflyspeed = 0F;
+				selfTransform.localPosition = UnityConstants.startingLocTwo;
+				trackOctant (CommonUtility.getOctantIndicesFromVector3
+					(new remap.NDNMOG.DiscoveryModule.Vector3(UnityConstants.startingLocTwo.x, UnityConstants.startingLocTwo.y, UnityConstants.startingLocTwo.z)));
+			}
+			else if (Input.GetKeyDown(KeyCode.Alpha3)) {
+				Movement.autoflyspeed = 0F;
+				selfTransform.localPosition = UnityConstants.startingLocThree;
+				trackOctant (CommonUtility.getOctantIndicesFromVector3
+					(new remap.NDNMOG.DiscoveryModule.Vector3(UnityConstants.startingLocThree.x, UnityConstants.startingLocThree.y, UnityConstants.startingLocThree.z)));
+			}
+		}
+		
 		selfLocation.x_ = selfTransform.localPosition.x;
 		selfLocation.y_ = selfTransform.localPosition.y;
 		selfLocation.z_ = selfTransform.localPosition.z;

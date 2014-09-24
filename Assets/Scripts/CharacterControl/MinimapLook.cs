@@ -19,7 +19,6 @@ using System.Collections;
 /// the step of attaching it to Character and use X for Character does the trick for looking left and right
 /// and the last step of attaching it to Camera and use Y for Camera does the trick for looking up and down
 
-[AddComponentMenu("Camera-Control/Mouse Look")]
 public class MinimapLook : MonoBehaviour {
 	public Transform Target;
 	
