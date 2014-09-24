@@ -1,0 +1,6 @@
+name:a
+instance:1
+logging-level:none
+render-string:red
+hub-prefix:ndn/edu/ucla/remap/apps/Matryoshka
+update-interval:40

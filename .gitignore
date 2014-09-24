@@ -3,3 +3,4 @@
 !*.cs
 !.gitignore
 !README.md
+!Build/
