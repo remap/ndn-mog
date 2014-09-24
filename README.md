@@ -3,9 +3,10 @@
 Matryoshka is an NDN multiplayer online game. The game is tested with OS X >= 10.7 and nfd release-0.2.0.
 
 ## How to Run
-1. nfd-start. For information about nfd, refer to nfd github or redmine site. (The game currently uses nfd-release-0.2.0)
-2. nfdc the hub you want to connect to, or the other player's nfd; for now the app uses /ndn/broadcast namespace(ideally the strategy for that face should be broadcast); and a customizable player namespace.
-3. double click the app, for now, please run on '640 * 480' and 'fastest'.
+1. Please put the config file and the app in the same folder.
+2. nfd-start.
+3. nfdc the hub you want to connect to, or the other player's nfd; for now the app uses /ndn/broadcast namespace(ideally the strategy for that face should be broadcast); and a customizable player namespace.
+4. double click the app, for now, please run on '640 * 480' and 'fastest'.
 
 ## What to See
 1. Your avatar created on one asteroid. 
@@ -35,7 +36,7 @@ Matryoshka is an NDN multiplayer online game. The game is tested with OS X >= 10
 
 ## Trouble Shooting: 
 1. If the game launches with an unrecognized color, and no labels anywhere, please check if nfd is running.
-2. If after some time, certain players stopped receiving updates, and other players rendered on those instances did not get destroyed (but those players on other instances get destroyed), please email, including network environment and current nfd-status for each localhost/hub if applicable.
+2. If after some time, certain players stopped receiving updates, and other players rendered on those instances did not get destroyed (but those players on other instances get destroyed), please restart...and email, including network environment and current nfd-status for each localhost/hub, if possible.
 
 ## Problem Reporting:
 Please email wangzhehao410305@gmail.com, and attach logs created in ~/Library/Logs/Unity/*.log if applicable.
