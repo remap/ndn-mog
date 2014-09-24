@@ -128,7 +128,7 @@ public class Initialize : MonoBehaviour
 			UnityEngine.Vector3 locationUnity = new UnityEngine.Vector3 (x, y, z);
 			Transform cube = Instantiate (cubeTransform, locationUnity, Quaternion.identity) as Transform;
 			
-			cube.Find(UnityConstants.labelTransformPath.TrimStart('/')).guiText.text = name;
+			cube.Find(UnityConstants.labelTransformPath.TrimStart('/')).guiText.text = name.Substring(UnityConstants.minimapPrefix.Length);
 			cube.name = name;
 			cube.renderer.material.SetColor ("_Color", new Color (0.5f, 0.5f, 0.5f, 0.5f));
 			cube.renderer.material.shader = Shader.Find ("Transparent/Diffuse");
